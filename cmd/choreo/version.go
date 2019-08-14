@@ -14,26 +14,26 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo/components/cli/pkg/version"
 )
 
-func main() {
-
-	cmd := cobra.Command{
-		Use: "choreo <command>",
-		Short: "Manage integration applications with Choreo platform",
-	}
-
-	cmd.AddCommand(newVersionCommand())
-
-	if err := cmd.Execute(); err != nil {
-		exitWithErrorMessage("Error executing choreo command", err)
+func newVersionCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:                        "version",
+		Short:                      "Get Choreo client version information",
+		Example:                    "choreo version",
+		Args:                       cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			runVersion()
+		},
 	}
 }
- 
-func exitWithErrorMessage(message string, err error) {
-	fmt.Printf("\n\n%s: %v\n\n", message, err)
-	os.Exit(1)
+
+func runVersion() {
+	fmt.Printf(" Version:\t\t%s\n", version.GetBuildVersion())
+	fmt.Printf(" Git commit:\t\t%s\n", version.GetBuildGitRevision())
+	fmt.Printf(" Built:\t\t\t%s\n", version.GetBuildTime())
+	fmt.Printf(" OS/Arch::\t\t%s\n", version.GetBuildPlatform())
 }

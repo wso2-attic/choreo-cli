@@ -10,30 +10,28 @@
  * WSO2 governing the purchase of this software and any associated services.
  */
 
-package main
+package version
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/spf13/cobra"
+// Values for the following variables will provided at compile time using the -ldflags option.
+var (
+	buildVersion     = "unknown"
+	buildGitRevision = "unknown"
+	buildTime        = "unknown"
+	buildPlatform = "unknown"
 )
 
-func main() {
-
-	cmd := cobra.Command{
-		Use: "choreo <command>",
-		Short: "Manage integration applications with Choreo platform",
-	}
-
-	cmd.AddCommand(newVersionCommand())
-
-	if err := cmd.Execute(); err != nil {
-		exitWithErrorMessage("Error executing choreo command", err)
-	}
+func GetBuildVersion() string {
+	return buildVersion
 }
- 
-func exitWithErrorMessage(message string, err error) {
-	fmt.Printf("\n\n%s: %v\n\n", message, err)
-	os.Exit(1)
+
+func GetBuildGitRevision() string {
+	return buildGitRevision
+}
+
+func GetBuildTime() string {
+	return buildTime
+}
+
+func GetBuildPlatform() string {
+	return buildPlatform
 }
