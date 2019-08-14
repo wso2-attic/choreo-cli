@@ -13,19 +13,11 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
+	"fmt"
+	"os"
 )
 
-func main() {
-
-	cmd := cobra.Command{
-		Use: "choreo <command>",
-		Short: "Manage integration applications with Choreo platform",
-	}
-
-	cmd.AddCommand(newVersionCommand())
-
-	if err := cmd.Execute(); err != nil {
-		exitWithErrorMessage("Error executing choreo command", err)
-	}
+func exitWithErrorMessage(message string, err error) {
+	fmt.Printf("\n\n%s: %v\n\n", message, err)
+	os.Exit(1)
 }
