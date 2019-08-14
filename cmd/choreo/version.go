@@ -16,7 +16,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo/components/cli/pkg/version"
+	"github.com/wso2/choreo/components/cli/pkg/build"
 )
 
 func newVersionCommand() *cobra.Command {
@@ -32,8 +32,8 @@ func newVersionCommand() *cobra.Command {
 }
 
 func runVersion() {
-	fmt.Printf(" Version:\t\t%s\n", version.GetBuildVersion())
-	fmt.Printf(" Git commit:\t\t%s\n", version.GetBuildGitRevision())
-	fmt.Printf(" Built:\t\t\t%s\n", version.GetBuildTime())
-	fmt.Printf(" OS/Arch::\t\t%s\n", version.GetBuildPlatform())
+	fmt.Printf(" Version:\t\t%s\n", build.GetBuildVersion())
+	fmt.Printf(" Git commit:\t\t%s\n", build.GetBuildGitRevision())
+	fmt.Printf(" Built:\t\t\t%s\n", build.GetBuildTime())
+	fmt.Printf(" OS/Arch::\t\t%s\n", build.GetBuildPlatform())
 }
