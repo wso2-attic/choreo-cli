@@ -17,7 +17,7 @@ var (
 	buildVersion     = "unknown"
 	buildGitRevision = "unknown"
 	buildTime        = "unknown"
-	buildPlatform = "unknown"
+	buildPlatform    = "unknown"
 )
 
 func GetBuildVersion() string {
