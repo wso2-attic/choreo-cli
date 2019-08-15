@@ -25,15 +25,13 @@ func newVersionCommand() *cobra.Command {
 		Short:                      "Get Choreo client version information",
 		Example:                    "choreo version",
 		Args:                       cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			runVersion()
-		},
+		Run: runVersion,
 	}
 }
 
-func runVersion() {
+func runVersion(cmd *cobra.Command, args []string) {
 	fmt.Printf(" Version:\t\t%s\n", build.GetBuildVersion())
 	fmt.Printf(" Git commit:\t\t%s\n", build.GetBuildGitRevision())
 	fmt.Printf(" Built:\t\t\t%s\n", build.GetBuildTime())
-	fmt.Printf(" OS/Arch::\t\t%s\n", build.GetBuildPlatform())
+	fmt.Printf(" OS/Arch:\t\t%s\n", build.GetBuildPlatform())
 }
