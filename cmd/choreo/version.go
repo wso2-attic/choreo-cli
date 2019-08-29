@@ -21,11 +21,11 @@ import (
 
 func newVersionCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:                        "version",
-		Short:                      "Get Choreo client version information",
-		Example:                    "choreo version",
-		Args:                       cobra.NoArgs,
-		Run: runVersion,
+		Use:     "version",
+		Short:   "Get " + productName + " client version information",
+		Example: getAbsoluteCommandName("version"),
+		Args:    cobra.NoArgs,
+		Run:     runVersion,
 	}
 }
 

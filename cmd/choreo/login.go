@@ -16,17 +16,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() {
-
-	cmd := cobra.Command{
-		Use: "choreo <command>",
-		Short: "Manage integration applications with Choreo platform",
+func newLoginCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "login",
+		Short:   "Login the user to " + productName,
+		Example: getAbsoluteCommandName("login"),
+		Args:    cobra.NoArgs,
+		Run:     runLogin,
 	}
+}
 
-	cmd.AddCommand(newVersionCommand())
-	cmd.AddCommand(newLoginCommand())
-
-	if err := cmd.Execute(); err != nil {
-		exitWithErrorMessage("Error executing choreo command", err)
-	}
+func runLogin(cmd *cobra.Command, args []string) {
+	// Add implementation
 }

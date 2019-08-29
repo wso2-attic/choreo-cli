@@ -12,21 +12,5 @@
 
 package main
 
-import (
-	"github.com/spf13/cobra"
-)
-
-func main() {
-
-	cmd := cobra.Command{
-		Use: "choreo <command>",
-		Short: "Manage integration applications with Choreo platform",
-	}
-
-	cmd.AddCommand(newVersionCommand())
-	cmd.AddCommand(newLoginCommand())
-
-	if err := cmd.Execute(); err != nil {
-		exitWithErrorMessage("Error executing choreo command", err)
-	}
-}
+const commandRoot = "choreo"
+const productName = "Choreo"
