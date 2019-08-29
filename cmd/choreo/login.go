@@ -19,7 +19,7 @@ import (
 func newLoginCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
-		Short:   "Login the user to " + productName,
+		Short:   "Login to " + productName,
 		Example: getAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
 		Run:     runLogin,
