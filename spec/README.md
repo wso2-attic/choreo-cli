@@ -30,15 +30,19 @@ When someone is dealing with high level objects, Choreo CLI uses *noun-verb* par
 
 ![local-run](assets/images/local-run.png) 
 
-`$git clone http://github.com/<user_name>/<app_name>.git`\
-`$cd <app_name>`\
-`$chor login`
+```
+$git clone http://github.com/<user_name>/<app_name>.git
+$cd <app_name>
+$chor login
+```
 
 >Login to id.choreo.dev - *this is a one time thing*
 
 >Also think about “$chor login -i” to provide un/pw through cli itself with a multi-factor auth possibly (backlog item)
 
-`$chor application create <app_name>`
+```
+$chor application create <app_name>
+```
 
 >Create the app in Choreo
 
@@ -46,16 +50,21 @@ When someone is dealing with high level objects, Choreo CLI uses *noun-verb* par
 
 >This will initialize the app with Choreo specific environment descriptor (for instrumentation etc.)
 
-`$git add <new files>`
+```
+$git add <new files>
+```
 
 >$chor create have added new files to the app dir\
 
-`$git commit -m”new files and changes”`\
-`$git push origin master`
-
+```
+$git commit -m”new files and changes”
+$git push origin master
+```
 >Assuming the dev is working on the master
 
-`$chor local run <app_name>`
+```
+$chor local run <app_name>
+```
 
 >This is to run the application locally.
 
@@ -65,13 +74,17 @@ When someone is dealing with high level objects, Choreo CLI uses *noun-verb* par
 
 ![dev-ops](assets/images/devops.png) 
 
-`$chor plan create <plan_name> -type aws|gcp|azure`
+```
+$chor plan create <plan_name> -type aws|gcp|azure
+```
 
 >choreo topology plans are created by dev-ops
 
 >Choreo plans are topology plans. These are defined with terraform to setup an environment in IaaSes (aws/gcp/azure/K8s)
 
-`$chor plan dryrun <plan_name>`
+```
+$chor plan dryrun <plan_name>
+```
 
 >Once you create a the devops should be able to do a dryrun of this
 
@@ -81,51 +94,71 @@ When someone is dealing with high level objects, Choreo CLI uses *noun-verb* par
 
 >… dev-ops flow above 
 
-`$git clone http://github.com/<user_name>/<app_name>.git`\
-`$cd <app_name>`\
-`$chor login`
+```
+$git clone http://github.com/<user_name>/<app_name>.git`
+$cd <app_name>`
+$chor login`
+```
 
 >Login to id.choreo.dev. *this is a one time thing*
 >*also think about “$chor login -i” to provide un/pw through cli itself with a multi-factor possibly (backlog item)*
 
-`$chor application create <app_name>`
+```
+$chor application create <app_name>
+```
 
 >Create the app in Choreo
 
 >Init the app with choreo specific environment descriptor (for instrumentation etc.)
 
-`$git add <new files>`
+```
+$git add <new files>
+```
 
 >$chor create have added new files to the app dir
 
-`$git commit -m”new files and changes”`\
-`$git push origin master`
+```
+$git commit -m”new files and changes”
+$git push origin master
+```
 
 >Assuming the dev is working on the master
 
-`$chor environment create <env_name> -plan <plan_name>`
+```
+$chor environment create <env_name> -plan <plan_name>
+```
 
 >Create an environment remotely in choreo cloud
 
 >When creating an environment devs can link a topology plan (which is pre-configured), based on the plan then the environment will be setup in the chosen IaaS
 
-`$chor environment link <env_name>`
+```
+$chor environment link <env_name>
+```
 
 >This links working source branch of the current app
 
-`$chor environment link <env_name> -b <upstream/featurebranch1>`
+```
+$chor environment link <env_name> -b <upstream/featurebranch1>
+```
 
 >This links specific source branch of the current app
 
-`$chor environment start|stop|restart <env_name>`
+```
+$chor environment start|stop|restart <env_name>
+```
 
 >This starts the app in the environment
 
-`$chor environment destroy <env_name>`
+```
+$chor environment destroy <env_name>
+```
 
 >This removes the environment
 
-`$chor logs tail <env_name>`
+```
+$chor logs tail <env_name>
+```
 
 >Similarly we need to get tracing through cli
 
