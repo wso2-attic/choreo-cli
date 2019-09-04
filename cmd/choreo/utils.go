@@ -27,6 +27,6 @@ func exitWithError(message string, err error) {
 }
 
 func exitWithErrorMessage(message string) {
-	fmt.Println(message)
+	fmt.Printf("\n\n%s\n\n", message)
 	os.Exit(1)
 }
