@@ -17,10 +17,10 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/oauth2"
 )
 
 func newLoginCommand() *cobra.Command {
@@ -49,34 +49,45 @@ func getAccessToken(authCode string) string {
 }
 
 func getAuthCode() string {
-	log.Printf("Requesting credentials through browser")
-	const callBackDefaultPort = 8888
-	const callbackUrlContext = "/auth"
-	const callBackUrl = "http://localhost:%d" + callbackUrlContext
-	const idpUrlPrefix = "https://id.choreo.io/sdk/fidp-select?redirectUrl="
+	const (
+		callBackDefaultPort = 8888
+		callbackUrlContext  = "/auth"
+	)
 
 	codeServicePort := getFirstOpenPort(callBackDefaultPort)
-	redirectUrl := url.QueryEscape(fmt.Sprintf(callBackUrl, codeServicePort))
-	hubAuthUrl := idpUrlPrefix + redirectUrl
-	log.Println("Callback URL: " + hubAuthUrl)
 
-	authCodeChannel := make(chan string)
-	go listenForAuthCode(getBindAddress(codeServicePort), callbackUrlContext, authCodeChannel)
+	authCodeChannel := startAuthCodeReceivingService(codeServicePort, callbackUrlContext)
+
+	openBrowserForAuthentication(callbackUrlContext, codeServicePort)
+
 	authCode := <-authCodeChannel
 
 	return authCode
 }
 
-func getBindAddress(port int) string {
-	return ":" + strconv.Itoa(port)
+func startAuthCodeReceivingService(port int, urlContext string) chan string {
+	authCodeChannel := make(chan string)
+	go listenForAuthCode(getLocalBindAddress(port), urlContext, authCodeChannel)
+	return authCodeChannel
 }
 
-func getFirstOpenPort(startingPort int) int {
-	port := startingPort
-	for connection, err := net.Dial("tcp", getBindAddress(port)); err == nil; port++ {
-		_ = connection.Close()
+func openBrowserForAuthentication(context string, port int) {
+	callBackUrlTemplate := "http://localhost:%d" + context
+	redirectUrl := fmt.Sprintf(callBackUrlTemplate, port)
+	hubAuthUrl := getHubUrl(redirectUrl)
+	log.Println("Callback URL: " + hubAuthUrl)
+}
+
+func getHubUrl(redirectUrl string) string {
+	conf := &oauth2.Config{
+		ClientID: clientId,
+		RedirectURL: redirectUrl,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:   authUrl,
+		},
 	}
-	return port
+
+	return conf.AuthCodeURL("state")
 }
 
 func listenForAuthCode(addrString string, callbackUrlContext string, authCodeChannel chan<- string) {
@@ -102,4 +113,16 @@ func listenForAuthCode(addrString string, callbackUrlContext string, authCodeCha
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		exitWithError("Error while initializing auth code accepting service", err)
 	}
+}
+
+func getLocalBindAddress(port int) string {
+	return ":" + strconv.Itoa(port)
+}
+
+func getFirstOpenPort(startingPort int) int {
+	port := startingPort
+	for connection, err := net.Dial("tcp", getLocalBindAddress(port)); err == nil; port++ {
+		_ = connection.Close()
+	}
+	return port
 }

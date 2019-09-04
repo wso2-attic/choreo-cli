@@ -12,5 +12,10 @@
 
 package main
 
-const commandRoot = "choreo"
-const productName = "Choreo"
+const (
+	commandRoot = "choreo"
+	productName = "Choreo"
+
+	authUrl     = "https://id.development.choreo.dev/oauth2/authorize"
+	clientId    = "TWDoWpGu5IKwvnhSS6ak4UP0Tcsa"
+)
