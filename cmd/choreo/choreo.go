@@ -26,6 +26,6 @@ func main() {
 	cmd.AddCommand(newVersionCommand())
 
 	if err := cmd.Execute(); err != nil {
-		exitWithErrorMessage("Error executing choreo command", err)
+		exitWithError("Error executing choreo command", err)
 	}
 }
