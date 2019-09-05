@@ -16,7 +16,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo/components/cli/pkg/build"
+	"github.com/wso2/choreo/components/cli/internal/pkg/build"
 )
 
 func newVersionCommand() *cobra.Command {
