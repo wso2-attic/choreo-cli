@@ -14,7 +14,9 @@ package common
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"strconv"
 )
 
 func GetAbsoluteCommandName(command string) string {
@@ -29,4 +31,16 @@ func ExitWithError(message string, err error) {
 func ExitWithErrorMessage(message string) {
 	fmt.Printf("\n\n%s\n\n", message)
 	os.Exit(1)
+}
+
+func GetLocalBindAddress(port int) string {
+	return ":" + strconv.Itoa(port)
+}
+
+func GetFirstOpenPort(startingPort int) int {
+	port := startingPort
+	for connection, err := net.Dial("tcp", GetLocalBindAddress(port)); err == nil; port++ {
+		_ = connection.Close()
+	}
+	return port
 }

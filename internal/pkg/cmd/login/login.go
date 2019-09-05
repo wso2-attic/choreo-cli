@@ -15,9 +15,7 @@ package login
 import (
 	"fmt"
 	"log"
-	"net"
 	"net/http"
-	"strconv"
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
@@ -50,7 +48,7 @@ func getAccessToken(authCode string) string {
 }
 
 func getAuthCode() string {
-	codeServicePort := getFirstOpenPort(callBackDefaultPort)
+	codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
 
 	authCodeChannel := startAuthCodeReceivingService(codeServicePort, callbackUrlContext)
 
@@ -63,7 +61,7 @@ func getAuthCode() string {
 
 func startAuthCodeReceivingService(port int, urlContext string) chan string {
 	authCodeChannel := make(chan string)
-	go listenForAuthCode(getLocalBindAddress(port), urlContext, authCodeChannel)
+	go listenForAuthCode(common.GetLocalBindAddress(port), urlContext, authCodeChannel)
 	return authCodeChannel
 }
 
@@ -109,16 +107,4 @@ func listenForAuthCode(addrString string, callbackUrlContext string, authCodeCha
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		common.ExitWithError("Error while initializing auth code accepting service", err)
 	}
-}
-
-func getLocalBindAddress(port int) string {
-	return ":" + strconv.Itoa(port)
-}
-
-func getFirstOpenPort(startingPort int) int {
-	port := startingPort
-	for connection, err := net.Dial("tcp", getLocalBindAddress(port)); err == nil; port++ {
-		_ = connection.Close()
-	}
-	return port
 }
