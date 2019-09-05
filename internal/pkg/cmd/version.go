@@ -10,22 +10,23 @@
  * WSO2 governing the purchase of this software and any associated services.
  */
 
-package main
+package cmd
 
 import (
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo/components/cli/internal/pkg/build"
+	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
 )
 
-func newVersionCommand() *cobra.Command {
+func NewVersionCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:                        "version",
-		Short:                      "Get Choreo client version information",
-		Example:                    "choreo version",
-		Args:                       cobra.NoArgs,
-		Run: runVersion,
+		Use:     "version",
+		Short:   "Get " + common.ProductName + " client version information",
+		Example: common.GetAbsoluteCommandName("version"),
+		Args:    cobra.NoArgs,
+		Run:     runVersion,
 	}
 }
 

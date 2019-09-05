@@ -10,19 +10,23 @@
  * WSO2 governing the purchase of this software and any associated services.
  */
 
-package main
+package common
 
 import (
 	"fmt"
 	"os"
 )
 
-func exitWithError(message string, err error) {
+func GetAbsoluteCommandName(command string) string {
+	return commandRoot + " " + command
+}
+
+func ExitWithError(message string, err error) {
 	fmt.Printf("\n\n%s: %v\n\n", message, err)
 	os.Exit(1)
 }
 
-func exitWithErrorMessage(message string) {
+func ExitWithErrorMessage(message string) {
 	fmt.Printf("\n\n%s\n\n", message)
 	os.Exit(1)
 }
