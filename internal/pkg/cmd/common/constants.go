@@ -10,25 +10,9 @@
  * WSO2 governing the purchase of this software and any associated services.
  */
 
-package main
+package common
 
-import (
-	"github.com/spf13/cobra"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd"
-	cmdCommon "github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
+const (
+	commandRoot = "choreo"
+	ProductName = "Choreo"
 )
-
-func main() {
-
-	command := cobra.Command{
-		Use:   "choreo <command>",
-		Short: "Manage integration applications with Choreo platform",
-	}
-
-	command.AddCommand(cmd.NewVersionCommand())
-	command.AddCommand(newLoginCommand())
-
-	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError("Error executing choreo command", err)
-	}
-}

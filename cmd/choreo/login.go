@@ -20,6 +20,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
 	"golang.org/x/oauth2"
 )
 
@@ -27,7 +28,7 @@ func newLoginCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
 		Short:   "Login to " + productName,
-		Example: getAbsoluteCommandName("login"),
+		Example: common.GetAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
 		Run:     runLogin,
 	}
@@ -96,14 +97,14 @@ func listenForAuthCode(addrString string, callbackUrlContext string, authCodeCha
 	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
 		if err := request.ParseForm(); err != nil {
 			writer.WriteHeader(http.StatusBadRequest)
-			exitWithError("Error parsing received query parameters", err)
+			common.ExitWithError("Error parsing received query parameters", err)
 		}
 
 		code := request.Form.Get("code")
 
 		if code == "" {
 			writer.WriteHeader(http.StatusBadRequest)
-			exitWithErrorMessage("Blank auth code received from IDP")
+			common.ExitWithErrorMessage("Blank auth code received from IDP")
 		}
 
 		writer.WriteHeader(http.StatusOK)
@@ -111,7 +112,7 @@ func listenForAuthCode(addrString string, callbackUrlContext string, authCodeCha
 	})
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		exitWithError("Error while initializing auth code accepting service", err)
+		common.ExitWithError("Error while initializing auth code accepting service", err)
 	}
 }
 
