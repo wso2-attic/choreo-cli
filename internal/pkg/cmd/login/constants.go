@@ -10,12 +10,11 @@
  * WSO2 governing the purchase of this software and any associated services.
  */
 
-package main
+package login
 
 const (
-	commandRoot = "choreo"
-	productName = "Choreo"
-
+	callbackUrlContext  = "/auth"
+	callBackDefaultPort = 8888
 	authUrl     = "https://id.development.choreo.dev/oauth2/authorize"
 	clientId    = "TWDoWpGu5IKwvnhSS6ak4UP0Tcsa"
 )

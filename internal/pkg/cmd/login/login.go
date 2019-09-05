@@ -10,7 +10,7 @@
  * WSO2 governing the purchase of this software and any associated services.
  */
 
-package main
+package login
 
 import (
 	"fmt"
@@ -24,10 +24,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func newLoginCommand() *cobra.Command {
+func NewLoginCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
-		Short:   "Login to " + productName,
+		Short:   "Login to " + common.ProductName,
 		Example: common.GetAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
 		Run:     runLogin,
@@ -50,11 +50,6 @@ func getAccessToken(authCode string) string {
 }
 
 func getAuthCode() string {
-	const (
-		callBackDefaultPort = 8888
-		callbackUrlContext  = "/auth"
-	)
-
 	codeServicePort := getFirstOpenPort(callBackDefaultPort)
 
 	authCodeChannel := startAuthCodeReceivingService(codeServicePort, callbackUrlContext)
@@ -81,10 +76,10 @@ func openBrowserForAuthentication(context string, port int) {
 
 func getHubUrl(redirectUrl string) string {
 	conf := &oauth2.Config{
-		ClientID: clientId,
+		ClientID:    clientId,
 		RedirectURL: redirectUrl,
 		Endpoint: oauth2.Endpoint{
-			AuthURL:   authUrl,
+			AuthURL: authUrl,
 		},
 	}
 
