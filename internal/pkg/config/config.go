@@ -52,3 +52,9 @@ func loadConfigFile(v *viper.Viper) error {
 	}
 	return nil
 }
+
+func GetConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) func(entry int) string {
+	return func(entry int) string {
+		return cliConfig.GetStringForKeyEntry(configDefinition[entry])
+	}
+}

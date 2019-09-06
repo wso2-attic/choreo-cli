@@ -9,10 +9,19 @@
 
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Config interface {
 	GetString(key string) string
+	GetStringOrDefault(key string, defaultValue string) string
+	GetStringForKeyEntry(key KeyEntry) string
+}
+
+type KeyEntry struct {
+	Key          string
+	DefaultValue string
 }
 
 type ViperConfig struct {
@@ -20,5 +29,18 @@ type ViperConfig struct {
 }
 
 func (cliConfig *ViperConfig) GetString(key string) string {
-	return cliConfig.viperInstance.GetString(key)
+	value := cliConfig.viperInstance.GetString(key)
+	return value
+}
+
+func (cliConfig *ViperConfig) GetStringOrDefault(key string, defaultValue string) string {
+	if value := cliConfig.GetString(key); value != "" {
+		return value
+	} else {
+		return defaultValue
+	}
+}
+
+func (cliConfig *ViperConfig) GetStringForKeyEntry(keyEntry KeyEntry) string {
+	return cliConfig.GetStringOrDefault(keyEntry.Key, keyEntry.DefaultValue)
 }
