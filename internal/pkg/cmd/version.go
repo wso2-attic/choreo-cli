@@ -18,9 +18,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo/components/cli/internal/pkg/build"
 	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo/components/cli/internal/pkg/config"
 )
 
-func NewVersionCommand() *cobra.Command {
+func NewVersionCommand(cliConfig config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
 		Short:   "Get " + common.ProductName + " client version information",
