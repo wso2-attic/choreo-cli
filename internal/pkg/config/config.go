@@ -19,7 +19,7 @@ import (
 
 func InitConfig() (*ViperConfig, error) {
 	config := new(ViperConfig)
-	
+
 	if err := initializeViper(config); err != nil {
 		return nil, err
 	}
@@ -28,17 +28,25 @@ func InitConfig() (*ViperConfig, error) {
 }
 
 func initializeViper(config *ViperConfig) error {
-	v := viper.New()
-	if err := loadConfigFile(v); err != nil {
+	userConfig := viper.New()
+	if err := loadConfigFile(userConfig, userConfigFileName); err != nil {
 		return err
 	}
-	config.viperInstance = v
+	x := &ViperManager{viperInstance: userConfig}
+	config.userConfigManager = x
+
+	envConfig := viper.New()
+	if err := loadConfigFile(envConfig, environmentConfigFileName); err != nil {
+		return err
+	}
+	config.envConfigManager = &ViperManager{viperInstance: envConfig}
+
 	return nil
 }
 
-func loadConfigFile(v *viper.Viper) error {
+func loadConfigFile(v *viper.Viper, configFileName string) error {
 	homeDirectoryLocation, err := homedir.Dir()
-	absoluteConfigFileDirectory := filepath.Join(homeDirectoryLocation, configFileDir, userConfigFileName)
+	absoluteConfigFileDirectory := filepath.Join(homeDirectoryLocation, configFileDir, configFileName)
 	if err != nil {
 		return err
 	}
@@ -51,10 +59,4 @@ func loadConfigFile(v *viper.Viper) error {
 		}
 	}
 	return nil
-}
-
-func GetConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) func(entry int) string {
-	return func(entry int) string {
-		return cliConfig.GetStringForKeyEntry(configDefinition[entry])
-	}
 }

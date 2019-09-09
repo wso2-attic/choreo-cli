@@ -11,5 +11,6 @@ package config
 
 const (
 	userConfigFileName = "config.toml"
+	environmentConfigFileName = "env_config.toml"
 	configFileDir      = ".choreo"
 )

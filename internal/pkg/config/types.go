@@ -14,6 +14,11 @@ import (
 )
 
 type Config interface {
+	Manager
+	GetEnvironmentConfig() Manager
+}
+
+type Manager interface {
 	GetString(key string) string
 	GetStringOrDefault(key string, defaultValue string) string
 	GetStringForKeyEntry(key KeyEntry) string
@@ -25,15 +30,36 @@ type KeyEntry struct {
 }
 
 type ViperConfig struct {
-	viperInstance *viper.Viper
+	userConfigManager *ViperManager
+	envConfigManager *ViperManager
+}
+
+func (cliConfig *ViperConfig) GetEnvironmentConfig() Manager {
+	return cliConfig.envConfigManager
 }
 
 func (cliConfig *ViperConfig) GetString(key string) string {
+	return cliConfig.userConfigManager.GetString(key)
+}
+
+func (cliConfig *ViperConfig) GetStringOrDefault(key string, defaultValue string) string {
+	return cliConfig.userConfigManager.GetStringOrDefault(key, defaultValue)
+}
+
+func (cliConfig *ViperConfig) GetStringForKeyEntry(keyEntry KeyEntry) string {
+	return cliConfig.userConfigManager.GetStringForKeyEntry(keyEntry)
+}
+
+type ViperManager struct {
+	viperInstance *viper.Viper
+}
+
+func (cliConfig *ViperManager) GetString(key string) string {
 	value := cliConfig.viperInstance.GetString(key)
 	return value
 }
 
-func (cliConfig *ViperConfig) GetStringOrDefault(key string, defaultValue string) string {
+func (cliConfig *ViperManager) GetStringOrDefault(key string, defaultValue string) string {
 	if value := cliConfig.GetString(key); value != "" {
 		return value
 	} else {
@@ -41,6 +67,6 @@ func (cliConfig *ViperConfig) GetStringOrDefault(key string, defaultValue string
 	}
 }
 
-func (cliConfig *ViperConfig) GetStringForKeyEntry(keyEntry KeyEntry) string {
+func (cliConfig *ViperManager) GetStringForKeyEntry(keyEntry KeyEntry) string {
 	return cliConfig.GetStringOrDefault(keyEntry.Key, keyEntry.DefaultValue)
 }
