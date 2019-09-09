@@ -9,9 +9,24 @@
 
 package config
 
-const (
-	userConfigFileName          = "config.toml"
-	environmentConfigFileName   = "env_config.toml"
-	configFileDir               = ".choreo"
-	enableEnvConfigPropertyName = "CHOREO_OVERRIDE_ENVIRONMENT_DEFAULTS"
+import (
+	"os"
+	"strconv"
 )
+
+func getEnvAsBool(name string, defaultValue bool) bool {
+	valStr := getEnv(name, "")
+	if val, err := strconv.ParseBool(valStr); err == nil {
+		return val
+	}
+
+	return defaultValue
+}
+
+func getEnv(key string, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+
+	return defaultValue
+}

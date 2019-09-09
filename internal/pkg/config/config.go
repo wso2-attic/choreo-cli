@@ -32,12 +32,13 @@ func initializeViper(config *ViperConfig) error {
 	if err := loadConfigFile(userConfig, userConfigFileName); err != nil {
 		return err
 	}
-	x := &ViperManager{viperInstance: userConfig}
-	config.userConfigManager = x
+	config.userConfigManager = &ViperManager{viperInstance: userConfig}
 
 	envConfig := viper.New()
-	if err := loadConfigFile(envConfig, environmentConfigFileName); err != nil {
-		return err
+	if getEnvAsBool(enableEnvConfigPropertyName, false) {
+		if err := loadConfigFile(envConfig, environmentConfigFileName); err != nil {
+			return err
+		}
 	}
 	config.envConfigManager = &ViperManager{viperInstance: envConfig}
 
