@@ -14,13 +14,14 @@ package main
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
 )
 
 func newLoginCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
 		Short:   "Login to " + productName,
-		Example: getAbsoluteCommandName("login"),
+		Example: common.GetAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
 		Run:     runLogin,
 	}
