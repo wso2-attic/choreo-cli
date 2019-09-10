@@ -7,9 +7,11 @@
  * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
-package common
+package config
 
 const (
-	commandRoot = "choreo"
-	ProductName = "Choreo"
+	userConfigFileName          = "config.toml"
+	environmentConfigFileName   = "env_config.toml"
+	configFileDir               = ".choreo"
+	enableEnvConfigPropertyName = "CHOREO_OVERRIDE_ENVIRONMENT_DEFAULTS"
 )

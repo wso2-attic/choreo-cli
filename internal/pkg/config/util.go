@@ -7,9 +7,26 @@
  * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
-package common
+package config
 
-const (
-	commandRoot = "choreo"
-	ProductName = "Choreo"
+import (
+	"os"
+	"strconv"
 )
+
+func getEnvAsBool(name string, defaultValue bool) bool {
+	valStr := getEnv(name, "")
+	if val, err := strconv.ParseBool(valStr); err == nil {
+		return val
+	}
+
+	return defaultValue
+}
+
+func getEnv(key string, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+
+	return defaultValue
+}
