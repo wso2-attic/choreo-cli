@@ -13,8 +13,8 @@
 package login
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -33,8 +33,13 @@ func NewLoginCommand() *cobra.Command {
 }
 
 func runLogin(cmd *cobra.Command, args []string) {
-	authCode := getAuthCode()
-	accessToken := getAccessToken(authCode)
+	authCode, oauth2Conf := getAuthCode()
+
+	accessToken, err := getAccessToken(authCode, oauth2Conf)
+	if err != nil {
+		common.ExitWithError("Could not get an access token", err)
+	}
+
 	persistAccessToken(accessToken)
 }
 
@@ -42,21 +47,26 @@ func persistAccessToken(accessToken string) {
 	panic("persistAccessToken Method not implemented")
 }
 
-func getAccessToken(authCode string) string {
-	log.Println("Received: " + authCode)
-	panic("getAccessToken Method not implemented")
+func getAccessToken(authCode string, conf *oauth2.Config) (string, error) {
+	token, err := conf.Exchange(context.Background(), authCode)
+
+	if err == nil {
+		return token.AccessToken, nil
+	} else {
+		return "", err
+	}
 }
 
-func getAuthCode() string {
+func getAuthCode() (string, *oauth2.Config) {
 	codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
 
 	authCodeChannel := startAuthCodeReceivingService(codeServicePort, callbackUrlContext)
 
-	openBrowserForAuthentication(callbackUrlContext, codeServicePort)
+	oauth2Conf := openBrowserForAuthentication(callbackUrlContext, codeServicePort)
 
 	authCode := <-authCodeChannel
 
-	return authCode
+	return authCode, oauth2Conf
 }
 
 func startAuthCodeReceivingService(port int, urlContext string) chan string {
@@ -65,23 +75,34 @@ func startAuthCodeReceivingService(port int, urlContext string) chan string {
 	return authCodeChannel
 }
 
-func openBrowserForAuthentication(context string, port int) {
+func openBrowserForAuthentication(context string, port int) *oauth2.Config {
 	callBackUrlTemplate := "http://localhost:%d" + context
 	redirectUrl := fmt.Sprintf(callBackUrlTemplate, port)
-	hubAuthUrl := getHubUrl(redirectUrl)
-	log.Println("Callback URL: " + hubAuthUrl)
+	conf := createOauth2Conf(redirectUrl)
+	hubAuthUrl := getHubUrl(conf)
+	if err := common.OpenBrowser(hubAuthUrl); err != nil {
+		common.ExitWithError("Couldn't open browser for " + common.ProductName + "  login", err)
+	}
+
+	return conf
 }
 
-func getHubUrl(redirectUrl string) string {
+func getHubUrl(conf*oauth2.Config) string {
+	return conf.AuthCodeURL("state")
+}
+
+func createOauth2Conf(redirectUrl string) *oauth2.Config {
 	conf := &oauth2.Config{
 		ClientID:    clientId,
 		RedirectURL: redirectUrl,
 		Endpoint: oauth2.Endpoint{
 			AuthURL: authUrl,
+			TokenURL: tokenUrl,
+			AuthStyle: 1,
 		},
 	}
 
-	return conf.AuthCodeURL("state")
+	return conf
 }
 
 func listenForAuthCode(addrString string, callbackUrlContext string, authCodeChannel chan<- string) {
