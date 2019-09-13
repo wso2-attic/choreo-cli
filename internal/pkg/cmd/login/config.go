@@ -15,21 +15,27 @@ const (
 	clientId = iota
 	authUrl
 	tokenUrl
+	accessToken
 )
 
-func createEnvConfigReader(cliConfig config.Config) func(entry int) string {
-	return config.GetEnvironmentConfigReader(cliConfig, map[int]config.KeyEntry{
-		clientId: {
-			Key:          "login.oauth2.clientId",
-			DefaultValue: "uEJMEFl4OFHbm54id3xdZiCHPS0a",
-		},
-		authUrl: {
-			Key:          "login.oauth2.authUrl",
-			DefaultValue: "https://id.development.choreo.dev/oauth2/authorize",
-		},
-		tokenUrl: {
-			Key:          "login.oauth2.tokenUrl",
-			DefaultValue: "https://id.development.choreo.dev/oauth2/token",
-		},
-	})
+var envConfigs = map[int]config.KeyEntry{
+	clientId: {
+		Key:          "login.oauth2.clientId",
+		DefaultValue: "uEJMEFl4OFHbm54id3xdZiCHPS0a",
+	},
+	authUrl: {
+		Key:          "login.oauth2.authUrl",
+		DefaultValue: "https://id.development.choreo.dev/oauth2/authorize",
+	},
+	tokenUrl: {
+		Key:          "login.oauth2.tokenUrl",
+		DefaultValue: "https://id.development.choreo.dev/oauth2/token",
+	},
+}
+
+var userConfigs = map[int]config.KeyEntry{
+	accessToken: {
+		Key:          "login.oauth2.accessToken",
+		DefaultValue: "",
+	},
 }

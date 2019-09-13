@@ -34,22 +34,19 @@ func NewLoginCommand(cliConfig config.Config) *cobra.Command {
 }
 
 func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
-	getEnvConfig := createEnvConfigReader(cliConfig)
+	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, envConfigs)
+	setUserConfig := config.GetUserConfigWriter(cliConfig,userConfigs)
 
 	return func(cmd *cobra.Command, args []string) {
 		authCode, oauth2Conf := getAuthCode(getEnvConfig)
 
-		accessToken, err := getAccessToken(authCode, oauth2Conf)
+		token, err := getAccessToken(authCode, oauth2Conf)
 		if err != nil {
 			common.ExitWithError("Could not get an access token", err)
 		}
 
-		persistAccessToken(accessToken)
+		setUserConfig(accessToken, token)
 	}
-}
-
-func persistAccessToken(accessToken string) {
-	panic("persistAccessToken Method not implemented")
 }
 
 func getAccessToken(authCode string, conf *oauth2.Config) (string, error) {
