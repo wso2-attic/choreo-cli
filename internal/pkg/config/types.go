@@ -10,15 +10,18 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 type Config interface {
-	Manager
-	GetEnvironmentConfig() Manager
+	Reader
+	Writer
+	GetEnvironmentConfig() Reader
 }
 
-type Manager interface {
+type Reader interface {
 	GetString(key string) string
 	GetStringOrDefault(key string, defaultValue string) string
 	GetStringForKeyEntry(key KeyEntry) string
@@ -34,7 +37,7 @@ type ViperConfig struct {
 	envConfigManager *ViperManager
 }
 
-func (cliConfig *ViperConfig) GetEnvironmentConfig() Manager {
+func (cliConfig *ViperConfig) GetEnvironmentConfig() Reader {
 	return cliConfig.envConfigManager
 }
 
@@ -69,4 +72,28 @@ func (cliConfig *ViperManager) GetStringOrDefault(key string, defaultValue strin
 
 func (cliConfig *ViperManager) GetStringForKeyEntry(keyEntry KeyEntry) string {
 	return cliConfig.GetStringOrDefault(keyEntry.Key, keyEntry.DefaultValue)
+}
+
+type Writer interface {
+	SetString(key string, value string)
+	SetStringForKeyEntry(keyEntry KeyEntry, value string)
+}
+
+func (cliConfig *ViperManager) SetString(key string, value string) {
+	cliConfig.viperInstance.Set(key, value)
+	if err := cliConfig.viperInstance.WriteConfig(); err != nil {
+		fmt.Printf("Could not write to config. Key: %s\n", key)
+	}
+}
+
+func (cliConfig *ViperManager) SetStringForKeyEntry(keyEntry KeyEntry, value string) {
+	cliConfig.SetString(keyEntry.Key, value)
+}
+
+func (cliConfig *ViperConfig) SetString(key string, value string) {
+	cliConfig.userConfigManager.SetString(key, value)
+}
+
+func (cliConfig *ViperConfig) SetStringForKeyEntry(keyEntry KeyEntry, value string) {
+	cliConfig.userConfigManager.SetStringForKeyEntry(keyEntry, value)
 }
