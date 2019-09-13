@@ -9,13 +9,15 @@
 
 package config
 
-func GetUserConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) func(entry int) string {
+type GetConfig func(entry int) string
+
+func GetUserConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) GetConfig {
 	return func(entry int) string {
 		return cliConfig.GetStringForKeyEntry(configDefinition[entry])
 	}
 }
 
-func GetEnvironmentConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) func(entry int) string {
+func GetEnvironmentConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) GetConfig {
 	configManager := cliConfig.GetEnvironmentConfig()
 
 	return func(entry int) string {
