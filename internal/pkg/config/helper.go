@@ -9,6 +9,8 @@
 
 package config
 
+type GetConfig func(entry int) string
+
 func GetUserConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) func(entry int) string {
 	return func(entry int) string {
 		return cliConfig.GetStringForKeyEntry(configDefinition[entry])
