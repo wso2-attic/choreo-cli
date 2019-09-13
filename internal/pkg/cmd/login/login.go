@@ -19,28 +19,33 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo/components/cli/internal/pkg/config"
 	"golang.org/x/oauth2"
 )
 
-func NewLoginCommand() *cobra.Command {
+func NewLoginCommand(cliConfig config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
 		Short:   "Login to " + common.ProductName,
 		Example: common.GetAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
-		Run:     runLogin,
+		Run:     createLoginFunction(cliConfig),
 	}
 }
 
-func runLogin(cmd *cobra.Command, args []string) {
-	authCode, oauth2Conf := getAuthCode()
+func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
+	getEnvConfig := createEnvConfigReader(cliConfig)
 
-	accessToken, err := getAccessToken(authCode, oauth2Conf)
-	if err != nil {
-		common.ExitWithError("Could not get an access token", err)
+	return func(cmd *cobra.Command, args []string) {
+		authCode, oauth2Conf := getAuthCode(getEnvConfig)
+
+		accessToken, err := getAccessToken(authCode, oauth2Conf)
+		if err != nil {
+			common.ExitWithError("Could not get an access token", err)
+		}
+
+		persistAccessToken(accessToken)
 	}
-
-	persistAccessToken(accessToken)
 }
 
 func persistAccessToken(accessToken string) {
@@ -57,12 +62,12 @@ func getAccessToken(authCode string, conf *oauth2.Config) (string, error) {
 	}
 }
 
-func getAuthCode() (string, *oauth2.Config) {
+func getAuthCode(getEnvConfig config.GetConfig) (string, *oauth2.Config) {
 	codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
 
 	authCodeChannel := startAuthCodeReceivingService(codeServicePort, callbackUrlContext)
 
-	oauth2Conf := openBrowserForAuthentication(callbackUrlContext, codeServicePort)
+	oauth2Conf := openBrowserForAuthentication(callbackUrlContext, codeServicePort, getEnvConfig)
 
 	authCode := <-authCodeChannel
 
@@ -75,10 +80,10 @@ func startAuthCodeReceivingService(port int, urlContext string) chan string {
 	return authCodeChannel
 }
 
-func openBrowserForAuthentication(context string, port int) *oauth2.Config {
+func openBrowserForAuthentication(context string, port int, getEnvConfig config.GetConfig) *oauth2.Config {
 	callBackUrlTemplate := "http://localhost:%d" + context
 	redirectUrl := fmt.Sprintf(callBackUrlTemplate, port)
-	conf := createOauth2Conf(redirectUrl)
+	conf := createOauth2Conf(redirectUrl, getEnvConfig)
 	hubAuthUrl := getHubUrl(conf)
 	if err := common.OpenBrowser(hubAuthUrl); err != nil {
 		common.ExitWithError("Couldn't open browser for " + common.ProductName + "  login", err)
@@ -91,13 +96,13 @@ func getHubUrl(conf*oauth2.Config) string {
 	return conf.AuthCodeURL("state")
 }
 
-func createOauth2Conf(redirectUrl string) *oauth2.Config {
+func createOauth2Conf(redirectUrl string, getEnvConfig config.GetConfig) *oauth2.Config {
 	conf := &oauth2.Config{
-		ClientID:    clientId,
+		ClientID:    getEnvConfig(clientId),
 		RedirectURL: redirectUrl,
 		Endpoint: oauth2.Endpoint{
-			AuthURL: authUrl,
-			TokenURL: tokenUrl,
+			AuthURL:   getEnvConfig(authUrl),
+			TokenURL:  getEnvConfig(tokenUrl),
 			AuthStyle: 1,
 		},
 	}

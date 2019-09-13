@@ -30,7 +30,7 @@ func main() {
 	}
 
 	command.AddCommand(cmd.NewVersionCommand(cliConfig))
-	command.AddCommand(login.NewLoginCommand())
+	command.AddCommand(login.NewLoginCommand(cliConfig))
 
 	if err := command.Execute(); err != nil {
 		cmdCommon.ExitWithError("Error executing choreo command", err)

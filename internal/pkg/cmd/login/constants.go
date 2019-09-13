@@ -15,7 +15,4 @@ package login
 const (
 	callbackUrlContext  = "/auth"
 	callBackDefaultPort = 8888
-	authUrl     = "https://id.development.choreo.dev/oauth2/authorize"
-	tokenUrl     = "https://id.development.choreo.dev/oauth2/token"
-	clientId    = "uEJMEFl4OFHbm54id3xdZiCHPS0a"
 )
