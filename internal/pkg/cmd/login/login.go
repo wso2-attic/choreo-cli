@@ -3,11 +3,8 @@
  *
  * This software is the property of WSO2 Inc. and its suppliers, if any.
  * Dissemination of any information or reproduction of any material contained
- * herein is strictly forbidden, unless permitted by WSO2 in accordance with
- * the WSO2 Commercial License available at http://wso2.com/licenses. For specific
- * language governing the permissions and limitations under this license,
- * please see the license as well as any agreement you’ve entered into with
- * WSO2 governing the purchase of this software and any associated services.
+ * herein in any form is strictly forbidden, unless permitted by WSO2 expressly.
+ * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
 package login
@@ -16,6 +13,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
@@ -61,20 +59,46 @@ func getAccessToken(authCode string, conf *oauth2.Config) (string, error) {
 
 func getAuthCode(getEnvConfig config.GetConfig) (string, *oauth2.Config) {
 	codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
-
-	authCodeChannel := startAuthCodeReceivingService(codeServicePort, callbackUrlContext)
-
+	authCodeChannel, server := startAuthCodeReceivingService(codeServicePort)
 	oauth2Conf := openBrowserForAuthentication(callbackUrlContext, codeServicePort, getEnvConfig)
-
 	authCode := <-authCodeChannel
+	stopAuthCodeServer(server)
 
 	return authCode, oauth2Conf
 }
 
-func startAuthCodeReceivingService(port int, urlContext string) chan string {
+func stopAuthCodeServer(server *http.Server) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	if err := server.Shutdown(ctx); err != nil {
+		fmt.Printf("Error shutting down the authcode receiving server: %s", err)
+	}
+}
+
+func startAuthCodeReceivingService(port int) (<-chan string, *http.Server) {
 	authCodeChannel := make(chan string)
-	go listenForAuthCode(common.GetLocalBindAddress(port), urlContext, authCodeChannel)
-	return authCodeChannel
+
+	mux := http.NewServeMux()
+	server := &http.Server{Addr: common.GetLocalBindAddress(port), Handler: mux}
+	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
+		if err := request.ParseForm(); err != nil {
+			writer.WriteHeader(http.StatusBadRequest)
+			common.ExitWithError("Error parsing received query parameters", err)
+		}
+
+		code := request.Form.Get("code")
+
+		if code == "" {
+			writer.WriteHeader(http.StatusBadRequest)
+			common.ExitWithErrorMessage("Blank auth code received from IDP")
+		}
+
+		writer.WriteHeader(http.StatusOK)
+		authCodeChannel <- code
+	})
+
+	go listenForAuthCode(server)
+
+	return authCodeChannel, server
 }
 
 func openBrowserForAuthentication(context string, port int, getEnvConfig config.GetConfig) *oauth2.Config {
@@ -107,26 +131,7 @@ func createOauth2Conf(redirectUrl string, getEnvConfig config.GetConfig) *oauth2
 	return conf
 }
 
-func listenForAuthCode(addrString string, callbackUrlContext string, authCodeChannel chan<- string) {
-	mux := http.NewServeMux()
-	server := http.Server{Addr: addrString, Handler: mux}
-	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
-		if err := request.ParseForm(); err != nil {
-			writer.WriteHeader(http.StatusBadRequest)
-			common.ExitWithError("Error parsing received query parameters", err)
-		}
-
-		code := request.Form.Get("code")
-
-		if code == "" {
-			writer.WriteHeader(http.StatusBadRequest)
-			common.ExitWithErrorMessage("Blank auth code received from IDP")
-		}
-
-		writer.WriteHeader(http.StatusOK)
-		authCodeChannel <- code
-	})
-
+func listenForAuthCode(server *http.Server) {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		common.ExitWithError("Error while initializing auth code accepting service", err)
 	}

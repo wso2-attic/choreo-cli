@@ -10,6 +10,7 @@
 package config
 
 type GetConfig func(entry int) string
+
 type SetConfig func(keyEntry int, value string)
 
 func GetUserConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) GetConfig {
