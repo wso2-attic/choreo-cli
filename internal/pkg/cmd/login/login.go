@@ -71,7 +71,8 @@ func getAuthCode(getEnvConfig config.GetConfig) (string, *oauth2.Config) {
 }
 
 func stopAuthCodeServer(server *http.Server) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
 		fmt.Printf("Error shutting down the authcode receiving server: %s", err)
 	}
