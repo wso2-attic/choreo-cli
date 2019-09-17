@@ -25,11 +25,11 @@ func GetAbsoluteCommandName(command string) string {
 }
 
 func PrintErrorMessage(message string) {
-	fmt.Printf("\n\n%s\n\n", message)
+	fmt.Println(message)
 }
 
 func PrintError(message string, err error) {
-	fmt.Printf("\n\n%s: %v\n\n", message, err)
+	fmt.Printf("\n%s: %v\n", message, err)
 }
 
 func PrintInfo(message string) {
@@ -38,11 +38,13 @@ func PrintInfo(message string) {
 
 func ExitWithError(message string, err error) {
 	PrintError(message, err)
+	fmt.Println()
 	os.Exit(1)
 }
 
 func ExitWithErrorMessage(message string) {
 	PrintErrorMessage(message)
+	fmt.Println()
 	os.Exit(1)
 }
 
