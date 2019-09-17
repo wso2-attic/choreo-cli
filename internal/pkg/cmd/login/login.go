@@ -92,6 +92,8 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 				message := "Login to Choreo failed due to internal error. Please try again using the CLI."
 				sendBrowserResponse(writer, http.StatusBadRequest, message)
 				common.PrintError("Could not exchange auth code for an access token", err)
+				oauthDone <- false
+				return
 			}
 		}
 
