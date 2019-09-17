@@ -21,7 +21,7 @@ const (
 var envConfigs = map[int]config.KeyEntry{
 	clientId: {
 		Key:          "login.oauth2.clientId",
-		DefaultValue: "bLirYyUTmo9HJ1VlZ43vzahs6gca",
+		DefaultValue: "choreocliapplication",
 	},
 	authUrl: {
 		Key:          "login.oauth2.authUrl",
