@@ -137,7 +137,7 @@ func sendBrowserResponse(writer http.ResponseWriter, status int, message string)
 func openBrowserForAuthentication(conf *oauth2.Config) {
 	hubAuthUrl := conf.AuthCodeURL("state")
 	if err := common.OpenBrowser(hubAuthUrl); err != nil {
-		common.ExitWithError("Couldn't open browser for "+common.ProductName+"  login", err)
+		common.ExitWithError("Couldn't open browser for " + common.ProductName + " login", err)
 	}
 }
 
