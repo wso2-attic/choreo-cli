@@ -46,8 +46,8 @@ func initializeViper(config *ViperConfig) error {
 }
 
 func loadConfigFile(v *viper.Viper, configFileName string) error {
-	homeDirectoryLocation, err := homedir.Dir()
-	absoluteConfigFileDirectory := filepath.Join(homeDirectoryLocation, configFileDir, configFileName)
+	configDirectory, err := getConfigDirectory()
+	absoluteConfigFileDirectory := filepath.Join(configDirectory, configFileName)
 	if err != nil {
 		return err
 	}
@@ -60,4 +60,14 @@ func loadConfigFile(v *viper.Viper, configFileName string) error {
 		}
 	}
 	return nil
+}
+
+func getConfigDirectory() (string, error) {
+	homeDirectoryLocation, err := homedir.Dir()
+	if err != nil {
+		return "", err
+	}
+
+	absoluteConfigDirectory := filepath.Join(homeDirectoryLocation, configFileDir)
+	return absoluteConfigDirectory, nil
 }
