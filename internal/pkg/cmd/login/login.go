@@ -44,6 +44,7 @@ func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args 
 		}
 
 		setUserConfig(accessToken, token)
+		common.PrintInfo("Successfully logged in to " + common.ProductName + ".")
 	}
 }
 
@@ -82,24 +83,47 @@ func startAuthCodeReceivingService(port int) (<-chan string, *http.Server) {
 	server := &http.Server{Addr: common.GetLocalBindAddress(port), Handler: mux}
 	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
 		if err := request.ParseForm(); err != nil {
-			writer.WriteHeader(http.StatusBadRequest)
-			common.ExitWithError("Error parsing received query parameters", err)
+			message := "Login to Choreo failed due to internal error. Please trying again using the CLI."
+			sendBrowserResponse(writer, http.StatusBadRequest, message)
+
+			common.PrintError("Error parsing received query parameters", err)
 		}
 
 		code := request.Form.Get("code")
 
 		if code == "" {
-			writer.WriteHeader(http.StatusBadRequest)
-			common.ExitWithErrorMessage("Blank auth code received from IDP")
+			message := "Login to Choreo failed. Please trying again using the CLI."
+			sendBrowserResponse(writer, http.StatusBadRequest, message)
+			common.PrintErrorMessage("Blank auth code received from IDP")
+		} else {
+			sendBrowserResponse(writer, http.StatusOK, "Login to Choreo is successful. Please return to the CLI.")
 		}
 
-		writer.WriteHeader(http.StatusOK)
 		authCodeChannel <- code
 	})
 
 	go listenForAuthCode(server)
 
 	return authCodeChannel, server
+}
+
+func sendBrowserResponse(writer http.ResponseWriter, status int, message string) {
+	writer.WriteHeader(status)
+	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	content := ` <!DOCTYPE html>
+			<html>
+			<head>
+			<meta charset="UTF-8">
+			<title>CLI Login</title>
+			</head>
+			<body>
+			<h2>%s</h2>
+			</body>
+			</html> `
+
+	if _, err := fmt.Fprintf(writer, content, message); err != nil {
+		common.PrintError("Error while sending response to auth code redirect", err)
+	}
 }
 
 func openBrowserForAuthentication(context string, port int, getEnvConfig config.GetConfig) *oauth2.Config {
