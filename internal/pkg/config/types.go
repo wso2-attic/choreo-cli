@@ -89,18 +89,18 @@ func (cliConfig *ViperManager) SetString(key string, value string) {
 	}
 
 	if _, ok := err.(*os.PathError); ok {
-		cliConfig.createDirectoryAndWrite(key)
+		createDirectoryAndWrite(cliConfig.viperInstance, key)
 	} else {
 		common.PrintError("Could not write to config. Key: "+key, err)
 	}
 }
 
-func (cliConfig *ViperManager) createDirectoryAndWrite(key string) {
+func createDirectoryAndWrite(viperInstance *viper.Viper, key string) {
 	if err := makeConfigDirectory(); err != nil {
 		common.PrintError("Could not make config directory to config. Key: "+key, err)
 	}
 
-	if err := cliConfig.viperInstance.WriteConfig(); err != nil {
+	if err := viperInstance.WriteConfig(); err != nil {
 		common.PrintError("Could not write to config. Key: "+key, err)
 	}
 }
