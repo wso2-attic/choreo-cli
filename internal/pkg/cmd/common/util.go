@@ -24,13 +24,25 @@ func GetAbsoluteCommandName(command string) string {
 	return commandRoot + " " + command
 }
 
-func ExitWithError(message string, err error) {
+func PrintErrorMessage(message string) {
+	fmt.Printf("\n\n%s\n\n", message)
+}
+
+func PrintError(message string, err error) {
 	fmt.Printf("\n\n%s: %v\n\n", message, err)
+}
+
+func PrintInfo(message string) {
+	fmt.Println(message)
+}
+
+func ExitWithError(message string, err error) {
+	PrintError(message, err)
 	os.Exit(1)
 }
 
 func ExitWithErrorMessage(message string) {
-	fmt.Printf("\n\n%s\n\n", message)
+	PrintErrorMessage(message)
 	os.Exit(1)
 }
 
