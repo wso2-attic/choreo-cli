@@ -72,8 +72,7 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 	server := &http.Server{Addr: common.GetLocalBindAddress(port), Handler: mux}
 	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
 		if err := request.ParseForm(); err != nil {
-			message := "Login to Choreo failed due to an internal error. Please try again."
-			sendBrowserResponse(writer, http.StatusBadRequest, message)
+			sendErrorToBrowser(writer)
 			common.PrintError("Login to Choreo failed due to an error parsing the received query parameters", err)
 			oauthDone <- false
 			return
@@ -82,15 +81,13 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 		code := request.Form.Get("code")
 
 		if code == "" {
-			message := "Login to Choreo failed due to an internal error. Please try again."
-			sendBrowserResponse(writer, http.StatusBadRequest, message)
+			sendErrorToBrowser(writer)
 			common.PrintErrorMessage("Login to Choreo failed due to receiving a blank auth code from the IDP")
 			oauthDone <- false
 			return
 		} else {
 			if err := exchangeAuthCodeForToken(code, oauth2Conf, writer, setUserConfig); err != nil {
-				message := "Login to Choreo failed due to internal error. Please try again using the CLI."
-				sendBrowserResponse(writer, http.StatusBadRequest, message)
+				sendErrorToBrowser(writer)
 				common.PrintError("Could not exchange auth code for an access token", err)
 				oauthDone <- false
 				return
@@ -103,6 +100,11 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 	go listenForAuthCode(server)
 
 	return oauthDone, server
+}
+
+func sendErrorToBrowser(writer http.ResponseWriter) {
+	message := "Login to Choreo failed due to an internal error. Please try again."
+	sendBrowserResponse(writer, http.StatusInternalServerError, message)
 }
 
 func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer http.ResponseWriter, setUserConfig config.SetConfig) error {
