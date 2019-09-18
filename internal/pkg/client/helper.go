@@ -20,8 +20,8 @@ import (
 // set InsecureSkipVerify option if required
 func NewClient(cliConfig config.Config) *http.Client {
 
-	getEnvConfig := CreateEnvironmentConfigReader(cliConfig)
-	skipVerify, _ := strconv.ParseBool(getEnvConfig(skipVerify))
+	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, EnvConfigs)
+	skipVerify, _ := strconv.ParseBool(getEnvConfig(SkipVerify))
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerify},
 	}
@@ -31,14 +31,14 @@ func NewClient(cliConfig config.Config) *http.Client {
 // creates the http request for the given path with Authorization header set
 func NewRequest(cliConfig config.Config, method, path string, body io.Reader) (*http.Request, error) {
 
-	getEnvConfig := CreateEnvironmentConfigReader(cliConfig)
-	getUserConfig := CreateUserConfigReader(cliConfig)
+	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, EnvConfigs)
+	getUserConfig := config.GetUserConfigReader(cliConfig, UserConfigs)
 
-	completeUrl := getEnvConfig(backendUrl) + path
+	completeUrl := getEnvConfig(BackendUrl) + path
 	req, err := http.NewRequest(method, completeUrl, body)
 
 	if err == nil {
-		req.Header.Set("Authorization", "Bearer "+getUserConfig(accessToken))
+		req.Header.Set("Authorization", "Bearer "+getUserConfig(AccessToken))
 		req.Header.Set("Content-Type", "application/json")
 	}
 

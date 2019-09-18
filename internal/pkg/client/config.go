@@ -12,29 +12,25 @@ package client
 import "github.com/wso2/choreo/components/cli/internal/pkg/config"
 
 const (
-	backendUrl = iota
-	skipVerify
-	accessToken
+	BackendUrl = iota
+	SkipVerify
+	AccessToken
 )
 
-func CreateEnvironmentConfigReader(cliConfig config.Config) func(entry int) string {
-	return config.GetEnvironmentConfigReader(cliConfig, map[int]config.KeyEntry{
-		backendUrl: {
-			Key:          "choreo.backend.url",
-			DefaultValue: "https://api.choreo.dev:8081",
-		},
-		skipVerify: {
-			Key:          "security.certificate.skipVerify",
-			DefaultValue: "false",
-		},
-	})
+var EnvConfigs = map[int]config.KeyEntry{
+	BackendUrl: {
+		Key:          "choreo.backend.url",
+		DefaultValue: "https://api.choreo.dev:8081",
+	},
+	SkipVerify: {
+		Key:          "security.certificate.skipVerify",
+		DefaultValue: "false",
+	},
 }
 
-func CreateUserConfigReader(cliConfig config.Config) func(entry int) string {
-	return config.GetUserConfigReader(cliConfig, map[int]config.KeyEntry{
-		accessToken: {
-			Key:          "login.oauth2.accessToken",
-			DefaultValue: "",
-		},
-	})
+var UserConfigs = map[int]config.KeyEntry{
+	AccessToken: {
+		Key:          "login.oauth2.accessToken",
+		DefaultValue: "",
+	},
 }

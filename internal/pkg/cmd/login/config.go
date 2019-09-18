@@ -15,7 +15,6 @@ const (
 	clientId = iota
 	authUrl
 	tokenUrl
-	accessToken
 )
 
 var envConfigs = map[int]config.KeyEntry{
@@ -30,12 +29,5 @@ var envConfigs = map[int]config.KeyEntry{
 	tokenUrl: {
 		Key:          "login.oauth2.tokenUrl",
 		DefaultValue: "https://id.development.choreo.dev/oauth2/token",
-	},
-}
-
-var userConfigs = map[int]config.KeyEntry{
-	accessToken: {
-		Key:          "login.oauth2.accessToken",
-		DefaultValue: "",
 	},
 }
