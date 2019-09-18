@@ -10,9 +10,10 @@
 package config
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/spf13/viper"
+	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
 )
 
 type Config interface {
@@ -81,9 +82,40 @@ type Writer interface {
 
 func (cliConfig *ViperManager) SetString(key string, value string) {
 	cliConfig.viperInstance.Set(key, value)
-	if err := cliConfig.viperInstance.WriteConfig(); err != nil {
-		fmt.Printf("Could not write to config. Key: %s\n", key)
+
+	err := cliConfig.viperInstance.WriteConfig()
+	if err == nil {
+		return
 	}
+
+	if _, ok := err.(*os.PathError); ok {
+		createDirectoryAndWrite(cliConfig.viperInstance, key)
+	} else {
+		common.PrintError("Could not write to config. Key: "+key, err)
+	}
+}
+
+func createDirectoryAndWrite(viperInstance *viper.Viper, key string) {
+	if err := makeConfigDirectory(); err != nil {
+		common.PrintError("Could not make config directory to config. Key: "+key, err)
+	}
+
+	if err := viperInstance.WriteConfig(); err != nil {
+		common.PrintError("Could not write to config. Key: "+key, err)
+	}
+}
+
+func makeConfigDirectory() error {
+	absoluteConfigDirectory, err := getConfigDirectory()
+	if err != nil {
+		return err
+	}
+
+	if err = os.Mkdir(absoluteConfigDirectory, os.ModePerm); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (cliConfig *ViperManager) SetStringForKeyEntry(keyEntry KeyEntry, value string) {
