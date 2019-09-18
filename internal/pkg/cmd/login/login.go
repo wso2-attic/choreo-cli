@@ -12,6 +12,7 @@ package login
 import (
 	"context"
 	"fmt"
+	"github.com/wso2/choreo/components/cli/internal/pkg/client"
 	"net/http"
 	"time"
 
@@ -33,7 +34,7 @@ func NewLoginCommand(cliConfig config.Config) *cobra.Command {
 
 func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
 	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, envConfigs)
-	setUserConfig := config.GetUserConfigWriter(cliConfig, userConfigs)
+	setUserConfig := config.GetUserConfigWriter(cliConfig, client.UserConfigs)
 
 	return func(cmd *cobra.Command, args []string) {
 		codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
@@ -112,7 +113,7 @@ func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer htt
 	if err != nil {
 		return err
 	}
-	setUserConfig(accessToken, token)
+	setUserConfig(client.AccessToken, token)
 	sendBrowserResponse(writer, http.StatusOK, "Login to Choreo is successful. Please return to the CLI.")
 	return nil
 }

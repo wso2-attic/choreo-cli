@@ -7,27 +7,30 @@
  * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
-package login
+package client
 
 import "github.com/wso2/choreo/components/cli/internal/pkg/config"
 
 const (
-	clientId = iota
-	authUrl
-	tokenUrl
+	BackendUrl = iota
+	SkipVerify
+	AccessToken
 )
 
-var envConfigs = map[int]config.KeyEntry{
-	clientId: {
-		Key:          "login.oauth2.clientId",
-		DefaultValue: "choreocliapplication",
+var EnvConfigs = map[int]config.KeyEntry{
+	BackendUrl: {
+		Key:          "choreo.backend.url",
+		DefaultValue: "https://api.choreo.dev:8081",
 	},
-	authUrl: {
-		Key:          "login.oauth2.authUrl",
-		DefaultValue: "https://id.development.choreo.dev/oauth2/authorize",
+	SkipVerify: {
+		Key:          "security.certificate.skipVerify",
+		DefaultValue: "false",
 	},
-	tokenUrl: {
-		Key:          "login.oauth2.tokenUrl",
-		DefaultValue: "https://id.development.choreo.dev/oauth2/token",
+}
+
+var UserConfigs = map[int]config.KeyEntry{
+	AccessToken: {
+		Key:          "login.oauth2.accessToken",
+		DefaultValue: "",
 	},
 }
