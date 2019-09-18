@@ -20,8 +20,12 @@ import (
 	"strings"
 )
 
-func GetAbsoluteCommandName(command string) string {
-	return commandRoot + " " + command
+func GetAbsoluteCommandName(commandComponents ...string) string {
+	commandName := commandRoot
+	for _, component := range commandComponents {
+		commandName = commandName + " " + component
+	}
+	return commandName
 }
 
 func PrintErrorMessage(message string) {

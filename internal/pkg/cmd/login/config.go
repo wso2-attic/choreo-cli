@@ -15,7 +15,6 @@ const (
 	clientId    = "login.oauth2.clientId"
 	authUrl     = "login.oauth2.authUrl"
 	tokenUrl    = "login.oauth2.tokenUrl"
-	accessToken = "login.oauth2.accessToken"
 )
 
 func createEnvConfigReader(cliConfig config.Config) func(string) string {
@@ -23,6 +22,5 @@ func createEnvConfigReader(cliConfig config.Config) func(string) string {
 		clientId: "choreocliapplication",
 		authUrl:  "https://id.development.choreo.dev/oauth2/authorize",
 		tokenUrl: "https://id.development.choreo.dev/oauth2/token",
-		accessToken: "",
 	})
 }

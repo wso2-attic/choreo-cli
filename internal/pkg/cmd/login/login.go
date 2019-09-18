@@ -12,6 +12,7 @@ package login
 import (
 	"context"
 	"fmt"
+	"github.com/wso2/choreo/components/cli/internal/pkg/client"
 	"net/http"
 	"time"
 
@@ -112,7 +113,7 @@ func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer htt
 	if err != nil {
 		return err
 	}
-	setUserConfig(accessToken, token)
+	setUserConfig(client.AccessToken, token)
 	sendBrowserResponse(writer, http.StatusOK, "Login to Choreo is successful. Please return to the CLI.")
 	return nil
 }
