@@ -12,30 +12,17 @@ package login
 import "github.com/wso2/choreo/components/cli/internal/pkg/config"
 
 const (
-	clientId = iota
-	authUrl
-	tokenUrl
-	accessToken
+	clientId    = "login.oauth2.clientId"
+	authUrl     = "login.oauth2.authUrl"
+	tokenUrl    = "login.oauth2.tokenUrl"
+	accessToken = "login.oauth2.accessToken"
 )
 
-var envConfigs = map[int]config.KeyEntry{
-	clientId: {
-		Key:          "login.oauth2.clientId",
-		DefaultValue: "choreocliapplication",
-	},
-	authUrl: {
-		Key:          "login.oauth2.authUrl",
-		DefaultValue: "https://id.development.choreo.dev/oauth2/authorize",
-	},
-	tokenUrl: {
-		Key:          "login.oauth2.tokenUrl",
-		DefaultValue: "https://id.development.choreo.dev/oauth2/token",
-	},
-}
-
-var userConfigs = map[int]config.KeyEntry{
-	accessToken: {
-		Key:          "login.oauth2.accessToken",
-		DefaultValue: "",
-	},
+func createEnvConfigReader(cliConfig config.Config) func(string) string {
+	return config.CreateEnvironmentConfigReader(cliConfig, map[string]string{
+		clientId: "choreocliapplication",
+		authUrl:  "https://id.development.choreo.dev/oauth2/authorize",
+		tokenUrl: "https://id.development.choreo.dev/oauth2/token",
+		accessToken: "",
+	})
 }

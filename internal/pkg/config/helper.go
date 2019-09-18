@@ -9,26 +9,25 @@
 
 package config
 
-type GetConfig func(entry int) string
+type GetConfig func(key string) string
+type SetConfig func(key string, value string)
 
-type SetConfig func(keyEntry int, value string)
-
-func GetUserConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) GetConfig {
-	return getConfigReader(cliConfig, configDefinition)
+func CreateUserConfigReader(cliConfig Config, configDefaults map[string]string) GetConfig {
+	return createConfigReader(cliConfig, configDefaults)
 }
 
-func GetEnvironmentConfigReader(cliConfig Config, configDefinition map[int]KeyEntry) GetConfig {
-	return getConfigReader(cliConfig.GetEnvironmentConfig(), configDefinition)
+func CreateEnvironmentConfigReader(cliConfig Config, configDefaults map[string]string) GetConfig {
+	return createConfigReader(cliConfig.GetEnvironmentConfig(), configDefaults)
 }
 
-func getConfigReader(reader Reader, configDefinition map[int]KeyEntry) GetConfig {
-	return func(entry int) string {
-		return reader.GetStringForKeyEntry(configDefinition[entry])
+func CreateUserConfigWriter(cliConfig Config) SetConfig {
+	return func(key string, value string) {
+		cliConfig.SetString(key, value)
 	}
 }
 
-func GetUserConfigWriter(cliConfig Config, configDefinition map[int]KeyEntry) SetConfig {
-	return func(entry int, value string) {
-		cliConfig.SetStringForKeyEntry(configDefinition[entry], value)
+func createConfigReader(reader Reader, configDefaults map[string]string) GetConfig {
+	return func(key string) string {
+		return reader.GetString(configDefaults[key])
 	}
 }
