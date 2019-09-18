@@ -25,7 +25,7 @@ func main() {
 	}
 
 	command := cobra.Command{
-		Use:   "choreo <command>",
+		Use:   cmdCommon.GetAbsoluteCommandName() + " <command>",
 		Short: "Manage integration applications with Choreo platform",
 	}
 
@@ -33,6 +33,6 @@ func main() {
 	command.AddCommand(login.NewLoginCommand(cliConfig))
 
 	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError("Error executing choreo command", err)
+		cmdCommon.ExitWithError("Error executing "+ cmdCommon.GetAbsoluteCommandName() + " command", err)
 	}
 }

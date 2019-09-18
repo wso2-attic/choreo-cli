@@ -10,6 +10,6 @@
 package common
 
 const (
-	commandRoot = "choreo"
+	commandRoot = "chor"
 	ProductName = "Choreo"
 )
