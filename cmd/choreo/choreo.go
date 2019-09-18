@@ -12,6 +12,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo/components/cli/internal/pkg/cmd"
+	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/application"
 	cmdCommon "github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/login"
 	"github.com/wso2/choreo/components/cli/internal/pkg/config"
@@ -31,6 +32,7 @@ func main() {
 
 	command.AddCommand(cmd.NewVersionCommand(cliConfig))
 	command.AddCommand(login.NewLoginCommand(cliConfig))
+	command.AddCommand(application.NewApplicationCommand(cliConfig))
 
 	if err := command.Execute(); err != nil {
 		cmdCommon.ExitWithError("Error executing choreo command", err)

@@ -104,7 +104,7 @@ $chor login`
 >*also think about “$chor login -i” to provide un/pw through cli itself with a multi-factor possibly (backlog item)*
 
 ```
-$chor application create <app_name>
+$chor application create <app_name> --description <app_description>
 ```
 
 >Create the app in Choreo
