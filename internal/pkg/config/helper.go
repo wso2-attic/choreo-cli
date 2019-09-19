@@ -28,6 +28,6 @@ func CreateUserConfigWriter(cliConfig Config) SetConfig {
 
 func createConfigReader(reader Reader, configDefaults map[string]string) GetConfig {
 	return func(key string) string {
-		return reader.GetString(configDefaults[key])
+		return reader.GetStringOrDefault(key, configDefaults[key])
 	}
 }
