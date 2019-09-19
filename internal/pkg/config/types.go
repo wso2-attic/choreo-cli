@@ -25,17 +25,11 @@ type Config interface {
 type Reader interface {
 	GetString(key string) string
 	GetStringOrDefault(key string, defaultValue string) string
-	GetStringForKeyEntry(key KeyEntry) string
-}
-
-type KeyEntry struct {
-	Key          string
-	DefaultValue string
 }
 
 type ViperConfig struct {
 	userConfigManager *ViperManager
-	envConfigManager *ViperManager
+	envConfigManager  *ViperManager
 }
 
 func (cliConfig *ViperConfig) GetEnvironmentConfig() Reader {
@@ -48,10 +42,6 @@ func (cliConfig *ViperConfig) GetString(key string) string {
 
 func (cliConfig *ViperConfig) GetStringOrDefault(key string, defaultValue string) string {
 	return cliConfig.userConfigManager.GetStringOrDefault(key, defaultValue)
-}
-
-func (cliConfig *ViperConfig) GetStringForKeyEntry(keyEntry KeyEntry) string {
-	return cliConfig.userConfigManager.GetStringForKeyEntry(keyEntry)
 }
 
 type ViperManager struct {
@@ -71,13 +61,8 @@ func (cliConfig *ViperManager) GetStringOrDefault(key string, defaultValue strin
 	}
 }
 
-func (cliConfig *ViperManager) GetStringForKeyEntry(keyEntry KeyEntry) string {
-	return cliConfig.GetStringOrDefault(keyEntry.Key, keyEntry.DefaultValue)
-}
-
 type Writer interface {
 	SetString(key string, value string)
-	SetStringForKeyEntry(keyEntry KeyEntry, value string)
 }
 
 func (cliConfig *ViperManager) SetString(key string, value string) {
@@ -118,14 +103,6 @@ func makeConfigDirectory() error {
 	return nil
 }
 
-func (cliConfig *ViperManager) SetStringForKeyEntry(keyEntry KeyEntry, value string) {
-	cliConfig.SetString(keyEntry.Key, value)
-}
-
 func (cliConfig *ViperConfig) SetString(key string, value string) {
 	cliConfig.userConfigManager.SetString(key, value)
-}
-
-func (cliConfig *ViperConfig) SetStringForKeyEntry(keyEntry KeyEntry, value string) {
-	cliConfig.userConfigManager.SetStringForKeyEntry(keyEntry, value)
 }

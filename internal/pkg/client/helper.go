@@ -11,16 +11,17 @@ package client
 
 import (
 	"crypto/tls"
-	"github.com/wso2/choreo/components/cli/internal/pkg/config"
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/wso2/choreo/components/cli/internal/pkg/config"
 )
 
 // set InsecureSkipVerify option if required
 func NewClient(cliConfig config.Config) *http.Client {
 
-	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, EnvConfigs)
+	getEnvConfig := config.CreateEnvironmentConfigReader(cliConfig, EnvConfigs)
 	skipVerify, _ := strconv.ParseBool(getEnvConfig(SkipVerify))
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerify},
@@ -31,8 +32,8 @@ func NewClient(cliConfig config.Config) *http.Client {
 // creates the http request for the given path with Authorization header set
 func NewRequest(cliConfig config.Config, method, path string, body io.Reader) (*http.Request, error) {
 
-	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, EnvConfigs)
-	getUserConfig := config.GetUserConfigReader(cliConfig, UserConfigs)
+	getEnvConfig := config.CreateEnvironmentConfigReader(cliConfig, EnvConfigs)
+	getUserConfig := config.CreateUserConfigReader(cliConfig, UserConfigs)
 
 	completeUrl := getEnvConfig(BackendUrl) + path
 	req, err := http.NewRequest(method, completeUrl, body)

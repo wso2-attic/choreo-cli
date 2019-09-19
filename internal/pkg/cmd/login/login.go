@@ -33,8 +33,8 @@ func NewLoginCommand(cliConfig config.Config) *cobra.Command {
 }
 
 func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
-	getEnvConfig := config.GetEnvironmentConfigReader(cliConfig, envConfigs)
-	setUserConfig := config.GetUserConfigWriter(cliConfig, client.UserConfigs)
+	getEnvConfig := createEnvConfigReader(cliConfig)
+	setUserConfig := config.CreateUserConfigWriter(cliConfig)
 
 	return func(cmd *cobra.Command, args []string) {
 		codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
