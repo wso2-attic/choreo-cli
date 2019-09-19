@@ -23,12 +23,15 @@ import (
 )
 
 func NewCreateCommand(cliConfig config.Config) *cobra.Command {
+
+	const cmdCreate = "create"
 	cmd := &cobra.Command{
-		Use:     "create",
-		Short:   "Create an application",
-		Example: common.GetAbsoluteCommandName("application", "create"),
-		Args:    cobra.ExactArgs(1),
-		Run:     runCreateAppCommand(cliConfig),
+		Use:   cmdCreate + " APP_NAME",
+		Short: "Create an application",
+		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdCreate),
+			" app1 -d \"My first app\""),
+		Args: cobra.ExactArgs(1),
+		Run:  runCreateAppCommand(cliConfig),
 	}
 	cmd.Flags().StringP("description", "d", "", "Specify description for the application")
 	return cmd
@@ -46,13 +49,12 @@ func runCreateAppCommand(cliConfig config.Config) func(cmd *cobra.Command, args 
 
 func createApp(cliConfig config.Config, application Application) {
 
-	path := "/applications"
 	jsonStr, err := json.Marshal(application)
 	if err != nil {
 		log.Print("Error converting application into json: ", err)
 		return
 	}
-	req, err := client.NewRequest(cliConfig, "POST", path, bytes.NewBuffer(jsonStr))
+	req, err := client.NewRequest(cliConfig, "POST", pathApplications, bytes.NewBuffer(jsonStr))
 
 	if err != nil {
 		log.Print("Error creating post request for application creation: ", err)

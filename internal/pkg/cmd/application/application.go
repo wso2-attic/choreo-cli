@@ -15,19 +15,13 @@ import (
 	"github.com/wso2/choreo/components/cli/internal/pkg/config"
 )
 
-type Application struct {
-	Name        string `json:"name" header:"Application Name"`
-	Description string `json:"description" header:"Description"`
-}
-
-type Applications []Application
-
 func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
+
 	cmd := &cobra.Command{
-		Use:     "application",
-		Short:   "Commands related to an environment",
-		Example: common.GetAbsoluteCommandName("environment"),
-		Args:    cobra.ExactArgs(1),
+		Use:     cmdApplication,
+		Short:   "Manage applications",
+		Example: common.GetAbsoluteCommandName(cmdApplication),
+		Args:    cobra.MaximumNArgs(1),
 	}
 	cmd.AddCommand(NewCreateCommand(cliConfig))
 	cmd.AddCommand(NewListCommand(cliConfig))

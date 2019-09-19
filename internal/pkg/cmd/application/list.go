@@ -24,10 +24,12 @@ import (
 )
 
 func NewListCommand(cliConfig config.Config) *cobra.Command {
+
+	const cmdLs = "ls"
 	cmd := &cobra.Command{
-		Use:     "ls",
+		Use:     cmdLs,
 		Short:   "List applications",
-		Example: common.GetAbsoluteCommandName("application", "ls"),
+		Example: common.GetAbsoluteCommandName(cmdApplication, cmdLs),
 		Args:    cobra.NoArgs,
 		Run:     runListAppCommand(cliConfig),
 	}
@@ -43,8 +45,7 @@ func runListAppCommand(cliConfig config.Config) func(cmd *cobra.Command, args []
 
 func listApps(cliConfig config.Config) {
 
-	path := "/applications"
-	req, err := client.NewRequest(cliConfig, "GET", path, nil)
+	req, err := client.NewRequest(cliConfig, "GET", pathApplications, nil)
 
 	if err != nil {
 		log.Print("Error creating post request for listing applications: ", err)
