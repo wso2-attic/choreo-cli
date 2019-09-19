@@ -25,11 +25,11 @@ import (
 
 func NewListCommand(cliConfig config.Config) *cobra.Command {
 
-	const cmdLs = "ls"
+	const cmdList = "list"
 	cmd := &cobra.Command{
-		Use:     cmdLs,
+		Use:     cmdList,
 		Short:   "List applications",
-		Example: common.GetAbsoluteCommandName(cmdApplication, cmdLs),
+		Example: common.GetAbsoluteCommandName(cmdApplication, cmdList),
 		Args:    cobra.NoArgs,
 		Run:     runListAppCommand(cliConfig),
 	}
