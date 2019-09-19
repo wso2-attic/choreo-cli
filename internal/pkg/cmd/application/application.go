@@ -10,15 +10,17 @@
 package application
 
 import (
-"github.com/spf13/cobra"
-"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
-"github.com/wso2/choreo/components/cli/internal/pkg/config"
+	"github.com/spf13/cobra"
+	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo/components/cli/internal/pkg/config"
 )
 
 type Application struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name" header:"Application Name"`
+	Description string `json:"description" header:"Description"`
 }
+
+type Applications []Application
 
 func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
 	cmd := &cobra.Command{
@@ -28,5 +30,6 @@ func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 	}
 	cmd.AddCommand(NewCreateCommand(cliConfig))
+	cmd.AddCommand(NewListCommand(cliConfig))
 	return cmd
 }
