@@ -28,4 +28,4 @@ jobs:
         fi
 
     - name: Build
-      run: build-cli
+      run: make build-cli
