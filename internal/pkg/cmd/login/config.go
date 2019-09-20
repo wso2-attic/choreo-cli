@@ -9,7 +9,7 @@
 
 package login
 
-import "github.com/wso2/choreo/components/cli/internal/pkg/config"
+import "github.com/wso2/choreo-cli/internal/pkg/config"
 
 const (
 	clientId    = "login.oauth2.clientId"

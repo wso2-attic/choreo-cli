@@ -11,8 +11,8 @@ package application
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo/components/cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 func NewApplicationCommand(cliConfig config.Config) *cobra.Command {

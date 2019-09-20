@@ -15,7 +15,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/wso2/choreo/components/cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 // set InsecureSkipVerify option if required

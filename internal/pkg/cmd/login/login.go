@@ -12,13 +12,13 @@ package login
 import (
 	"context"
 	"fmt"
-	"github.com/wso2/choreo/components/cli/internal/pkg/client"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"net/http"
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo/components/cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"golang.org/x/oauth2"
 )
 

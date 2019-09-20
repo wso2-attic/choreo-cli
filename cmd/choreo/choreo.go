@@ -11,11 +11,11 @@ package main
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/application"
-	cmdCommon "github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/login"
-	"github.com/wso2/choreo/components/cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
+	cmdCommon "github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/login"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 func main() {

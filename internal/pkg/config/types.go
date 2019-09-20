@@ -13,7 +13,7 @@ import (
 	"os"
 
 	"github.com/spf13/viper"
-	"github.com/wso2/choreo/components/cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 )
 
 type Config interface {
