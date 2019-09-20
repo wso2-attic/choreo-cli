@@ -22,56 +22,21 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-#reactjs related
-node_modules/
-components/frontend/*/build/
-coverage/
-
 # misc
 .DS_Store
 .env
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # ignore Intellij-IDEA files
 *.iml
 .idea/
-.DS_Store
 
 # Eclipse files
 .project
 
 # Temporary directories
 target/
-
-# Terraform state
-.terraform/
-
-# Sensitive data
-*.secrets*tfvars
-
-# Do not ignore the sample secrets file
-!*secrets.tfvars.sample
-
-# TF state files
-terraform.tfstate*
-errored.tfstate*
-
-# Don't ignore the needed zip files
-!terraform/modules/aws/EBSBackupJob/files/ebs_volume_backup.zip
-
-# Temp files created during script executions
-tmp_*
 tmp/
 
 # Key files
 *.key
 *.pem
-
-# Demo certs and keys should be kept
-!/certs/cloud.client.org-private.key
-!/certs/cloud.client.org-apache.pem
-
-# kubeconfig template
-*.kubeconfig

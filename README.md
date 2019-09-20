@@ -1,5 +1,7 @@
 # Choreo CLI
 
+CLI to manage integration applications with Choreo platform
+
 ## Building from source
 
 1. Download and install go 1.13 or later version from https://golang.org/dl/
