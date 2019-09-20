@@ -16,7 +16,7 @@ const (
 )
 
 var EnvConfigs = map[string]string{
-	BackendUrl: "https://api.choreo.dev:8081",
+	BackendUrl: "https://api.development.choreo.dev",
 	SkipVerify: "false",
 }
 
