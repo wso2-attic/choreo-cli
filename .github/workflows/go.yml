@@ -22,4 +22,4 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
-      run: make build-cli
+      run: make build-cli && make test
