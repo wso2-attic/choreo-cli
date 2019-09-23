@@ -22,7 +22,7 @@ func main() {
 
 	cliConfig, err := config.InitConfig()
 	if err != nil {
-		cmdCommon.ExitWithError("Error loading configs", err)
+		cmdCommn.ExitWithError("Error loading configs", err)
 	}
 
 	command := cobra.Command{
