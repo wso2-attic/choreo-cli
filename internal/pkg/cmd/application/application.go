@@ -20,6 +20,7 @@ func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     cmdApplication,
 		Short:   "Manage applications",
+		Aliases: []string{"app"},
 		Example: common.GetAbsoluteCommandName(cmdApplication),
 		Args:    cobra.MaximumNArgs(1),
 	}
