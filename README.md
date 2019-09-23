@@ -6,9 +6,9 @@ CLI to manage integration applications with Choreo platform
 - [Getting started](docs/cli/reference.md)
 - [Building from source](#building-from-source)
 
-# Getting started with Choreo
+## Getting started with Choreo
 
-1. Download Choreo Cli from [releases page](https://github.com/wso2/choreo-cli/releases)
+1. Download Choreo Cli from the [releases page](https://github.com/wso2/choreo-cli/releases)
 2. Extract the tar.gz file
     ```
     $tar -xf choreo-cli-0.0.1-{os}-x64.tar.gz
