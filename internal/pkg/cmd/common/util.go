@@ -12,12 +12,14 @@ package common
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"net"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetAbsoluteCommandName(commandComponents ...string) string {
@@ -93,4 +95,14 @@ func OpenBrowser(url string) error {
 	} else {
 		return errors.New("unsupported platform")
 	}
+}
+
+func GetRandomString(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789")
+	var builder strings.Builder
+	for i := 0; i < length; i++ {
+		builder.WriteRune(chars[rand.Intn(len(chars))])
+	}
+	return builder.String()
 }
