@@ -26,6 +26,10 @@ GO_LDFLAGS += -X $(PROJECT_MODULE)/internal/pkg/build.buildGitRevision=$(GIT_REV
 GO_LDFLAGS += -X $(PROJECT_MODULE)/internal/pkg/build.buildTime=$(shell date +%Y-%m-%dT%H:%M:%S%z)
 GO_LDFLAGS += -X $(PROJECT_MODULE)/internal/pkg/build.buildPlatform=local
 
+.PHONY: test
+test:
+	go test $(shell go list ./...)
+
 .PHONY: build-cli
 build-cli: clean-cli
 	go build -o ${GO_BUILD_DIRECTORY}/chor -ldflags "$(GO_LDFLAGS)" -x $(PROJECT_MODULE)/$(CHORE_CLI_SRC_ROOT)
