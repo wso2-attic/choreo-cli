@@ -32,7 +32,7 @@ test:
 
 .PHONY: coverage
 coverage: test
-	go tool cover -html=coverage.txt
+	go tool cover -html=coverage.txt -o coverage.html
 
 .PHONY: build-cli
 build-cli: clean-cli

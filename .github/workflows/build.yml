@@ -24,3 +24,9 @@ jobs:
 
     - name: Build
       run: make build-cli && make test
+
+    - name: Upload code coverage results
+      uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage
+          path: coverage.html
