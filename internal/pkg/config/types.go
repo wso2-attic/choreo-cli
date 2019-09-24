@@ -54,7 +54,11 @@ func (cliConfig *ViperManager) GetString(key string) string {
 }
 
 func (cliConfig *ViperManager) GetStringOrDefault(key string, defaultValue string) string {
-	if value := cliConfig.GetString(key); value != "" {
+	return getStringOrDefault(cliConfig.GetString, key, defaultValue)
+}
+
+func getStringOrDefault(predicate func(key string) string, key string, defaultValue string) string {
+	if value := predicate(key); value != "" {
 		return value
 	} else {
 		return defaultValue
