@@ -21,9 +21,7 @@ func TestViperConfigHolderReadValue(t *testing.T) {
 	configHolder := &ViperConfigHolder{viperInstance: v}
 
 	got := configHolder.GetString("foo")
-	if got != "fooValue" {
-		t.Errorf("ViperConfigHolder did not read the value correctly; %s; want %s", "fooValue", got)
-	}
+	assertString(t, "fooValue", got, "ViperConfigHolder did not read the value correctly")
 }
 
 func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
@@ -32,9 +30,7 @@ func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
 	configHolder := &ViperConfigHolder{viperInstance: v}
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
-	if got != "fooValue" {
-		t.Errorf("ViperConfigHolder did not read the value correctly; %s; want %s", "fooValue", got)
-	}
+	assertString(t, "fooValue", got, "ViperConfigHolder did not return the value correctly")
 }
 
 func TestViperConfigHolderReadDefault(t *testing.T) {
@@ -42,9 +38,7 @@ func TestViperConfigHolderReadDefault(t *testing.T) {
 	configHolder := &ViperConfigHolder{viperInstance: v}
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
-	if got != "fooDefault" {
-		t.Errorf("ViperConfigHolder did not read the default correctly; %s; want %s", "fooDefault", got)
-	}
+	assertString(t, "fooDefault", got, "ViperConfigHolder did not read the default")
 }
 
 func TestViperConfigHolderWrite(t *testing.T) {
@@ -53,7 +47,5 @@ func TestViperConfigHolderWrite(t *testing.T) {
 
 	configHolder.SetString("foo", "fooValue")
 	got := configHolder.GetString("foo")
-	if got != "fooValue" {
-		t.Errorf("ViperConfigHolder did not write the value correctly; %s; want %s", "fooValue", got)
-	}
+	assertString(t, "fooValue", got, "ViperConfigHolder did not write the value correctly")
 }

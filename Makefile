@@ -30,7 +30,6 @@ GO_LDFLAGS += -X $(PROJECT_MODULE)/internal/pkg/build.buildPlatform=local
 test:
 	go test -coverprofile coverage.txt $(shell go list ./...)
 
-
 .PHONY: coverage
 coverage: test
 	go tool cover -html=coverage.txt

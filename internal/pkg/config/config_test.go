@@ -9,8 +9,9 @@
 
 package config
 
-import "testing"
-
+import (
+	"testing"
+)
 
 func TestCreateUserConfigReaderValue(t *testing.T) {
 	mockConfig := &CliConfig{
@@ -20,9 +21,7 @@ func TestCreateUserConfigReaderValue(t *testing.T) {
 	reader := CreateUserConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	if got != "fooValue" {
-		t.Errorf("CreateUserConfigReader did not create the reader correctly; %s; want %s", "fooValue", got)
-	}
+	assertString(t, "fooValue", got, "CreateUserConfigReader did not create the reader correctly")
 }
 
 func TestCreateUserConfigReaderDefault(t *testing.T) {
@@ -33,9 +32,7 @@ func TestCreateUserConfigReaderDefault(t *testing.T) {
 	reader := CreateUserConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	if got != "fooDefault" {
-		t.Errorf("CreateUserConfigReader did not create the reader correctly; %s; want %s", "fooDefault", got)
-	}
+	assertString(t, "fooDefault", got, "CreateUserConfigReader did not create the reader correctly")
 }
 
 func TestCreateEnvConfigReaderValue(t *testing.T) {
@@ -46,9 +43,7 @@ func TestCreateEnvConfigReaderValue(t *testing.T) {
 	reader := CreateEnvironmentConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	if got != "fooValue" {
-		t.Errorf("CreateEnvConfigReader did not create the reader correctly; %s; want %s", "fooValue", got)
-	}
+	assertString(t, "fooValue", got, "CreateEnvConfigReader did not create the reader correctly")
 }
 
 func TestCreateEnvConfigReaderDefault(t *testing.T) {
@@ -59,9 +54,7 @@ func TestCreateEnvConfigReaderDefault(t *testing.T) {
 	reader := CreateEnvironmentConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	if got != "fooDefault" {
-		t.Errorf("CreateEnvConfigReader did not create the reader correctly; %s; want %s", "fooDefault", got)
-	}
+	assertString(t, "fooDefault", got, "CreateEnvConfigReader did not create the reader correctly")
 }
 
 func TestCreateUserConfigWrite(t *testing.T) {
@@ -73,7 +66,5 @@ func TestCreateUserConfigWrite(t *testing.T) {
 	writer("foo", "fooValue")
 
 	got := mockConfig.GetString("foo")
-	if got != "fooValue" {
-		t.Errorf("CreateUserConfigWriter did not create the reader correctly; %s; want %s", "fooValue", got)
-	}
+	assertString(t, "fooValue", got, "CreateUserConfigWriter did not create the reader correctly")
 }

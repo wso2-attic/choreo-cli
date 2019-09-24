@@ -28,18 +28,12 @@ func TestGetEnvAsBool(t *testing.T) {
 	}()
 
 	got := getEnvAsBool(envConfigName, false)
-	if !got {
-		t.Errorf("getEnvAsBool did not return \"true\"")
-	}
+	assertBool(t, true, got, "Reading a boolean from an environment variable failed")
 }
 
 func TestGetEnvAsBoolDefault(t *testing.T) {
 	envConfigName := "choreo.config.test/TestGetEnvAsBoolDefault"
 
 	got := getEnvAsBool(envConfigName, true)
-	if !got {
-		t.Errorf("getEnvAsBool did not return \"true\"")
-	}
+	assertBool(t, true, got, "Returning default when environment variable does not exist failed")
 }
-
-
