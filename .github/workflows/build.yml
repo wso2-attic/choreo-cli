@@ -4,7 +4,7 @@ on:
 jobs:
 
   build:
-    name: Build
+    name: Linux
     runs-on: ubuntu-latest
     steps:
 
@@ -24,7 +24,7 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
-      run: make build-cli && make test
+      run: make build-cli && make coverage
 
     - name: Upload code coverage results to GitHub
       uses: actions/upload-artifact@v1
