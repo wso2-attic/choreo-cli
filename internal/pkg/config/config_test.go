@@ -13,7 +13,7 @@ import "testing"
 
 
 func TestCreateUserConfigReaderValue(t *testing.T) {
-	mockConfig := &MockConfig{
+	mockConfig := &CliConfig{
 		userConfigHolder: &MockConfigHolder{entries: map[string]string{"foo": "fooValue"}},
 	}
 
@@ -26,7 +26,7 @@ func TestCreateUserConfigReaderValue(t *testing.T) {
 }
 
 func TestCreateUserConfigReaderDefault(t *testing.T) {
-	mockConfig := &MockConfig{
+	mockConfig := &CliConfig{
 		userConfigHolder: &MockConfigHolder{entries: map[string]string{}},
 	}
 
@@ -39,7 +39,7 @@ func TestCreateUserConfigReaderDefault(t *testing.T) {
 }
 
 func TestCreateEnvConfigReaderValue(t *testing.T) {
-	mockConfig := &MockConfig{
+	mockConfig := &CliConfig{
 		envConfigHolder: &MockConfigHolder{entries: map[string]string{"foo": "fooValue"}},
 	}
 
@@ -52,7 +52,7 @@ func TestCreateEnvConfigReaderValue(t *testing.T) {
 }
 
 func TestCreateEnvConfigReaderDefault(t *testing.T) {
-	mockConfig := &MockConfig{
+	mockConfig := &CliConfig{
 		envConfigHolder: &MockConfigHolder{entries: map[string]string{}},
 	}
 
@@ -65,7 +65,7 @@ func TestCreateEnvConfigReaderDefault(t *testing.T) {
 }
 
 func TestCreateUserConfigWrite(t *testing.T) {
-	mockConfig := &MockConfig{
+	mockConfig := &CliConfig{
 		userConfigHolder: &MockConfigHolder{entries: map[string]string{}},
 	}
 

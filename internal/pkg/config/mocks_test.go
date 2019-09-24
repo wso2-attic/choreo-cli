@@ -9,27 +9,6 @@
 
 package config
 
-type MockConfig struct {
-	userConfigHolder *MockConfigHolder
-	envConfigHolder  *MockConfigHolder
-}
-
-func (mockConfig *MockConfig) GetEnvironmentConfig() Reader {
-	return mockConfig.envConfigHolder
-}
-
-func (mockConfig *MockConfig) GetString(key string) string {
-	return mockConfig.userConfigHolder.GetString(key)
-}
-
-func (mockConfig *MockConfig) GetStringOrDefault(key string, defaultValue string) string {
-	return mockConfig.userConfigHolder.GetStringOrDefault(key, defaultValue)
-}
-
-func (mockConfig *MockConfig) SetString(key string, value string) {
-	mockConfig.userConfigHolder.SetString(key, value)
-}
-
 type MockConfigHolder struct {
 	entries map[string]string
 }

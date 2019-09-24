@@ -27,34 +27,39 @@ type Reader interface {
 	GetStringOrDefault(key string, defaultValue string) string
 }
 
-type ViperConfig struct {
-	userConfigManager *ViperManager
-	envConfigManager  *ViperManager
+type CliConfig struct {
+	userConfigHolder configHolder
+	envConfigHolder  configHolder
 }
 
-func (cliConfig *ViperConfig) GetEnvironmentConfig() Reader {
-	return cliConfig.envConfigManager
+func (c *CliConfig) GetEnvironmentConfig() Reader {
+	return c.envConfigHolder
 }
 
-func (cliConfig *ViperConfig) GetString(key string) string {
-	return cliConfig.userConfigManager.GetString(key)
+func (c *CliConfig) GetString(key string) string {
+	return c.userConfigHolder.GetString(key)
 }
 
-func (cliConfig *ViperConfig) GetStringOrDefault(key string, defaultValue string) string {
-	return cliConfig.userConfigManager.GetStringOrDefault(key, defaultValue)
+func (c *CliConfig) GetStringOrDefault(key string, defaultValue string) string {
+	return c.userConfigHolder.GetStringOrDefault(key, defaultValue)
 }
 
-type ViperManager struct {
+type configHolder interface {
+	Reader
+	Writer
+}
+
+type ViperConfigHolder struct {
 	viperInstance *viper.Viper
 }
 
-func (cliConfig *ViperManager) GetString(key string) string {
-	value := cliConfig.viperInstance.GetString(key)
+func (v *ViperConfigHolder) GetString(key string) string {
+	value := v.viperInstance.GetString(key)
 	return value
 }
 
-func (cliConfig *ViperManager) GetStringOrDefault(key string, defaultValue string) string {
-	return getStringOrDefault(cliConfig.GetString, key, defaultValue)
+func (v *ViperConfigHolder) GetStringOrDefault(key string, defaultValue string) string {
+	return getStringOrDefault(v.GetString, key, defaultValue)
 }
 
 func getStringOrDefault(predicate func(key string) string, key string, defaultValue string) string {
@@ -69,16 +74,16 @@ type Writer interface {
 	SetString(key string, value string)
 }
 
-func (cliConfig *ViperManager) SetString(key string, value string) {
-	cliConfig.viperInstance.Set(key, value)
+func (v *ViperConfigHolder) SetString(key string, value string) {
+	v.viperInstance.Set(key, value)
 
-	err := cliConfig.viperInstance.WriteConfig()
+	err := v.viperInstance.WriteConfig()
 	if err == nil {
 		return
 	}
 
 	if _, ok := err.(*os.PathError); ok {
-		createDirectoryAndWrite(cliConfig.viperInstance, key)
+		createDirectoryAndWrite(v.viperInstance, key)
 	} else {
 		common.PrintError("Could not write to config. Key: "+key, err)
 	}
@@ -107,6 +112,6 @@ func makeConfigDirectory() error {
 	return nil
 }
 
-func (cliConfig *ViperConfig) SetString(key string, value string) {
-	cliConfig.userConfigManager.SetString(key, value)
+func (c *CliConfig) SetString(key string, value string) {
+	c.userConfigHolder.SetString(key, value)
 }
