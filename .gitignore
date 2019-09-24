@@ -40,3 +40,5 @@ tmp/
 # Key files
 *.key
 *.pem
+
+/coverage.txt
