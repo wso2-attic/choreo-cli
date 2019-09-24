@@ -1,4 +1,4 @@
-name: Go
+name: Build
 on:
   [push, pull_request]
 jobs:
@@ -16,10 +16,11 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
+        fetch-depth: 1
 
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
 
     - name: Build
-      run: make build-cli
+      run: make build-cli && make test

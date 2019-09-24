@@ -1,5 +1,7 @@
 # Choreo CLI
 
+![](https://github.com/wso2/choreo-cli/workflows/Build/badge.svg)
+
 CLI to manage integration applications with Choreo platform
 
 ## Table of content
