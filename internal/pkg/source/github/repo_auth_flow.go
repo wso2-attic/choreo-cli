@@ -10,102 +10,66 @@
 package github
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
+	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
-	"golang.org/x/oauth2"
 )
 
 func StartAuthFlow(cliConfig config.Config) bool {
 
-	getEnvConfig := createEnvironmentConfigReader(cliConfig)
+	getEnvConfig := config.CreateEnvironmentConfigReader(cliConfig, client.EnvConfigs)
 
 	localServerPort := common.GetFirstOpenPort(localServerBasePort)
 	localServerUrl := "http://localhost:" + strconv.Itoa(localServerPort) + localServerPath
-
-	conf := &oauth2.Config{
-		ClientID: getEnvConfig(clientID),
-		Scopes:   []string{"repo"},
-		Endpoint: oauth2.Endpoint{
-			AuthURL: githubAuthUrl,
-		},
-		RedirectURL: localServerUrl,
-	}
-
-	state := common.GetRandomString(10)
-	authUrl := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	authRequestUrl := getEnvConfig(client.BackendUrl) + backendOauthRequestPath + "?user_redirect=" + url.QueryEscape(localServerUrl)
 
 	doneChannel := make(chan bool)
 	mux := http.NewServeMux()
 	server := &http.Server{Addr: common.GetLocalBindAddress(localServerPort), Handler: mux}
-	mux.HandleFunc(localServerPath, callbackHandler(getEnvConfig, doneChannel, state))
+	mux.HandleFunc(localServerPath, callbackHandler(getEnvConfig, doneChannel))
 
 	go func() {
 		// returns ErrServerClosed on graceful close
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatal("Error while ListenAndServe: ", err)
+			common.ExitWithError("Error while ListenAndServe: ", err)
 		}
 	}()
 
-	fmt.Println("You will now be taken to your browser for authentication")
-	err := common.OpenBrowser(authUrl)
+	common.PrintInfo("You will now be taken to your browser for authentication")
+	err := common.OpenBrowser(authRequestUrl)
 	if err != nil {
-		log.Fatal("Error opening browser: ", err)
+		common.ExitWithError("Error opening browser: ", err)
 	}
 
 	isAuthorized := <-doneChannel
 	time.Sleep(2 * time.Second)
 	shutdownServer(server)
 
+	if isAuthorized {
+		common.PrintInfo("Authorization successful")
+	} else {
+		common.PrintErrorMessage("Authorization failed")
+	}
 	return isAuthorized
 }
 
-func callbackHandler(getEnvConfig func(key string) string, doneChannel chan bool, state string) func(responseWriter http.ResponseWriter, request *http.Request) {
+func callbackHandler(getEnvConfig func(key string) string, doneChannel chan bool) func(responseWriter http.ResponseWriter, request *http.Request) {
 	return func(responseWriter http.ResponseWriter, request *http.Request) {
 
 		var isAuthorized = false
-		var code, receivedState = "", ""
 		queryParts, err := url.ParseQuery(request.URL.RawQuery)
-		if err == nil {
-			code = queryParts["code"][0]
-			receivedState = queryParts["state"][0]
+		if err == nil && queryParts["is_authorized"][0] == "true" {
+			isAuthorized = true
 		}
-
-		var browserMsg string
-		if code == "" {
-			log.Print("Error obtaining auth code")
-			browserMsg = createBrowserContent(false)
-		} else if receivedState != state {
-			log.Print("Error: Sent and received states are different")
-			browserMsg = createBrowserContent(false)
-		} else {
-			statusCode := doPostBackend(getEnvConfig, code, state)
-			if statusCode == http.StatusOK {
-				isAuthorized = true
-			}
-			browserMsg = createBrowserContent(isAuthorized)
-		}
-
-		responseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, err = fmt.Fprintf(responseWriter, browserMsg)
-		if err != nil {
-			log.Print("Error displaying browser content: ", err)
-		}
-		flusher, ok := responseWriter.(http.Flusher)
-		if !ok {
-			log.Print("Error in casting the flusher", err)
-		}
-		flusher.Flush()
+		showBrowserResponse(responseWriter, isAuthorized)
 
 		doneChannel <- isAuthorized
 	}
@@ -117,51 +81,29 @@ func shutdownServer(server *http.Server) {
 	defer cancel()
 	err := server.Shutdown(ctx)
 	if err != nil {
-		log.Print("Error shutting down: ", err)
+		common.PrintError("Error shutting down the local server. Reason: ", err)
 	}
 }
 
-func createBrowserContent(isAuthorized bool) string {
+func showBrowserResponse(responseWriter http.ResponseWriter, isAuthorized bool) {
 
-	var msg string
+	responseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
+	var browserMsg string
 	if isAuthorized == true {
-		msg = "<h2>Authorization successful !</h2>"
+		browserMsg = "<h2>Authorization successful !</h2>"
 	} else {
-		msg = "<h2>Authorization failed !</h2>"
+		browserMsg = "<h2>Authorization failed !</h2>"
 	}
-	msg = msg + "<h2>Please return to the CLI</h2>"
+	browserMsg = browserMsg + "<h2>Please return to the CLI</h2>"
+	htmlContent := common.GenerateHtmlContent("Github Authorization", browserMsg)
 
-	return msg
-}
-
-func doPostBackend(getEnvConfig func(key string) string, code string, state string) int {
-
-	postUrl := getEnvConfig(backendUrl) + backendGithubAuthPath
-	jsonStr := []byte(`{"code":"` + code + `", "state":"` + state + `"}`)
-	req, err := http.NewRequest("POST", postUrl, bytes.NewBuffer(jsonStr))
+	_, err := fmt.Fprintf(responseWriter, htmlContent)
 	if err != nil {
-		log.Print("Error creating post request to submit auth code: ", err)
-		return -1
+		log.Println("Error displaying browser content: ", err)
 	}
-	req.Header.Set("Content-Type", "application/json")
-
-	skipVerify, _ := strconv.ParseBool(getEnvConfig(skipVerify))
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerify},
+	flusher, ok := responseWriter.(http.Flusher)
+	if !ok {
+		log.Println("Error in casting the flusher", err)
 	}
-	client := &http.Client{Transport: tr}
-	resp, err := client.Do(req)
-	if err == nil {
-		body, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println("==> ", string(body))
-
-		err = resp.Body.Close()
-		if err != nil {
-			log.Print(err)
-		}
-		return resp.StatusCode
-	} else {
-		log.Print("Error making post request to submit auth code: ", err)
-		return -1
-	}
+	flusher.Flush()
 }

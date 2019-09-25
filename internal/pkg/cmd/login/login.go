@@ -121,18 +121,9 @@ func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer htt
 func sendBrowserResponse(writer http.ResponseWriter, status int, message string) {
 	writer.WriteHeader(status)
 	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	content := ` <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>CLI Login</title>
-  </head>
-  <body>
-    <h2>%s</h2>
-  </body>
-</html> `
+	content := common.GenerateHtmlContent("CLI Login", "<h2>"+message+"</h2>")
 
-	if _, err := fmt.Fprintf(writer, content, message); err != nil {
+	if _, err := fmt.Fprintf(writer, content); err != nil {
 		common.PrintError("Error while sending response to auth code redirect", err)
 	}
 }
@@ -140,7 +131,7 @@ func sendBrowserResponse(writer http.ResponseWriter, status int, message string)
 func openBrowserForAuthentication(conf *oauth2.Config) {
 	hubAuthUrl := conf.AuthCodeURL("state")
 	if err := common.OpenBrowser(hubAuthUrl); err != nil {
-		common.ExitWithError("Couldn't open browser for " + common.ProductName + " login", err)
+		common.ExitWithError("Couldn't open browser for "+common.ProductName+" login", err)
 	}
 }
 

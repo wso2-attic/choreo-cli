@@ -97,6 +97,20 @@ func OpenBrowser(url string) error {
 	}
 }
 
+func GenerateHtmlContent(title string, body string) string {
+	htmlContent := `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>%s</title>
+  </head>
+  <body>
+    %s
+  </body>
+</html>`
+	return fmt.Sprintf(htmlContent, title, body)
+}
+
 func GetRandomString(length int) string {
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789")
