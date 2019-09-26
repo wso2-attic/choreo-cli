@@ -1,7 +1,7 @@
 name: PR-Alert
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened]
 jobs:
 
   build:
@@ -10,4 +10,4 @@ jobs:
     steps:
       - name: Send chat message
         run: |
-          curl -sS --output /dev/null -X POST -H 'Content-Type: application/json' ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }} -d '{"text": "New PR - ${{ github.event.pull_request._links.html.href }} "}'
+          curl -sS --output /dev/null -X POST -H 'Content-Type: application/json' "${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}" -d '{"text": "New PR - ${{ github.event.pull_request._links.html.href }} "}' || echo "Sending PR alerts failed"
