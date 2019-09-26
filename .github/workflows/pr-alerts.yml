@@ -1,0 +1,13 @@
+name: PR-Alert
+on:
+  pull_request:
+    types: [opened]
+jobs:
+
+  build:
+    name: Chat Bot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send chat message
+        run: |
+          curl -sS --output /dev/null -X POST -H 'Content-Type: application/json' ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }} -d '{"text": "New PR - ${{ github.event.pull_request._links.html.href }} "}'
