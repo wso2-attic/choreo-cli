@@ -19,11 +19,11 @@ Choreo CLI design is influenced by *noun-verb* grouping paradigm. It is inspired
 
 ## Object (nouns) relationship
 
-<img src="assets/images/rel.png" width="400" />
+<img src="assets/images/rel.svg" width="400" />
 
 ## Developer creating an app and running it locally
 
-![local-run](assets/images/local-run.png) 
+![local-run](assets/images/local-run.svg) 
 
 ```
 $git clone http://github.com/<user_name>/<app_name>.git
@@ -97,7 +97,7 @@ $chor plan dryrun <plan_name>
 
 ## Developer creating an app and deploying it remotely (in Choreo or in aws/gcp/azure..)
 
-![remote-run](assets/images/remote-dep.png) 
+![remote-run](assets/images/remote-dep.svg) 
 
 >… dev-ops flow above 
 
