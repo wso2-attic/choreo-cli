@@ -48,7 +48,6 @@ func StartAuthFlow(cliConfig config.Config) bool {
 	}
 
 	isAuthorized := <-doneChannel
-	time.Sleep(2 * time.Second)
 	shutdownServer(server)
 
 	if isAuthorized {
