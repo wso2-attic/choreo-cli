@@ -1,6 +1,6 @@
 # Choreo CLI
 
-[![Build Status](https://github.com/wso2/choreo-cli/workflows/Build/badge.svg)](https://github.com/wso2/choreo-cli/actions)
+[![Build Status](https://github.com/wso2/choreo-cli/workflows/Build/badge.svg)](https://github.com/wso2/choreo-cli/actions?workflow=Build)
 
 CLI to manage integration applications with Choreo platform
 
