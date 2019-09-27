@@ -28,3 +28,7 @@ jobs:
 
     - name: Tests results
       run: make test
+
+    - name: Validate TODOs
+      if: github.base_ref == 'master'
+      run: (! grep -rin "//todo" ./cmd ./docs ./internal ./spec)
