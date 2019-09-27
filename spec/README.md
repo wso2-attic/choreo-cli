@@ -120,7 +120,7 @@ $chor auth login`
 ```
 
 >Login to id.choreo.dev. *this is a one time thing*
->*also think about “$chor login -i” to provide un/pw through cli itself with a multi-factor possibly (backlog item)*
+>*also think about “$chor auth login -i” to provide un/pw through cli itself with a multi-factor possibly (backlog item)*
 
 ```
 $chor app create <app_name> --description <app_description>
