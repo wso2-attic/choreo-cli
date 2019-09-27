@@ -15,21 +15,21 @@ Choreo CLI design is influenced by *noun-verb* grouping paradigm. It is inspired
 
 `logging` - Top level object to deal with anytype of a log of an app or part of an app. Associated verbs are like: `tail, trace, ...`
 
-`version` - Choreo backend API version & CLI version
+`version, --version, -v` - Choreo backend API version & CLI version
+
+`help, --help, -h` - Choreo help
 
 ## Object (nouns) relationship
 
 <img src="assets/images/rel.svg" width="400" />
 
-## Choreo wide flags
+## Choreo command convention
 
-Flags are applied for any *Choreo command*
+`$chor foo bar NAME [EXTRA] [--format=FORMAT]`
 
-`--description, -d` - specify the description of an entity (app, environment etc.)
+>Where `foo` is a noun, `bar` is a verb and `NAME` is a mandatory positional argument, `[EXTRA]` an optional positional argument and `[--format=FORMAT]` is an optional flag
 
-`--url, -u` - specify the url of the repository, url of the deployment etc.
 
-``
 
 ## Developer creating an app and running it locally
 
@@ -46,17 +46,15 @@ $chor auth login
 >Also think about “$chor auth login -i” to provide un/pw through cli itself with a multi-factor auth possibly (backlog item)
 
 ```
-$chor app create <app_name>
+$chor app create APP_NAME
 ```
-
->Create the app in Choreo
 
 >This always associate the origin repo with all it’s branches
 
 >Init the app with choreo specific environment descriptor (for instrumentation etc.). This descriptor <app_name>.yaml will have app name / description and all other details for git-ops purposes
 
 ```
-$chor app link <app-name> -url <git repo url>
+$chor app link [APP_NAME] GIT_REPO_URL
 ```
 
 >This will try to link a github repo, but if github is not yet linked to the user account, an error will be fired for asking for github connection `$chor auth connect github`
@@ -67,7 +65,7 @@ $chor app link <app-name> -url <git repo url>
 $chor auth connect github
 ```
 
->Will connect Choreo user account with user's github account. Similarly `$chor auth connect bitbucket` will connect to bitbucket et. al. Once connected user can link git repos to apps with `$chor app link <app-name> -url <git repo url>`
+>Will connect Choreo user account with user's github account. Similarly `$chor auth connect bitbucket` will connect to bitbucket et. al. 
 
 ```
 $git add <new files>
@@ -82,7 +80,7 @@ $git push origin master
 >Assuming the dev is working on the master
 
 ```
-$chor local run <app_name>
+$chor app local run [APP_NAME]
 ```
 
 >This is to run the application locally.
@@ -94,15 +92,17 @@ $chor local run <app_name>
 ![dev-ops](assets/images/devops.png) 
 
 ```
-$chor plan create <plan_name> -type aws|gcp|azure
+$chor plan create PLAN_NAME
 ```
 
 >choreo topology plans are created by dev-ops
 
 >Choreo plans are topology plans. These are defined with terraform to setup an environment in IaaSes (aws/gcp/azure/K8s)
 
+>This will create a plan.yaml file where devops can describe the plan
+
 ```
-$chor plan dryrun <plan_name>
+$chor plan dryrun PLAN_NAME
 ```
 
 >Once you create a plan, the devops  team should be able to do a dryrun of this
@@ -123,7 +123,7 @@ $chor auth login`
 >*also think about “$chor auth login -i” to provide un/pw through cli itself with a multi-factor possibly (backlog item)*
 
 ```
-$chor app create <app_name> --description <app_description>
+$chor app create APP_NAME [--description]
 ```
 
 >Create the app in Choreo
@@ -131,7 +131,7 @@ $chor app create <app_name> --description <app_description>
 >Init the app with choreo specific environment descriptor (for instrumentation etc.). This descriptor <app_name>.yaml will have app name / description and all other details for git-ops purposes
 
 ```
-$chor app link <app-name> -url <git repo url>
+$chor app link [APP_NAME] GIT_REPO_URL
 ```
 
 >This will try to link a github repo, but if github is not yet linked to the user account, an error will be fired for asking for github connection `$chor auth connect github`
@@ -140,7 +140,7 @@ $chor app link <app-name> -url <git repo url>
 $chor auth connect github
 ```
 
->Will connect Choreo user account with user's github account. Similarly `$chor auth connect bitbucket` will connect to bitbucket et. al. Once connected user can link git repos to apps with `$chor app link <app-name> -url <git repo url>`
+>Will connect Choreo user account with user's github account. Similarly `$chor auth connect bitbucket` will connect to bitbucket et. al. 
 
 ```
 $git add <new files>
@@ -156,46 +156,39 @@ $git push origin master
 >Assuming the dev is working on the master
 
 ```
-$chor environment create <env_name> -plan <plan_name>
+$chor env create ENV_NAME
 ```
 
 >Create an environment remotely in choreo cloud
 
->When creating an environment devs can link a topology plan (which is pre-configured), based on the plan then the environment will be setup in the chosen IaaS
+>This will create a `<env_name>.yaml` file, where the devs can specify the chosen topology `plan` for this environment. Alternatively we can ask the plan during the creation process
 
 ```
-$chor app link <app_name> -env <env_name>
+$chor app link [APP_NAME] ENV_NAME
 ```
 
->This links an environment to an application. `$chor app link -env <env_name>` will link the environment to the current working app
-
-
-```
-$chor env link <env_name>
-```
-
->This links working source branch of the current app
+>This links an environment to an application. `$chor app link ENV_NAME` will link the environment to the current working app
 
 ```
-$chor env link <env_name> -b <upstream/featurebranch1>
+$chor env link ENV_NAME GIT_BRANCH_NAME
 ```
 
->This links specific source branch of the current app
+>This links specific source branch of the specified environment
 
 ```
-$chor env start|stop|restart -env <env_name>
+$chor env start|stop|restart ENV_NAME
 ```
 
 >This starts the app in the environment
 
 ```
-$chor env destroy -env <env_name>
+$chor env destroy ENV_NAME
 ```
 
 >This removes the environment
 
 ```
-$chor logging logs trace -env <env_name>
+$chor logging logs trace ENV_NAME
 ```
 
 >Similarly we need to get tracing through cli
@@ -209,26 +202,26 @@ $chor logging logs trace -env <env_name>
 $chor auth login
 >>Sucessful!
 
-$chor app create <app_name>
+$chor app create cat_pics
 >>Succesful!
 
-$chor app link <app-name> -url <git repo url>
+$chor app link my_cat_pics http://github.com/cats/cat_pics
 >>Fail connect. Try to connect to github with..
 >>$chor auth connect github
 
 $chor auth connect github
 >>Sucessful!
 
-$chor app link <app-name> -url <git repo url>
+$chor app link my_cat_pics http://github.com/cats/cat_pics
 >>Sucessful!
 
-$chor env create <env-name> -plan <plan-name>
+$chor env create cats_dev simple
 >>Sucessful!
 
-$chor app link <app-name> -env <env-name>
+$chor app link my_cat_pics cats_dev
 >>Sucessful!
 
-$chor env link <env-name> -branch <upstream/featurebranch1>
+$chor env link cats_dev upstream/cat_pics_b1
 >>Sucessful!
 
 ```
