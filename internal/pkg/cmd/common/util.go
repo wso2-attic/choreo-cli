@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
@@ -97,18 +98,34 @@ func OpenBrowser(url string) error {
 	}
 }
 
-func GenerateHtmlContent(title string, body string) string {
+func SendBrowserResponse(responseWriter http.ResponseWriter, status int, title string, messages ...string) {
+	responseWriter.WriteHeader(status)
+	responseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
 	htmlContent := `<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>%s</title>
-  </head>
-  <body>
-    %s
-  </body>
+	<head>
+		<meta charset="UTF-8">
+		<title>%s</title>
+	</head>
+	<body>
+		<div style="text-align: center;">
+		%s
+		</div>
+	</body>
 </html>`
-	return fmt.Sprintf(htmlContent, title, body)
+	body := ""
+	for _, line := range messages {
+		body += "<h2>" + line + "</h2>"
+	}
+
+	if _, err := fmt.Fprintf(responseWriter, htmlContent, title, body); err != nil {
+		PrintError("Error displaying browser content", err)
+	}
+	flusher, ok := responseWriter.(http.Flusher)
+	if !ok {
+		PrintErrorMessage("Error in casting the flusher")
+	}
+	flusher.Flush()
 }
 
 func GetRandomString(length int) string {

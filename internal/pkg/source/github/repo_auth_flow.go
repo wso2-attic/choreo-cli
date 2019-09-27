@@ -11,8 +11,6 @@ package github
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -69,7 +67,14 @@ func callbackHandler(getEnvConfig func(key string) string, doneChannel chan bool
 		if err == nil && queryParts["is_authorized"][0] == "true" {
 			isAuthorized = true
 		}
-		showBrowserResponse(responseWriter, isAuthorized)
+
+		title := "Github Authorization"
+		message := "Please return to the CLI."
+		if isAuthorized {
+			common.SendBrowserResponse(responseWriter, http.StatusOK, title, "Authorization successful !", message)
+		} else {
+			common.SendBrowserResponse(responseWriter, http.StatusInternalServerError, title, "Authorization failed !", message)
+		}
 
 		doneChannel <- isAuthorized
 	}
@@ -83,27 +88,4 @@ func shutdownServer(server *http.Server) {
 	if err != nil {
 		common.PrintError("Error shutting down the local server. Reason: ", err)
 	}
-}
-
-func showBrowserResponse(responseWriter http.ResponseWriter, isAuthorized bool) {
-
-	responseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
-	var browserMsg string
-	if isAuthorized == true {
-		browserMsg = "<h2>Authorization successful !</h2>"
-	} else {
-		browserMsg = "<h2>Authorization failed !</h2>"
-	}
-	browserMsg = browserMsg + "<h2>Please return to the CLI</h2>"
-	htmlContent := common.GenerateHtmlContent("Github Authorization", browserMsg)
-
-	_, err := fmt.Fprintf(responseWriter, htmlContent)
-	if err != nil {
-		log.Println("Error displaying browser content: ", err)
-	}
-	flusher, ok := responseWriter.(http.Flusher)
-	if !ok {
-		log.Println("Error in casting the flusher", err)
-	}
-	flusher.Flush()
 }
