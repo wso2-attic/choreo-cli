@@ -5,7 +5,7 @@ Choreo CLI design is influenced by *noun-verb* grouping paradigm. It is inspired
 
 ## High level objects (nouns/groups)
 
-`auth` - Choreo auth is the command group that deals with user authentication to Choreo via the CLI. The associated verbs are: `login, revoke, print-access-token, ...`
+`auth` - Choreo auth is the command group that deals with user authentication to Choreo via the CLI. The associated verbs are: `login, connect, revoke, print-access-token, ...`
 
 `application, app` - Choreo app is a placeholder. At minimum this represent some code that can be deployed as one unit (service.bal/service.java/service.js). In a real world situation, an app is a composite. (e.g. App = front end component + backend component + ..) In such a situation, a single app has multiple deployable units. The application is associated with verbs like: `create, describe, ...`
 
@@ -21,6 +21,16 @@ Choreo CLI design is influenced by *noun-verb* grouping paradigm. It is inspired
 
 <img src="assets/images/rel.svg" width="400" />
 
+## Choreo wide flags
+
+Flags are applied for any *Choreo command*
+
+`--description, -d` - specify the description of an entity (app, environment etc.)
+
+`--url, -u` - specify the url of the repository, url of the deployment etc.
+
+``
+
 ## Developer creating an app and running it locally
 
 ![local-run](assets/images/local-run.svg) 
@@ -33,7 +43,7 @@ $chor auth login
 
 >Login to id.choreo.dev - *this is a one time thing*
 
->Also think about “$chor login -i” to provide un/pw through cli itself with a multi-factor auth possibly (backlog item)
+>Also think about “$chor auth login -i” to provide un/pw through cli itself with a multi-factor auth possibly (backlog item)
 
 ```
 $chor app create <app_name>
@@ -50,6 +60,8 @@ $chor app link <app-name> -url <git repo url>
 ```
 
 >This will try to link a github repo, but if github is not yet linked to the user account, an error will be fired for asking for github connection `$chor auth connect github`
+
+>if <app_name> is not specified, `$chor` will take working app name in default
 
 ```
 $chor auth connect github
@@ -93,7 +105,7 @@ $chor plan create <plan_name> -type aws|gcp|azure
 $chor plan dryrun <plan_name>
 ```
 
->Once you create a the devops should be able to do a dryrun of this
+>Once you create a plan, the devops  team should be able to do a dryrun of this
 
 ## Developer creating an app and deploying it remotely (in Choreo or in aws/gcp/azure..)
 
