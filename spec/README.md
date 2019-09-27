@@ -195,7 +195,7 @@ $chor logging logs trace -env <env_name>
 
 ```
 $chor auth login
-<font color='red'>>>Sucessful!</font>
+>>Sucessful!
 
 $chor app create <app_name>
 >>Succesful!
