@@ -7,22 +7,19 @@
  * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
-package application
+package auth
 
 import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
-
+func NewAuthCommand(cliConfig config.Config) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     cmdApplication,
-		Short:   "Manage applications",
-		Aliases: []string{"app"},
-		Args:    cobra.MaximumNArgs(1),
+		Use:     cmdAuth,
+		Short:   "Manage authentication and authorization",
+		Args:    cobra.ExactArgs(1),
 	}
-	cmd.AddCommand(NewCreateCommand(cliConfig))
-	cmd.AddCommand(NewListCommand(cliConfig))
+	cmd.AddCommand(NewConnectCommand(cliConfig))
 	return cmd
 }

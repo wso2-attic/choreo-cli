@@ -21,7 +21,7 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func StartAuthFlow(cliConfig config.Config) bool {
+func PerformGithubAuthorization(cliConfig config.Config) bool {
 
 	getEnvConfig := config.CreateEnvironmentConfigReader(cliConfig, client.EnvConfigs)
 
@@ -50,11 +50,6 @@ func StartAuthFlow(cliConfig config.Config) bool {
 	isAuthorized := <-doneChannel
 	shutdownServer(server)
 
-	if isAuthorized {
-		common.PrintInfo("Authorization successful")
-	} else {
-		common.PrintErrorMessage("Authorization failed")
-	}
 	return isAuthorized
 }
 
@@ -67,7 +62,7 @@ func callbackHandler(getEnvConfig func(key string) string, doneChannel chan bool
 			isAuthorized = true
 		}
 
-		title := "Github Authorization"
+		title := "GitHub Authorization"
 		message := "Please return to the CLI."
 		if isAuthorized {
 			common.SendBrowserResponse(responseWriter, http.StatusOK, title, "Authorization successful !", message)
