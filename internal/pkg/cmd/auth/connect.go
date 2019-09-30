@@ -24,7 +24,7 @@ func NewConnectCommand(cliConfig config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     cmdConnect,
 		Short:   "Connect to a source code provider",
-		Example: fmt.Sprintln(common.GetAbsoluteCommandName(cmdAuth, cmdConnect), " github"),
+		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdAuth, cmdConnect), " github"),
 		Args:    cobra.ExactArgs(1),
 		Run:     runConnectCommand(cliConfig),
 	}
@@ -35,14 +35,14 @@ func runConnectCommand(cliConfig config.Config) func(cmd *cobra.Command, args []
 	return func(cmd *cobra.Command, args []string) {
 
 		if strings.ToLower(args[0]) == sourceProviderGithub {
-			if github.StartAuthFlow(cliConfig) {
-				common.PrintInfo("Github authorization successful.")
+			if github.PerformGithubAuthorization(cliConfig) {
+				common.PrintInfo("GitHub authorization successful.")
 			} else {
-				common.PrintErrorMessage("Github authorization failed.")
+				common.PrintErrorMessage("GitHub authorization failed.")
 			}
 		} else {
 			common.PrintErrorMessage("Unsupported source provider specified: " + args[0] +
-				". At the moment we only support Github.")
+				". At the moment we only support GitHub.")
 		}
 	}
 }

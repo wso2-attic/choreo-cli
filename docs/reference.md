@@ -66,6 +66,49 @@ $ chor version
 
 [Back to Command List](#chor-cli-commands)
 
+### chor auth
+
+`auth` command is used to manage authentication and authorization in Choreo platform. 
+Available sub commands include [connect](#chor-auth-connect).
+
+#### Synopsis
+
+Manage authentication and authorization.
+
+#### Options
+
+```
+  -h, --help   help for application
+```
+
+[Back to Command List](#chor-cli-commands)
+
+### chor auth connect
+
+`auth connect` command is used to connect a source code provider to Choreo. At the moment only GitHub is supported.
+
+#### Synopsis
+
+Connect a source code provider.
+
+```
+auth connect SOURCE_PROVIDER
+```
+
+#### Examples
+
+```
+$ chor auth connect github
+```
+
+#### Options
+
+```
+  -h, --help                 help for create
+```
+
+[Back to Command List](#chor-cli-commands)
+
 ### chor application
 
 `application` command is used to manage applications created with the Choreo platform. 
