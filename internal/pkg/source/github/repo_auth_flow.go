@@ -50,11 +50,6 @@ func StartAuthFlow(cliConfig config.Config) bool {
 	isAuthorized := <-doneChannel
 	shutdownServer(server)
 
-	if isAuthorized {
-		common.PrintInfo("Authorization successful")
-	} else {
-		common.PrintErrorMessage("Authorization failed")
-	}
 	return isAuthorized
 }
 
