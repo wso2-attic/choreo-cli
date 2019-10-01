@@ -25,16 +25,22 @@ func main() {
 		cmdCommon.ExitWithError("Error loading configs", err)
 	}
 
+	command := initCommands(cliConfig)
+
+	if err := command.Execute(); err != nil {
+		cmdCommon.ExitWithError("Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
+	}
+}
+
+func initCommands(cliConfig *config.CliConfig) cobra.Command {
 	command := cobra.Command{
-		Use:   cmdCommon.GetAbsoluteCommandName() + " <command>",
-		Short: "Manage integration applications with Choreo platform",
+		Use:   cmdCommon.GetAbsoluteCommandName() + " COMMAND",
+		Short: "Manage integration applications with " + cmdCommon.ProductName + " platform",
 	}
 
 	command.AddCommand(cmd.NewVersionCommand(cliConfig))
 	command.AddCommand(login.NewLoginCommand(cliConfig))
 	command.AddCommand(application.NewApplicationCommand(cliConfig))
 
-	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError("Error executing "+ cmdCommon.GetAbsoluteCommandName() + " command", err)
-	}
+	return command
 }
