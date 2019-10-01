@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
+	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
 func TestViperConfigHolderReadValue(t *testing.T) {
@@ -21,7 +22,7 @@ func TestViperConfigHolderReadValue(t *testing.T) {
 	configHolder := &ViperConfigHolder{viperInstance: v}
 
 	got := configHolder.GetString("foo")
-	assertString(t, "fooValue", got, "ViperConfigHolder did not read the value correctly")
+	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not read the value correctly")
 }
 
 func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
@@ -30,7 +31,7 @@ func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
 	configHolder := &ViperConfigHolder{viperInstance: v}
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
-	assertString(t, "fooValue", got, "ViperConfigHolder did not return the value correctly")
+	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not return the value correctly")
 }
 
 func TestViperConfigHolderReadDefault(t *testing.T) {
@@ -38,7 +39,7 @@ func TestViperConfigHolderReadDefault(t *testing.T) {
 	configHolder := &ViperConfigHolder{viperInstance: v}
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
-	assertString(t, "fooDefault", got, "ViperConfigHolder did not read the default")
+	test.AssertString(t, "fooDefault", got, "ViperConfigHolder did not read the default")
 }
 
 func TestViperConfigHolderWrite(t *testing.T) {
@@ -47,5 +48,5 @@ func TestViperConfigHolderWrite(t *testing.T) {
 
 	configHolder.SetString("foo", "fooValue")
 	got := configHolder.GetString("foo")
-	assertString(t, "fooValue", got, "ViperConfigHolder did not write the value correctly")
+	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not write the value correctly")
 }
