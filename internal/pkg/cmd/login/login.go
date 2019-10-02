@@ -12,11 +12,13 @@ package login
 import (
 	"context"
 	"fmt"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
+	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"golang.org/x/oauth2"
@@ -39,7 +41,7 @@ func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args 
 	return func(cmd *cobra.Command, args []string) {
 		codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
 		oauth2Conf := createOauth2Conf(callbackUrlContext, codeServicePort, getEnvConfig)
-		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauth2Conf, setUserConfig)
+		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauth2Conf, setUserConfig, os.Stdout)
 		openBrowserForAuthentication(oauth2Conf)
 		<-authCodeChannel
 		stopAuthCodeServer(server)
@@ -66,7 +68,7 @@ func stopAuthCodeServer(server *http.Server) {
 	}
 }
 
-func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserConfig config.SetConfig) (<-chan bool, *http.Server) {
+func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserConfig config.SetConfig, writer io.Writer) (<-chan bool, *http.Server) {
 	oauthDone := make(chan bool)
 
 	mux := http.NewServeMux()
@@ -74,7 +76,7 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
 		if err := request.ParseForm(); err != nil {
 			sendErrorToBrowser(writer)
-			common.PrintError("Login to Choreo failed due to an error parsing the received query parameters", err)
+			common.PrintError("Login to "+common.ProductName+" failed due to an error parsing the received query parameters", err)
 			oauthDone <- false
 			return
 		}
@@ -83,7 +85,7 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 
 		if code == "" {
 			sendErrorToBrowser(writer)
-			common.PrintErrorMessage("Login to Choreo failed due to receiving a blank auth code from the IDP")
+			common.PrintErrorMessage(writer, "Login to Choreo failed due to receiving a blank auth code from the IDP")
 			oauthDone <- false
 			return
 		} else {
