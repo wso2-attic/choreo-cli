@@ -19,12 +19,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	cmdContext "github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"golang.org/x/oauth2"
 )
 
-func NewLoginCommand(cliContext cmdContext.CliContext) *cobra.Command {
+func NewLoginCommand(cliContext runtime.CliContext) *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
 		Short:   "Login to " + common.ProductName,
@@ -34,7 +34,7 @@ func NewLoginCommand(cliContext cmdContext.CliContext) *cobra.Command {
 	}
 }
 
-func createLoginFunction(cliContext cmdContext.CliContext) func(cmd *cobra.Command, args []string) {
+func createLoginFunction(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	getEnvConfig := createEnvConfigReader(cliContext.Config())
 	setUserConfig := config.CreateUserConfigWriter(cliContext.Config())
 	consoleWriter := cliContext.Out()
