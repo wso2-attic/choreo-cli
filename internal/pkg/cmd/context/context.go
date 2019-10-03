@@ -18,16 +18,13 @@ type CliContext interface {
 	Out() io.Writer
 }
 
-type cliContextData struct {
-	out io.Writer
+type CliContextData struct {
 }
 
-func (c *cliContextData) Out() io.Writer {
-	return c.out
+func (c *CliContextData) Out() io.Writer {
+	return os.Stdout
 }
 
-func NewCliContext() *cliContextData {
-	return &cliContextData{
-		out: os.Stdout,
-	}
+func NewCliContext() *CliContextData {
+	return &CliContextData{}
 }
