@@ -12,6 +12,7 @@ package common
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"os/exec"
@@ -28,8 +29,8 @@ func GetAbsoluteCommandName(commandComponents ...string) string {
 	return commandName
 }
 
-func PrintErrorMessage(message string) {
-	fmt.Println(message)
+func PrintErrorMessage(writer io.Writer, message string) {
+	fPrintln(writer, message)
 }
 
 func PrintError(message string, err error) {
@@ -46,9 +47,9 @@ func ExitWithError(message string, err error) {
 	os.Exit(1)
 }
 
-func ExitWithErrorMessage(message string) {
-	PrintErrorMessage(message)
-	fmt.Println()
+func ExitWithErrorMessage(writer io.Writer, message string) {
+	PrintErrorMessage(writer, message)
+	fPrintln(writer)
 	os.Exit(1)
 }
 
@@ -93,4 +94,8 @@ func OpenBrowser(url string) error {
 	} else {
 		return errors.New("unsupported platform")
 	}
+}
+
+func fPrintln(writer io.Writer, message ...interface{}) {
+	_, _ = fmt.Fprintln(writer, message...)
 }
