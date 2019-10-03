@@ -11,6 +11,9 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/build"
@@ -29,8 +32,20 @@ func NewVersionCommand(cliConfig config.Config) *cobra.Command {
 }
 
 func runVersion(cmd *cobra.Command, args []string) {
-	fmt.Printf(" Version:\t\t%s\n", build.GetBuildVersion())
-	fmt.Printf(" Git commit:\t\t%s\n", build.GetBuildGitRevision())
-	fmt.Printf(" Built:\t\t\t%s\n", build.GetBuildTime())
-	fmt.Printf(" OS/Arch:\t\t%s\n", build.GetBuildPlatform())
+	printVersionInfo(os.Stdout)
+}
+
+func printVersionInfo(writer io.Writer) {
+	sb := &strings.Builder{}
+
+	concat(sb, " Version:\t\t%s\n", build.GetBuildVersion())
+	concat(sb, " Git commit:\t\t%s\n", build.GetBuildGitRevision())
+	concat(sb, " Built:\t\t\t%s\n", build.GetBuildTime())
+	concat(sb, " OS/Arch:\t\t%s\n", build.GetBuildPlatform())
+
+	_, _ = fmt.Fprint(writer, sb.String())
+}
+
+func concat(sb *strings.Builder, format string, a ...interface{}) {
+	sb.WriteString(fmt.Sprintf(format, a...))
 }

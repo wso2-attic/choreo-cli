@@ -11,6 +11,8 @@ package config
 
 import (
 	"testing"
+
+	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
 func TestCreateUserConfigReaderValue(t *testing.T) {
@@ -21,7 +23,7 @@ func TestCreateUserConfigReaderValue(t *testing.T) {
 	reader := CreateUserConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	assertString(t, "fooValue", got, "CreateUserConfigReader did not create the reader correctly")
+	test.AssertString(t, "fooValue", got, "CreateUserConfigReader did not create the reader correctly")
 }
 
 func TestCreateUserConfigReaderDefault(t *testing.T) {
@@ -32,7 +34,7 @@ func TestCreateUserConfigReaderDefault(t *testing.T) {
 	reader := CreateUserConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	assertString(t, "fooDefault", got, "CreateUserConfigReader did not create the reader correctly")
+	test.AssertString(t, "fooDefault", got, "CreateUserConfigReader did not create the reader correctly")
 }
 
 func TestCreateEnvConfigReaderValue(t *testing.T) {
@@ -43,7 +45,7 @@ func TestCreateEnvConfigReaderValue(t *testing.T) {
 	reader := CreateEnvironmentConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	assertString(t, "fooValue", got, "CreateEnvConfigReader did not create the reader correctly")
+	test.AssertString(t, "fooValue", got, "CreateEnvConfigReader did not create the reader correctly")
 }
 
 func TestCreateEnvConfigReaderDefault(t *testing.T) {
@@ -54,7 +56,7 @@ func TestCreateEnvConfigReaderDefault(t *testing.T) {
 	reader := CreateEnvironmentConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	assertString(t, "fooDefault", got, "CreateEnvConfigReader did not create the reader correctly")
+	test.AssertString(t, "fooDefault", got, "CreateEnvConfigReader did not create the reader correctly")
 }
 
 func TestCreateUserConfigWrite(t *testing.T) {
@@ -66,5 +68,5 @@ func TestCreateUserConfigWrite(t *testing.T) {
 	writer("foo", "fooValue")
 
 	got := mockConfig.GetString("foo")
-	assertString(t, "fooValue", got, "CreateUserConfigWriter did not create the reader correctly")
+	test.AssertString(t, "fooValue", got, "CreateUserConfigWriter did not create the reader correctly")
 }

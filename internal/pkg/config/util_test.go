@@ -12,6 +12,8 @@ package config
 import (
 	"os"
 	"testing"
+
+	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
 func TestGetEnvAsBool(t *testing.T) {
@@ -28,12 +30,12 @@ func TestGetEnvAsBool(t *testing.T) {
 	}()
 
 	got := getEnvAsBool(envConfigName, false)
-	assertBool(t, true, got, "Reading a boolean from an environment variable failed")
+	test.AssertBool(t, true, got, "Reading a boolean from an environment variable failed")
 }
 
 func TestGetEnvAsBoolDefault(t *testing.T) {
 	envConfigName := "choreo.config.test/TestGetEnvAsBoolDefault"
 
 	got := getEnvAsBool(envConfigName, true)
-	assertBool(t, true, got, "Returning default when environment variable does not exist failed")
+	test.AssertBool(t, true, got, "Returning default when environment variable does not exist failed")
 }
