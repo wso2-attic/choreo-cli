@@ -42,7 +42,7 @@ func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args 
 		codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
 		oauth2Conf := createOauth2Conf(callbackUrlContext, codeServicePort, getEnvConfig)
 		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauth2Conf, setUserConfig, os.Stdout)
-		openBrowserForAuthentication(oauth2Conf)
+		openBrowserForAuthentication(os.Stdout, oauth2Conf)
 		<-authCodeChannel
 		stopAuthCodeServer(server)
 
@@ -68,15 +68,15 @@ func stopAuthCodeServer(server *http.Server) {
 	}
 }
 
-func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserConfig config.SetConfig, writer io.Writer) (<-chan bool, *http.Server) {
+func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserConfig config.SetConfig, consoleWriter io.Writer) (<-chan bool, *http.Server) {
 	oauthDone := make(chan bool)
 
 	mux := http.NewServeMux()
 	server := &http.Server{Addr: common.GetLocalBindAddress(port), Handler: mux}
-	mux.HandleFunc(callbackUrlContext, func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(callbackUrlContext, func(httpWriter http.ResponseWriter, request *http.Request) {
 		if err := request.ParseForm(); err != nil {
-			sendErrorToBrowser(writer)
-			common.PrintError("Login to "+common.ProductName+" failed due to an error parsing the received query parameters", err)
+			sendErrorToBrowser(consoleWriter, httpWriter)
+			common.PrintError(consoleWriter, "Login to "+common.ProductName+" failed due to an error parsing the received query parameters", err)
 			oauthDone <- false
 			return
 		}
@@ -84,14 +84,14 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 		code := request.Form.Get("code")
 
 		if code == "" {
-			sendErrorToBrowser(writer)
-			common.PrintErrorMessage(writer, "Login to Choreo failed due to receiving a blank auth code from the IDP")
+			sendErrorToBrowser(consoleWriter, httpWriter)
+			common.PrintErrorMessage(consoleWriter, "Login to Choreo failed due to receiving a blank auth code from the IDP")
 			oauthDone <- false
 			return
 		} else {
-			if err := exchangeAuthCodeForToken(code, oauth2Conf, writer, setUserConfig); err != nil {
-				sendErrorToBrowser(writer)
-				common.PrintError("Could not exchange auth code for an access token", err)
+			if err := exchangeAuthCodeForToken(code, oauth2Conf, httpWriter, consoleWriter, setUserConfig); err != nil {
+				sendErrorToBrowser(consoleWriter, httpWriter)
+				common.PrintError(consoleWriter, "Could not exchange auth code for an access token", err)
 				oauthDone <- false
 				return
 			}
@@ -100,29 +100,29 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 		oauthDone <- true
 	})
 
-	go listenForAuthCode(server)
+	go listenForAuthCode(server, consoleWriter)
 
 	return oauthDone, server
 }
 
-func sendErrorToBrowser(writer http.ResponseWriter) {
+func sendErrorToBrowser(consoleWriter io.Writer, httpWriter http.ResponseWriter) {
 	message := "Login to Choreo failed due to an internal error. Please try again."
-	sendBrowserResponse(writer, http.StatusInternalServerError, message)
+	sendBrowserResponse(consoleWriter, httpWriter, http.StatusInternalServerError, message)
 }
 
-func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer http.ResponseWriter, setUserConfig config.SetConfig) error {
+func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer http.ResponseWriter, consoleWriter io.Writer, setUserConfig config.SetConfig) error {
 	token, err := getAccessToken(code, oauth2Conf)
 	if err != nil {
 		return err
 	}
 	setUserConfig(client.AccessToken, token)
-	sendBrowserResponse(writer, http.StatusOK, "Login to Choreo is successful. Please return to the CLI.")
+	sendBrowserResponse(consoleWriter, writer, http.StatusOK, "Login to Choreo is successful. Please return to the CLI.")
 	return nil
 }
 
-func sendBrowserResponse(writer http.ResponseWriter, status int, message string) {
-	writer.WriteHeader(status)
-	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+func sendBrowserResponse(consoleWriter io.Writer, httpWriter http.ResponseWriter, status int, message string) {
+	httpWriter.WriteHeader(status)
+	httpWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
 	content := ` <!DOCTYPE html>
 <html>
   <head>
@@ -134,15 +134,15 @@ func sendBrowserResponse(writer http.ResponseWriter, status int, message string)
   </body>
 </html> `
 
-	if _, err := fmt.Fprintf(writer, content, message); err != nil {
-		common.PrintError("Error while sending response to auth code redirect", err)
+	if _, err := fmt.Fprintf(httpWriter, content, message); err != nil {
+		common.PrintError(consoleWriter, "Error while sending response to auth code redirect", err)
 	}
 }
 
-func openBrowserForAuthentication(conf *oauth2.Config) {
+func openBrowserForAuthentication(consoleWriter io.Writer, conf *oauth2.Config) {
 	hubAuthUrl := conf.AuthCodeURL("state")
 	if err := common.OpenBrowser(hubAuthUrl); err != nil {
-		common.ExitWithError("Couldn't open browser for " + common.ProductName + " login", err)
+		common.ExitWithError(consoleWriter, "Couldn't open browser for "+common.ProductName+" login", err)
 	}
 }
 
@@ -163,8 +163,8 @@ func createOauth2Conf(context string, port int, getEnvConfig config.GetConfig) *
 	return conf
 }
 
-func listenForAuthCode(server *http.Server) {
+func listenForAuthCode(server *http.Server, consoleWriter io.Writer) {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		common.ExitWithError("Error while initializing auth code accepting service", err)
+		common.ExitWithError(consoleWriter,"Error while initializing auth code accepting service", err)
 	}
 }

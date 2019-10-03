@@ -10,6 +10,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
@@ -19,16 +21,17 @@ import (
 )
 
 func main() {
+	consoleWriter := os.Stdout
 
 	cliConfig, err := config.InitConfig()
 	if err != nil {
-		cmdCommon.ExitWithError("Error loading configs", err)
+		cmdCommon.ExitWithError(consoleWriter, "Error loading configs", err)
 	}
 
 	command := initCommands(cliConfig)
 
 	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError("Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
+		cmdCommon.ExitWithError(consoleWriter, "Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
 	}
 }
 

@@ -36,14 +36,10 @@ func runVersion(cmd *cobra.Command, args []string) {
 }
 
 func printVersionInfo(writer io.Writer) {
-	sb := &strings.Builder{}
-
-	concat(sb, " Version:\t\t%s\n", build.GetBuildVersion())
-	concat(sb, " Git commit:\t\t%s\n", build.GetBuildGitRevision())
-	concat(sb, " Built:\t\t\t%s\n", build.GetBuildTime())
-	concat(sb, " OS/Arch:\t\t%s\n", build.GetBuildPlatform())
-
-	_, _ = fmt.Fprint(writer, sb.String())
+	common.Printf(writer, " Version:\t\t%s\n", build.GetBuildVersion())
+	common.Printf(writer, " Git commit:\t\t%s\n", build.GetBuildGitRevision())
+	common.Printf(writer, " Built:\t\t\t%s\n", build.GetBuildTime())
+	common.Printf(writer, " OS/Arch:\t\t%s\n", build.GetBuildPlatform())
 }
 
 func concat(sb *strings.Builder, format string, a ...interface{}) {
