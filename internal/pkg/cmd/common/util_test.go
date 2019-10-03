@@ -11,6 +11,7 @@ package common
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/wso2/choreo-cli/internal/pkg/test"
@@ -35,8 +36,16 @@ func TestGetLocalBindAddress(t *testing.T) {
 
 func TestPrintErrorMessage(t *testing.T) {
 	var b bytes.Buffer
-	PrintErrorMessage(&b,"test message")
+	PrintErrorMessage(&b, "test message")
 
 	expect := "test message\n"
+	test.AssertString(t, expect, b.String(), "Incorrect error message format")
+}
+
+func TestPrintError(t *testing.T) {
+	var b bytes.Buffer
+	PrintError(&b, "test message", errors.New("test error"))
+
+	expect := "\ntest message: test error\n"
 	test.AssertString(t, expect, b.String(), "Incorrect error message format")
 }

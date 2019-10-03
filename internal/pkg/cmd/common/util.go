@@ -30,26 +30,26 @@ func GetAbsoluteCommandName(commandComponents ...string) string {
 }
 
 func PrintErrorMessage(writer io.Writer, message string) {
-	fPrintln(writer, message)
+	Println(writer, message)
 }
 
-func PrintError(message string, err error) {
-	fmt.Printf("\n%s: %v\n", message, err)
+func PrintError(writer io.Writer, message string, err error) {
+	Printf(writer, "\n%s: %v\n", message, err)
 }
 
 func PrintInfo(message string) {
 	fmt.Println(message)
 }
 
-func ExitWithError(message string, err error) {
-	PrintError(message, err)
+func ExitWithError(writer io.Writer, message string, err error) {
+	PrintError(writer, message, err)
 	fmt.Println()
 	os.Exit(1)
 }
 
 func ExitWithErrorMessage(writer io.Writer, message string) {
 	PrintErrorMessage(writer, message)
-	fPrintln(writer)
+	Println(writer)
 	os.Exit(1)
 }
 
@@ -96,6 +96,10 @@ func OpenBrowser(url string) error {
 	}
 }
 
-func fPrintln(writer io.Writer, message ...interface{}) {
+func Println(writer io.Writer, message ...interface{}) {
 	_, _ = fmt.Fprintln(writer, message...)
+}
+
+func Printf(writer io.Writer, format string, message ...interface{}) {
+	_, _ = fmt.Fprintf(writer, format, message...)
 }

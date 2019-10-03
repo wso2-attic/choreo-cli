@@ -10,6 +10,7 @@
 package config
 
 import (
+	"io"
 	"os"
 
 	"github.com/spf13/viper"
@@ -51,6 +52,7 @@ type configHolder interface {
 
 type ViperConfigHolder struct {
 	viperInstance *viper.Viper
+	writer        io.Writer
 }
 
 func (v *ViperConfigHolder) GetString(key string) string {
@@ -83,19 +85,19 @@ func (v *ViperConfigHolder) SetString(key string, value string) {
 	}
 
 	if _, ok := err.(*os.PathError); ok {
-		createDirectoryAndWrite(v.viperInstance, key)
+		createDirectoryAndWrite(v.viperInstance, key, v.writer)
 	} else {
-		common.PrintError("Could not write to config. Key: "+key, err)
+		common.PrintError(v.writer, "Could not write to config. Key: "+key, err)
 	}
 }
 
-func createDirectoryAndWrite(viperInstance *viper.Viper, key string) {
+func createDirectoryAndWrite(viperInstance *viper.Viper, key string, writer io.Writer) {
 	if err := makeConfigDirectory(); err != nil {
-		common.PrintError("Could not make config directory to config. Key: "+key, err)
+		common.PrintError(writer, "Could not make config directory to config. Key: "+key, err)
 	}
 
 	if err := viperInstance.WriteConfig(); err != nil {
-		common.PrintError("Could not write to config. Key: "+key, err)
+		common.PrintError(writer, "Could not write to config. Key: "+key, err)
 	}
 }
 
