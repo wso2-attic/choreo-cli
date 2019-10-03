@@ -15,12 +15,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 // set InsecureSkipVerify option if required
-func NewClient(cliContext context.CliContext) *http.Client {
+func NewClient(cliContext runtime.CliContext) *http.Client {
 
 	getEnvConfig := config.CreateEnvironmentConfigReader(cliContext.Config(), EnvConfigs)
 	skipVerify, _ := strconv.ParseBool(getEnvConfig(SkipVerify))
@@ -31,7 +31,7 @@ func NewClient(cliContext context.CliContext) *http.Client {
 }
 
 // creates the http request for the given path with Authorization header set
-func NewRequest(cliContext context.CliContext, method, path string, body io.Reader) (*http.Request, error) {
+func NewRequest(cliContext runtime.CliContext, method, path string, body io.Reader) (*http.Request, error) {
 
 	getEnvConfig := config.CreateEnvironmentConfigReader(cliContext.Config(), EnvConfigs)
 	getUserConfig := config.CreateUserConfigReader(cliContext.Config(), UserConfigs)

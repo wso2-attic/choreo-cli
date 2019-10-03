@@ -20,11 +20,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewCreateCommand(cliContext context.CliContext) *cobra.Command {
+func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
 
 	const cmdCreate = "create"
 	cmd := &cobra.Command{
@@ -39,31 +38,31 @@ func NewCreateCommand(cliContext context.CliContext) *cobra.Command {
 	return cmd
 }
 
-func runCreateAppCommand(cliContext context.CliContext) func(cmd *cobra.Command, args []string) {
+func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
 		description, _ := cmd.Flags().GetString("description")
 
 		app := Application{args[0], description}
-		createApp(cliContext.Config(), app)
+		createApp(cliContext, app)
 	}
 }
 
-func createApp(cliConfig config.Config, application Application) {
+func createApp(cliContext runtime.CliContext, application Application) {
 
 	jsonStr, err := json.Marshal(application)
 	if err != nil {
 		log.Print("Error converting application into json: ", err)
 		return
 	}
-	req, err := client.NewRequest(cliConfig, "POST", pathApplications, bytes.NewBuffer(jsonStr))
+	req, err := client.NewRequest(cliContext, "POST", pathApplications, bytes.NewBuffer(jsonStr))
 
 	if err != nil {
 		log.Print("Error creating post request for application creation: ", err)
 		return
 	}
 
-	httpClient := client.NewClient(cliConfig)
+	httpClient := client.NewClient(cliContext)
 
 	resp, err := httpClient.Do(req)
 	if err == nil {

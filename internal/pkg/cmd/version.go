@@ -15,10 +15,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/build"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewVersionCommand(cliContext context.CliContext) *cobra.Command {
+func NewVersionCommand(cliContext runtime.CliContext) *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
 		Short:   "Get " + common.ProductName + " client version information",
@@ -28,7 +28,7 @@ func NewVersionCommand(cliContext context.CliContext) *cobra.Command {
 	}
 }
 
-func createRunVersion(cliContext context.CliContext) func(cmd *cobra.Command, args []string) {
+func createRunVersion(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		printVersionInfo(cliContext.Out())
 	}

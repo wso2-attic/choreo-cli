@@ -17,7 +17,7 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
 	cmdCommon "github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/login"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
@@ -53,7 +53,7 @@ func initConfig(cliContext *CliContextData) {
 	cliContext.config = cliConfig
 }
 
-func initCommands(cliContext context.CliContext) cobra.Command {
+func initCommands(cliContext runtime.CliContext) cobra.Command {
 	command := cobra.Command{
 		Use:   cmdCommon.GetAbsoluteCommandName() + " COMMAND",
 		Short: "Manage integration applications with " + cmdCommon.ProductName + " platform",

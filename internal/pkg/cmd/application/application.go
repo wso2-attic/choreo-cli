@@ -12,10 +12,10 @@ package application
 import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewApplicationCommand(cliContext context.CliContext) *cobra.Command {
+func NewApplicationCommand(cliContext runtime.CliContext) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     cmdApplication,

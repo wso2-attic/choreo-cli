@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	cmdContext "github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	cmdContext "github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"golang.org/x/oauth2"
 )
