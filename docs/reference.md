@@ -10,7 +10,7 @@ Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](
 ### chor auth
 
 `auth` command is used to manage authentication and authorization in Choreo platform. 
-Available sub commands include [connect](#chor-auth-connect).
+Available sub commands include [login](#chor-auth-login).
 
 #### Synopsis
 
