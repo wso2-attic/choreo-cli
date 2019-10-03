@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/auth"
 	cmdCommon "github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/login"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
@@ -39,7 +39,7 @@ func initCommands(cliConfig *config.CliConfig) cobra.Command {
 	}
 
 	command.AddCommand(cmd.NewVersionCommand(cliConfig))
-	command.AddCommand(login.NewLoginCommand(cliConfig))
+	command.AddCommand(auth.NewAuthCommand(cliConfig))
 	command.AddCommand(application.NewApplicationCommand(cliConfig))
 
 	return command
