@@ -25,7 +25,7 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewListCommand(cliContext context.CliContext, cliConfig config.Config) *cobra.Command {
+func NewListCommand(cliContext context.CliContext) *cobra.Command {
 
 	const cmdList = "list"
 	cmd := &cobra.Command{
@@ -33,28 +33,28 @@ func NewListCommand(cliContext context.CliContext, cliConfig config.Config) *cob
 		Short:   "List applications",
 		Example: common.GetAbsoluteCommandName(cmdApplication, cmdList),
 		Args:    cobra.NoArgs,
-		Run:     runListAppCommand(cliConfig),
+		Run:     runListAppCommand(cliContext),
 	}
 	return cmd
 }
 
-func runListAppCommand(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
+func runListAppCommand(cliContext context.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
-		listApps(cliConfig)
+		listApps(cliContext)
 	}
 }
 
-func listApps(cliConfig config.Config) {
+func listApps(cliContext context.CliContext) {
 
-	req, err := client.NewRequest(cliConfig, "GET", pathApplications, nil)
+	req, err := client.NewRequest(cliContext, "GET", pathApplications, nil)
 
 	if err != nil {
 		log.Print("Error creating post request for listing applications: ", err)
 		return
 	}
 
-	httpClient := client.NewClient(cliConfig)
+	httpClient := client.NewClient(cliContext)
 
 	resp, err := httpClient.Do(req)
 	if err == nil {

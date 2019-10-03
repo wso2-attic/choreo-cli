@@ -24,19 +24,19 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func NewLoginCommand(cliContext cmdContext.CliContext, cliConfig config.Config) *cobra.Command {
+func NewLoginCommand(cliContext cmdContext.CliContext) *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
 		Short:   "Login to " + common.ProductName,
 		Example: common.GetAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
-		Run:     createLoginFunction(cliContext, cliConfig),
+		Run:     createLoginFunction(cliContext),
 	}
 }
 
-func createLoginFunction(cliContext cmdContext.CliContext, cliConfig config.Config) func(cmd *cobra.Command, args []string) {
-	getEnvConfig := createEnvConfigReader(cliConfig)
-	setUserConfig := config.CreateUserConfigWriter(cliConfig)
+func createLoginFunction(cliContext cmdContext.CliContext) func(cmd *cobra.Command, args []string) {
+	getEnvConfig := createEnvConfigReader(cliContext.Config())
+	setUserConfig := config.CreateUserConfigWriter(cliContext.Config())
 	consoleWriter := cliContext.Out()
 
 	return func(cmd *cobra.Command, args []string) {

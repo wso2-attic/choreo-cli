@@ -16,10 +16,9 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/build"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewVersionCommand(cliContext context.CliContext, cliConfig config.Config) *cobra.Command {
+func NewVersionCommand(cliContext context.CliContext) *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
 		Short:   "Get " + common.ProductName + " client version information",

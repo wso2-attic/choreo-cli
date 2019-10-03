@@ -14,6 +14,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
@@ -31,7 +32,7 @@ func TestPrintVersionInfo(t *testing.T) {
 
 func TestNewVersionCommand(t *testing.T) {
 	var b bytes.Buffer
-	versionCommand := NewVersionCommand(&mockContext{out: &b}, nil)
+	versionCommand := NewVersionCommand(&mockContext{out: &b})
 	versionCommand.Run(nil,nil)
 
 	expect := ` Version:		unknown
@@ -44,8 +45,13 @@ func TestNewVersionCommand(t *testing.T) {
 
 type mockContext struct {
 	out io.Writer
+	config config.Config
 }
 
 func (c *mockContext) Out() io.Writer {
 	return c.out
+}
+
+func (c *mockContext) Config() config.Config {
+	return c.config
 }

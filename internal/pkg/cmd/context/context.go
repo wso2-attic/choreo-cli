@@ -11,20 +11,11 @@ package context
 
 import (
 	"io"
-	"os"
+
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 type CliContext interface {
 	Out() io.Writer
-}
-
-type CliContextData struct {
-}
-
-func (c *CliContextData) Out() io.Writer {
-	return os.Stdout
-}
-
-func NewCliContext() *CliContextData {
-	return &CliContextData{}
+	Config() config.Config
 }

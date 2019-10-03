@@ -24,7 +24,7 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewCreateCommand(cliContext context.CliContext, cliConfig config.Config) *cobra.Command {
+func NewCreateCommand(cliContext context.CliContext) *cobra.Command {
 
 	const cmdCreate = "create"
 	cmd := &cobra.Command{
@@ -33,19 +33,19 @@ func NewCreateCommand(cliContext context.CliContext, cliConfig config.Config) *c
 		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdCreate),
 			" app1 -d \"My first app\""),
 		Args: cobra.ExactArgs(1),
-		Run:  runCreateAppCommand(cliConfig),
+		Run:  runCreateAppCommand(cliContext),
 	}
 	cmd.Flags().StringP("description", "d", "", "Specify description for the application")
 	return cmd
 }
 
-func runCreateAppCommand(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
+func runCreateAppCommand(cliContext context.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
 		description, _ := cmd.Flags().GetString("description")
 
 		app := Application{args[0], description}
-		createApp(cliConfig, app)
+		createApp(cliContext.Config(), app)
 	}
 }
 
