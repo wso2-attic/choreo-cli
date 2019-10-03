@@ -14,35 +14,36 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	cmdContext "github.com/wso2/choreo-cli/internal/pkg/cmd/context"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"golang.org/x/oauth2"
 )
 
-func NewLoginCommand(cliConfig config.Config) *cobra.Command {
+func NewLoginCommand(cliContext cmdContext.CliContext, cliConfig config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "login",
 		Short:   "Login to " + common.ProductName,
 		Example: common.GetAbsoluteCommandName("login"),
 		Args:    cobra.NoArgs,
-		Run:     createLoginFunction(cliConfig),
+		Run:     createLoginFunction(cliContext, cliConfig),
 	}
 }
 
-func createLoginFunction(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
+func createLoginFunction(cliContext cmdContext.CliContext, cliConfig config.Config) func(cmd *cobra.Command, args []string) {
 	getEnvConfig := createEnvConfigReader(cliConfig)
 	setUserConfig := config.CreateUserConfigWriter(cliConfig)
+	consoleWriter := cliContext.Out()
 
 	return func(cmd *cobra.Command, args []string) {
 		codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
 		oauth2Conf := createOauth2Conf(callbackUrlContext, codeServicePort, getEnvConfig)
-		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauth2Conf, setUserConfig, os.Stdout)
-		openBrowserForAuthentication(os.Stdout, oauth2Conf)
+		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauth2Conf, setUserConfig, consoleWriter)
+		openBrowserForAuthentication(consoleWriter, oauth2Conf)
 		<-authCodeChannel
 		stopAuthCodeServer(server)
 

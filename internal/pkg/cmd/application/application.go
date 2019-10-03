@@ -12,10 +12,11 @@ package application
 import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
+func NewApplicationCommand(cliContext context.CliContext, cliConfig config.Config) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     cmdApplication,
@@ -24,7 +25,7 @@ func NewApplicationCommand(cliConfig config.Config) *cobra.Command {
 		Example: common.GetAbsoluteCommandName(cmdApplication),
 		Args:    cobra.MaximumNArgs(1),
 	}
-	cmd.AddCommand(NewCreateCommand(cliConfig))
-	cmd.AddCommand(NewListCommand(cliConfig))
+	cmd.AddCommand(NewCreateCommand(cliContext, cliConfig))
+	cmd.AddCommand(NewListCommand(cliContext, cliConfig))
 	return cmd
 }

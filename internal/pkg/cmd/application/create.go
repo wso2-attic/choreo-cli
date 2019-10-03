@@ -13,16 +13,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewCreateCommand(cliConfig config.Config) *cobra.Command {
+func NewCreateCommand(cliContext context.CliContext, cliConfig config.Config) *cobra.Command {
 
 	const cmdCreate = "create"
 	cmd := &cobra.Command{

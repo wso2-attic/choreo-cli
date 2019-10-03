@@ -12,18 +12,20 @@ package application
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/landoop/tableprinter"
-	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/landoop/tableprinter"
+	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewListCommand(cliConfig config.Config) *cobra.Command {
+func NewListCommand(cliContext context.CliContext, cliConfig config.Config) *cobra.Command {
 
 	const cmdList = "list"
 	cmd := &cobra.Command{

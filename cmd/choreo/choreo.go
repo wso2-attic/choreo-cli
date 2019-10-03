@@ -10,40 +10,39 @@
 package main
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
 	cmdCommon "github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/context"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/login"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 func main() {
-	consoleWriter := os.Stdout
+	cliContext := context.NewCliContext()
 
 	cliConfig, err := config.InitConfig()
 	if err != nil {
-		cmdCommon.ExitWithError(consoleWriter, "Error loading configs", err)
+		cmdCommon.ExitWithError(cliContext.Out(), "Error loading configs", err)
 	}
 
-	command := initCommands(cliConfig)
+	command := initCommands(cliContext, cliConfig)
 
 	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError(consoleWriter, "Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
+		cmdCommon.ExitWithError(cliContext.Out(), "Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
 	}
 }
 
-func initCommands(cliConfig *config.CliConfig) cobra.Command {
+func initCommands(cliContext context.CliContext, cliConfig *config.CliConfig) cobra.Command {
 	command := cobra.Command{
 		Use:   cmdCommon.GetAbsoluteCommandName() + " COMMAND",
 		Short: "Manage integration applications with " + cmdCommon.ProductName + " platform",
 	}
 
-	command.AddCommand(cmd.NewVersionCommand(cliConfig))
-	command.AddCommand(login.NewLoginCommand(cliConfig))
-	command.AddCommand(application.NewApplicationCommand(cliConfig))
+	command.AddCommand(cmd.NewVersionCommand(cliContext, cliConfig))
+	command.AddCommand(login.NewLoginCommand(cliContext, cliConfig))
+	command.AddCommand(application.NewApplicationCommand(cliContext, cliConfig))
 
 	return command
 }
