@@ -11,8 +11,10 @@ package cmd
 
 import (
 	"bytes"
+	"io"
 	"testing"
 
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
@@ -26,4 +28,30 @@ func TestPrintVersionInfo(t *testing.T) {
  OS/Arch:		unknown
 `
 	test.AssertString(t, expect, b.String(), "Version command output is not as expected")
+}
+
+func TestNewVersionCommand(t *testing.T) {
+	var b bytes.Buffer
+	versionCommand := NewVersionCommand(&mockContext{out: &b})
+	versionCommand.Run(nil,nil)
+
+	expect := ` Version:		unknown
+ Git commit:		unknown
+ Built:			unknown
+ OS/Arch:		unknown
+`
+	test.AssertString(t, expect, b.String(), "Version command output is not as expected")
+}
+
+type mockContext struct {
+	out io.Writer
+	config config.Config
+}
+
+func (c *mockContext) Out() io.Writer {
+	return c.out
+}
+
+func (c *mockContext) Config() config.Config {
+	return c.config
 }

@@ -10,42 +10,33 @@
 package cmd
 
 import (
-	"fmt"
 	"io"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/build"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewVersionCommand(cliConfig config.Config) *cobra.Command {
+func NewVersionCommand(cliContext runtime.CliContext) *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
 		Short:   "Get " + common.ProductName + " client version information",
 		Example: common.GetAbsoluteCommandName("version"),
 		Args:    cobra.NoArgs,
-		Run:     runVersion,
+		Run:     createRunVersion(cliContext),
 	}
 }
 
-func runVersion(cmd *cobra.Command, args []string) {
-	printVersionInfo(os.Stdout)
+func createRunVersion(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		printVersionInfo(cliContext.Out())
+	}
 }
 
 func printVersionInfo(writer io.Writer) {
-	sb := &strings.Builder{}
-
-	concat(sb, " Version:\t\t%s\n", build.GetBuildVersion())
-	concat(sb, " Git commit:\t\t%s\n", build.GetBuildGitRevision())
-	concat(sb, " Built:\t\t\t%s\n", build.GetBuildTime())
-	concat(sb, " OS/Arch:\t\t%s\n", build.GetBuildPlatform())
-
-	_, _ = fmt.Fprint(writer, sb.String())
-}
-
-func concat(sb *strings.Builder, format string, a ...interface{}) {
-	sb.WriteString(fmt.Sprintf(format, a...))
+	common.Printf(writer, " Version:\t\t%s\n", build.GetBuildVersion())
+	common.Printf(writer, " Git commit:\t\t%s\n", build.GetBuildGitRevision())
+	common.Printf(writer, " Built:\t\t\t%s\n", build.GetBuildTime())
+	common.Printf(writer, " OS/Arch:\t\t%s\n", build.GetBuildPlatform())
 }

@@ -10,37 +10,58 @@
 package main
 
 import (
+	"io"
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/auth"
 	cmdCommon "github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
+type CliContextData struct {
+	config config.Config
+}
+
+func (c *CliContextData) Out() io.Writer {
+	return os.Stdout
+}
+
+func (c *CliContextData) Config() config.Config {
+	return c.config
+}
+
 func main() {
+	cliContext := &CliContextData{}
 
-	cliConfig, err := config.InitConfig()
-	if err != nil {
-		cmdCommon.ExitWithError("Error loading configs", err)
-	}
-
-	command := initCommands(cliConfig)
+	initConfig(cliContext)
+	command := initCommands(cliContext)
 
 	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError("Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
+		cmdCommon.ExitWithError(cliContext.Out(), "Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
 	}
 }
 
-func initCommands(cliConfig *config.CliConfig) cobra.Command {
+func initConfig(cliContext *CliContextData) {
+	cliConfig, err := config.InitConfig()
+	if err != nil {
+		cmdCommon.ExitWithError(cliContext.Out(), "Error loading configs", err)
+	}
+	cliContext.config = cliConfig
+}
+
+func initCommands(cliContext runtime.CliContext) cobra.Command {
 	command := cobra.Command{
 		Use:   cmdCommon.GetAbsoluteCommandName() + " COMMAND",
 		Short: "Manage integration applications with " + cmdCommon.ProductName + " platform",
 	}
 
-	command.AddCommand(cmd.NewVersionCommand(cliConfig))
-	command.AddCommand(auth.NewAuthCommand(cliConfig))
-	command.AddCommand(application.NewApplicationCommand(cliConfig))
+	command.AddCommand(cmd.NewVersionCommand(cliContext))
+	command.AddCommand(auth.NewAuthCommand(cliContext))
+	command.AddCommand(application.NewApplicationCommand(cliContext))
 
 	return command
 }

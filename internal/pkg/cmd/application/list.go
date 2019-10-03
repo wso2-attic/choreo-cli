@@ -12,18 +12,19 @@ package application
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/landoop/tableprinter"
-	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/landoop/tableprinter"
+	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewListCommand(cliConfig config.Config) *cobra.Command {
+func NewListCommand(cliContext runtime.CliContext) *cobra.Command {
 
 	const cmdList = "list"
 	cmd := &cobra.Command{
@@ -31,28 +32,28 @@ func NewListCommand(cliConfig config.Config) *cobra.Command {
 		Short:   "List applications",
 		Example: common.GetAbsoluteCommandName(cmdApplication, cmdList),
 		Args:    cobra.NoArgs,
-		Run:     runListAppCommand(cliConfig),
+		Run:     runListAppCommand(cliContext),
 	}
 	return cmd
 }
 
-func runListAppCommand(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
+func runListAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
-		listApps(cliConfig)
+		listApps(cliContext)
 	}
 }
 
-func listApps(cliConfig config.Config) {
+func listApps(cliContext runtime.CliContext) {
 
-	req, err := client.NewRequest(cliConfig, "GET", pathApplications, nil)
+	req, err := client.NewRequest(cliContext, "GET", pathApplications, nil)
 
 	if err != nil {
 		log.Print("Error creating post request for listing applications: ", err)
 		return
 	}
 
-	httpClient := client.NewClient(cliConfig)
+	httpClient := client.NewClient(cliContext)
 
 	resp, err := httpClient.Do(req)
 	if err == nil {

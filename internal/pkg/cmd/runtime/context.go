@@ -7,19 +7,15 @@
  * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
-package auth
+package runtime
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/auth/login"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
+	"io"
+
+	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-func NewAuthCommand(cliContext runtime.CliContext) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     cmdAuth,
-		Short:   "Manage authentication and authorization",
-	}
-	cmd.AddCommand(login.NewLoginCommand(cliContext))
-	return cmd
+type CliContext interface {
+	Out() io.Writer
+	Config() config.Config
 }

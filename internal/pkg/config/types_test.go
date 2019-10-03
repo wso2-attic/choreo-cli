@@ -10,6 +10,7 @@
 package config
 
 import (
+	"os"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -19,7 +20,7 @@ import (
 func TestViperConfigHolderReadValue(t *testing.T) {
 	v := viper.New()
 	v.Set("foo", "fooValue")
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	got := configHolder.GetString("foo")
 	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not read the value correctly")
@@ -28,7 +29,7 @@ func TestViperConfigHolderReadValue(t *testing.T) {
 func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
 	v := viper.New()
 	v.Set("foo", "fooValue")
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
 	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not return the value correctly")
@@ -36,7 +37,7 @@ func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
 
 func TestViperConfigHolderReadDefault(t *testing.T) {
 	v := viper.New()
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
 	test.AssertString(t, "fooDefault", got, "ViperConfigHolder did not read the default")
@@ -44,9 +45,13 @@ func TestViperConfigHolderReadDefault(t *testing.T) {
 
 func TestViperConfigHolderWrite(t *testing.T) {
 	v := viper.New()
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	configHolder.SetString("foo", "fooValue")
 	got := configHolder.GetString("foo")
 	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not write the value correctly")
+}
+
+func createMockConfigHolder(v *viper.Viper) *ViperConfigHolder {
+	return &ViperConfigHolder{viperInstance: v, writer: os.Stdout}
 }
