@@ -9,7 +9,10 @@
 
 package login
 
-import "github.com/wso2/choreo-cli/internal/pkg/config"
+import (
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
+	"github.com/wso2/choreo-cli/internal/pkg/config"
+)
 
 const (
 	clientId    = "login.oauth2.clientId"
@@ -17,8 +20,8 @@ const (
 	tokenUrl    = "login.oauth2.tokenUrl"
 )
 
-func createEnvConfigReader(cliConfig config.Config) func(string) string {
-	return config.CreateEnvironmentConfigReader(cliConfig, map[string]string{
+func createEnvConfigReader(cliConfig runtime.EnvConfigHolder) func(string) string {
+	return config.CreateConfigReader(cliConfig.EnvConfig(), map[string]string{
 		clientId: "choreocliapplication",
 		authUrl:  "https://id.development.choreo.dev/oauth2/authorize",
 		tokenUrl: "https://id.development.choreo.dev/oauth2/token",

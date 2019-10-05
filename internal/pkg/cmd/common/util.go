@@ -103,3 +103,11 @@ func Println(writer io.Writer, message ...interface{}) {
 func Printf(writer io.Writer, format string, message ...interface{}) {
 	_, _ = fmt.Fprintf(writer, format, message...)
 }
+
+func GetStringOrDefault(getValue func(key string) string, key string, defaultValue string) string {
+	if value := getValue(key); value != "" {
+		return value
+	} else {
+		return defaultValue
+	}
+}

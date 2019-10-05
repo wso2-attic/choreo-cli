@@ -13,60 +13,33 @@ import (
 	"testing"
 
 	"github.com/wso2/choreo-cli/internal/pkg/test"
+	"github.com/wso2/choreo-cli/internal/pkg/test/mock/config"
 )
 
 func TestCreateUserConfigReaderValue(t *testing.T) {
-	mockConfig := &CliConfig{
-		userConfigHolder: &MockConfigHolder{entries: map[string]string{"foo": "fooValue"}},
-	}
+	mockConfig := config.NewMockConfigHolder(map[string]string{"foo": "fooValue"})
 
-	reader := CreateUserConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
+	reader := CreateConfigReader(mockConfig, map[string]string{"foo": "fooDefault"})
 
 	got := reader("foo")
-	test.AssertString(t, "fooValue", got, "CreateUserConfigReader did not create the reader correctly")
+	test.AssertString(t, "fooValue", got, "CreateConfigReader did not create the reader correctly")
 }
 
 func TestCreateUserConfigReaderDefault(t *testing.T) {
-	mockConfig := &CliConfig{
-		userConfigHolder: &MockConfigHolder{entries: map[string]string{}},
-	}
+	mockConfig := config.NewMockConfigHolder(map[string]string{})
 
-	reader := CreateUserConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
+	reader := CreateConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
 
 	got := reader("foo")
-	test.AssertString(t, "fooDefault", got, "CreateUserConfigReader did not create the reader correctly")
-}
-
-func TestCreateEnvConfigReaderValue(t *testing.T) {
-	mockConfig := &CliConfig{
-		envConfigHolder: &MockConfigHolder{entries: map[string]string{"foo": "fooValue"}},
-	}
-
-	reader := CreateEnvironmentConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
-
-	got := reader("foo")
-	test.AssertString(t, "fooValue", got, "CreateEnvConfigReader did not create the reader correctly")
-}
-
-func TestCreateEnvConfigReaderDefault(t *testing.T) {
-	mockConfig := &CliConfig{
-		envConfigHolder: &MockConfigHolder{entries: map[string]string{}},
-	}
-
-	reader := CreateEnvironmentConfigReader(mockConfig, map[string]string{"foo":"fooDefault"})
-
-	got := reader("foo")
-	test.AssertString(t, "fooDefault", got, "CreateEnvConfigReader did not create the reader correctly")
+	test.AssertString(t, "fooDefault", got, "CreateConfigReader did not create the reader correctly")
 }
 
 func TestCreateUserConfigWrite(t *testing.T) {
-	mockConfig := &CliConfig{
-		userConfigHolder: &MockConfigHolder{entries: map[string]string{}},
-	}
+	mockConfig := config.NewMockConfigHolder(map[string]string{})
 
-	writer := CreateUserConfigWriter(mockConfig)
+	writer := CreateConfigWriter(mockConfig)
 	writer("foo", "fooValue")
 
 	got := mockConfig.GetString("foo")
-	test.AssertString(t, "fooValue", got, "CreateUserConfigWriter did not create the reader correctly")
+	test.AssertString(t, "fooValue", got, "CreateConfigWriter did not create the writer correctly")
 }

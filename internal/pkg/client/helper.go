@@ -22,7 +22,7 @@ import (
 // set InsecureSkipVerify option if required
 func NewClient(cliContext runtime.CliContext) *http.Client {
 
-	getEnvConfig := config.CreateEnvironmentConfigReader(cliContext.Config(), EnvConfigs)
+	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), EnvConfigs)
 	skipVerify, _ := strconv.ParseBool(getEnvConfig(SkipVerify))
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerify},
@@ -33,8 +33,8 @@ func NewClient(cliContext runtime.CliContext) *http.Client {
 // creates the http request for the given path with Authorization header set
 func NewRequest(cliContext runtime.CliContext, method, path string, body io.Reader) (*http.Request, error) {
 
-	getEnvConfig := config.CreateEnvironmentConfigReader(cliContext.Config(), EnvConfigs)
-	getUserConfig := config.CreateUserConfigReader(cliContext.Config(), UserConfigs)
+	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), EnvConfigs)
+	getUserConfig := config.CreateConfigReader(cliContext.UserConfig(), UserConfigs)
 
 	completeUrl := getEnvConfig(BackendUrl) + path
 	req, err := http.NewRequest(method, completeUrl, body)

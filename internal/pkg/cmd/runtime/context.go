@@ -11,11 +11,40 @@ package runtime
 
 import (
 	"io"
-
-	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-type CliContext interface {
+type Reader interface {
+	GetString(key string) string
+	GetStringOrDefault(key string, defaultValue string) string
+}
+
+type Writer interface {
+	SetString(key string, value string)
+}
+
+type UserConfig interface {
+	Reader
+	Writer
+}
+
+type EnvConfig interface {
+	Reader
+}
+
+type EnvConfigHolder interface {
+	EnvConfig() EnvConfig
+}
+
+type UserConfigHolder interface {
+	UserConfig() UserConfig
+}
+
+type ConsoleOutHolder interface {
 	Out() io.Writer
-	Config() config.Config
+}
+
+type CliContext interface {
+	ConsoleOutHolder
+	UserConfigHolder
+	EnvConfigHolder
 }

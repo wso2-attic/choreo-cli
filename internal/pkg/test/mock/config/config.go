@@ -9,6 +9,11 @@
 
 package config
 
+import (
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
+)
+
 type MockConfigHolder struct {
 	entries map[string]string
 }
@@ -18,10 +23,25 @@ func (configHolder *MockConfigHolder) GetString(key string) string {
 }
 
 func (configHolder *MockConfigHolder) GetStringOrDefault(key string, defaultValue string) string {
-	return getStringOrDefault(configHolder.GetString, key, defaultValue)
+	return common.GetStringOrDefault(configHolder.GetString, key, defaultValue)
 }
 
 func (configHolder *MockConfigHolder) SetString(key string, value string) {
 	configHolder.entries[key] = value
 }
 
+func NewMockConfigHolder(entries map[string]string) *MockConfigHolder {
+	return &MockConfigHolder{entries: entries}
+}
+
+type MockEnvConfigHolder struct {
+	configHolder *MockConfigHolder
+}
+
+func (c *MockEnvConfigHolder) EnvConfig() runtime.EnvConfig {
+	return c.configHolder
+}
+
+func NewMockEnvConfigHolder(entries map[string]string) *MockEnvConfigHolder {
+	return &MockEnvConfigHolder{configHolder: NewMockConfigHolder(entries)}
+}
