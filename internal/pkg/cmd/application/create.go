@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -66,18 +67,18 @@ func createApp(cliContext runtime.CliContext, application Application) {
 
 	resp, err := httpClient.Do(req)
 	if err == nil {
-		showCreateAppResult(resp)
+		showCreateAppResult(cliContext.Out(), resp)
 	} else {
 		log.Print("Error making post request for application creation: ", err)
 	}
 }
 
-func showCreateAppResult(resp *http.Response) {
+func showCreateAppResult(consoleWriter io.Writer, resp *http.Response) {
 
 	if resp.StatusCode == http.StatusCreated {
-		common.PrintInfo("Application created successfully.")
+		common.PrintInfo(consoleWriter, "Application created successfully.")
 	} else {
-		common.PrintInfo("Error creating application.")
+		common.PrintInfo(consoleWriter, "Error creating application.")
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Print("Error reading json body: ", err)

@@ -49,3 +49,11 @@ func TestPrintError(t *testing.T) {
 	expect := "\ntest message: test error\n"
 	test.AssertString(t, expect, b.String(), "Incorrect error message format")
 }
+
+func TestPrintInfo(t *testing.T) {
+	var b bytes.Buffer
+	PrintInfo(&b, "test message")
+
+	expect := "test message\n"
+	test.AssertString(t, expect, b.String(), "Incorrect info message format")
+}

@@ -12,6 +12,7 @@ package application
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,13 +58,13 @@ func listApps(cliContext runtime.CliContext) {
 
 	resp, err := httpClient.Do(req)
 	if err == nil {
-		showListAppsResult(resp)
+		showListAppsResult(cliContext.Out(), resp)
 	} else {
 		log.Print("Error making post request for listing applications: ", err)
 	}
 }
 
-func showListAppsResult(resp *http.Response) {
+func showListAppsResult(consoleWriter io.Writer, resp *http.Response) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -79,7 +80,7 @@ func showListAppsResult(resp *http.Response) {
 		printer := tableprinter.New(os.Stdout)
 		printer.Print(apps)
 	} else {
-		common.PrintInfo("Error listing applications.")
+		common.PrintInfo(consoleWriter, "Error listing applications.")
 		fmt.Println("Error: ", string(body))
 	}
 	err = resp.Body.Close()
