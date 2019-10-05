@@ -47,7 +47,7 @@ func createLoginFunction(cliContext runtime.CliContext) func(cmd *cobra.Command,
 		<-authCodeChannel
 		stopAuthCodeServer(server)
 
-		common.PrintInfo("Successfully logged in to " + common.ProductName + ".")
+		common.PrintInfo(consoleWriter, "Successfully logged in to "+common.ProductName+".")
 	}
 }
 
@@ -166,6 +166,6 @@ func createOauth2Conf(context string, port int, getEnvConfig config.GetConfig) *
 
 func listenForAuthCode(server *http.Server, consoleWriter io.Writer) {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		common.ExitWithError(consoleWriter,"Error while initializing auth code accepting service", err)
+		common.ExitWithError(consoleWriter, "Error while initializing auth code accepting service", err)
 	}
 }

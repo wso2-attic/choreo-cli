@@ -37,8 +37,8 @@ func PrintError(writer io.Writer, message string, err error) {
 	Printf(writer, "\n%s: %v\n", message, err)
 }
 
-func PrintInfo(message string) {
-	fmt.Println(message)
+func PrintInfo(writer io.Writer, message string) {
+	Println(writer, message)
 }
 
 func ExitWithError(writer io.Writer, message string, err error) {
