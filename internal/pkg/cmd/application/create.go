@@ -12,10 +12,10 @@ package application
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -24,8 +24,9 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
+const descriptionFlagName = "description"
 
+func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
 	const cmdCreate = "create"
 	cmd := &cobra.Command{
 		Use:   cmdCreate + " APP_NAME",
@@ -35,58 +36,60 @@ func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		Run:  runCreateAppCommand(cliContext),
 	}
-	cmd.Flags().StringP("description", "d", "", "Specify description for the application")
+	cmd.Flags().StringP(descriptionFlagName, "d", "", "Specify description for the application")
 	return cmd
 }
 
 func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		description, err := cmd.Flags().GetString(descriptionFlagName)
+		if err != nil {
+			common.ExitWithError(cliContext.Out(), "Error reading description flag", err)
+		}
 
-		description, _ := cmd.Flags().GetString("description")
-
-		app := Application{args[0], description}
-		createApp(cliContext, app)
+		createApp(cliContext, &Application{Name: args[0], Description: description})
 	}
 }
 
-func createApp(cliContext runtime.CliContext, application Application) {
+func createApp(cliContext runtime.CliContext, application *Application) {
+	err := createNewApp(cliContext, application)
+	if err != nil {
+		common.ExitWithError(cliContext.Out(), "Error occurred while creating the application. Reason: ", err)
+	}
+}
 
+func createNewApp(cliContext runtime.CliContext, application *Application) error {
 	jsonStr, err := json.Marshal(application)
 	if err != nil {
-		log.Print("Error converting application into json: ", err)
-		return
+		common.ExitWithError(cliContext.Out(), "Error converting application data into JSON format. Reason: ", err)
 	}
-	req, err := client.NewRequest(cliContext, "POST", pathApplications, bytes.NewBuffer(jsonStr))
 
+	req, err := client.NewRequest(cliContext, "POST", pathApplications, bytes.NewBuffer(jsonStr))
 	if err != nil {
-		log.Print("Error creating post request for application creation: ", err)
-		return
+		common.ExitWithError(cliContext.Out(), "Error creating post request for application creation. Reason: ", err)
 	}
 
 	httpClient := client.NewClient(cliContext)
-
 	resp, err := httpClient.Do(req)
-	if err == nil {
-		showCreateAppResult(cliContext.Out(), resp)
-	} else {
-		log.Print("Error making post request for application creation: ", err)
+	if err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusCreated {
+		body, err := ioutil.ReadAll(resp.Body)
+		defer closeResource(cliContext.Out(), resp.Body)()
+		if err != nil {
+			return err
+		}
+
+		return errors.New(string(body))
 	}
+
+	return nil
 }
 
-func showCreateAppResult(consoleWriter io.Writer, resp *http.Response) {
-
-	if resp.StatusCode == http.StatusCreated {
-		common.PrintInfo(consoleWriter, "Application created successfully.")
-	} else {
-		common.PrintInfo(consoleWriter, "Error creating application.")
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Print("Error reading json body: ", err)
+func closeResource(consoleWriter io.Writer, res io.Closer) func() {
+	return func() {
+		if err := res.Close(); err != nil {
+			common.PrintError(consoleWriter, "Error closing resource. Reason: ", err)
 		}
-		fmt.Println("Error: ", string(body))
-	}
-	err := resp.Body.Close()
-	if err != nil {
-		log.Print(err)
 	}
 }
