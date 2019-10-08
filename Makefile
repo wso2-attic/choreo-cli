@@ -28,7 +28,7 @@ GO_LDFLAGS += -X $(PROJECT_MODULE)/internal/pkg/build.buildPlatform=local
 
 .PHONY: test
 test:
-	go test -coverprofile coverage.txt $(shell go list ./...)
+	go test -coverprofile coverage.txt $(shell go list ./... | grep -v github.com/wso2/choreo-cli/internal/pkg/test)
 
 .PHONY: coverage
 coverage: test

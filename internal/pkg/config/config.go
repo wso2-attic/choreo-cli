@@ -17,32 +17,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-func InitConfig() (*CliConfig, error) {
-	config := new(CliConfig)
-
-	if err := initializeViper(config); err != nil {
-		return nil, err
-	}
-
-	return config, nil
-}
-
-func initializeViper(config *CliConfig) error {
+func InitUserConfig() (*ViperConfigHolder, error) {
 	userConfig := viper.New()
 	if err := loadConfigFile(userConfig, userConfigFileName); err != nil {
-		return err
+		return nil, err
 	}
-	config.userConfigHolder = &ViperConfigHolder{viperInstance: userConfig}
+	return &ViperConfigHolder{viperInstance: userConfig}, nil
+}
 
+func InitEnvConfig() (*ViperConfigHolder, error) {
 	envConfig := viper.New()
 	if getEnvAsBool(enableEnvConfigPropertyName, false) {
 		if err := loadConfigFile(envConfig, environmentConfigFileName); err != nil {
-			return err
+			return nil, err
 		}
 	}
-	config.envConfigHolder = &ViperConfigHolder{viperInstance: envConfig}
-
-	return nil
+	return &ViperConfigHolder{viperInstance: envConfig}, nil
 }
 
 func loadConfigFile(v *viper.Viper, configFileName string) error {

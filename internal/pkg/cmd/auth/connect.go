@@ -13,12 +13,12 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/source/github"
 	"strings"
 )
 
-func NewConnectCommand(cliConfig config.Config) *cobra.Command {
+func NewConnectCommand(cliContext runtime.CliContext) *cobra.Command {
 
 	const cmdConnect = "connect"
 	cmd := &cobra.Command{
@@ -26,22 +26,24 @@ func NewConnectCommand(cliConfig config.Config) *cobra.Command {
 		Short:   "Connect to a source code provider",
 		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdAuth, cmdConnect), " github"),
 		Args:    cobra.ExactArgs(1),
-		Run:     runConnectCommand(cliConfig),
+		Run:     runConnectCommand(cliContext),
 	}
 	return cmd
 }
 
-func runConnectCommand(cliConfig config.Config) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func runConnectCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 
+	consoleWriter := cliContext.Out()
+
+	return func(cmd *cobra.Command, args []string) {
 		if strings.ToLower(args[0]) == sourceProviderGithub {
-			if github.PerformGithubAuthorization(cliConfig) {
-				common.PrintInfo("GitHub authorization successful.")
+			if github.PerformGithubAuthorization(cliContext) {
+				common.PrintInfo(consoleWriter, "GitHub authorization successful.")
 			} else {
-				common.PrintErrorMessage("GitHub authorization failed.")
+				common.PrintErrorMessage(consoleWriter, "GitHub authorization failed.")
 			}
 		} else {
-			common.PrintErrorMessage("Unsupported source provider specified: " + args[0] +
+			common.PrintErrorMessage(consoleWriter, "Unsupported source provider specified: "+args[0]+
 				". At the moment we only support GitHub.")
 		}
 	}

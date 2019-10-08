@@ -12,6 +12,7 @@ package common
 import (
 	"errors"
 	"fmt"
+	"io"
 	"math/rand"
 	"net"
 	"net/http"
@@ -31,27 +32,27 @@ func GetAbsoluteCommandName(commandComponents ...string) string {
 	return commandName
 }
 
-func PrintErrorMessage(message string) {
-	fmt.Println(message)
+func PrintErrorMessage(writer io.Writer, message string) {
+	Println(writer, message)
 }
 
-func PrintError(message string, err error) {
-	fmt.Printf("\n%s: %v\n", message, err)
+func PrintError(writer io.Writer, message string, err error) {
+	Printf(writer, "\n%s: %v\n", message, err)
 }
 
-func PrintInfo(message string) {
-	fmt.Println(message)
+func PrintInfo(writer io.Writer, message string) {
+	Println(writer, message)
 }
 
-func ExitWithError(message string, err error) {
-	PrintError(message, err)
+func ExitWithError(writer io.Writer, message string, err error) {
+	PrintError(writer, message, err)
 	fmt.Println()
 	os.Exit(1)
 }
 
-func ExitWithErrorMessage(message string) {
-	PrintErrorMessage(message)
-	fmt.Println()
+func ExitWithErrorMessage(writer io.Writer, message string) {
+	PrintErrorMessage(writer, message)
+	Println(writer)
 	os.Exit(1)
 }
 
@@ -98,7 +99,7 @@ func OpenBrowser(url string) error {
 	}
 }
 
-func SendBrowserResponse(responseWriter http.ResponseWriter, status int, title string, messages ...string) {
+func SendBrowserResponse(consoleWriter io.Writer, responseWriter http.ResponseWriter, status int, title string, messages ...string) {
 	responseWriter.WriteHeader(status)
 	responseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
 	htmlContent := `<!DOCTYPE html>
@@ -119,11 +120,11 @@ func SendBrowserResponse(responseWriter http.ResponseWriter, status int, title s
 	}
 
 	if _, err := fmt.Fprintf(responseWriter, htmlContent, title, body); err != nil {
-		PrintError("Error displaying browser content", err)
+		PrintError(consoleWriter, "Error displaying browser content", err)
 	}
 	flusher, ok := responseWriter.(http.Flusher)
 	if !ok {
-		PrintErrorMessage("Error in casting the flusher")
+		PrintErrorMessage(consoleWriter, "Error in casting the flusher")
 	}
 	flusher.Flush()
 }
@@ -136,4 +137,20 @@ func GetRandomString(length int) string {
 		builder.WriteRune(chars[rand.Intn(len(chars))])
 	}
 	return builder.String()
+}
+
+func Println(writer io.Writer, message ...interface{}) {
+	_, _ = fmt.Fprintln(writer, message...)
+}
+
+func Printf(writer io.Writer, format string, message ...interface{}) {
+	_, _ = fmt.Fprintf(writer, format, message...)
+}
+
+func GetStringOrDefault(getValue func(key string) string, key string, defaultValue string) string {
+	if value := getValue(key); value != "" {
+		return value
+	} else {
+		return defaultValue
+	}
 }

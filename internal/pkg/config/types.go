@@ -10,47 +10,16 @@
 package config
 
 import (
+	"io"
 	"os"
 
 	"github.com/spf13/viper"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 )
 
-type Config interface {
-	Reader
-	Writer
-	GetEnvironmentConfig() Reader
-}
-
-type Reader interface {
-	GetString(key string) string
-	GetStringOrDefault(key string, defaultValue string) string
-}
-
-type CliConfig struct {
-	userConfigHolder configHolder
-	envConfigHolder  configHolder
-}
-
-func (c *CliConfig) GetEnvironmentConfig() Reader {
-	return c.envConfigHolder
-}
-
-func (c *CliConfig) GetString(key string) string {
-	return c.userConfigHolder.GetString(key)
-}
-
-func (c *CliConfig) GetStringOrDefault(key string, defaultValue string) string {
-	return c.userConfigHolder.GetStringOrDefault(key, defaultValue)
-}
-
-type configHolder interface {
-	Reader
-	Writer
-}
-
 type ViperConfigHolder struct {
 	viperInstance *viper.Viper
+	writer        io.Writer
 }
 
 func (v *ViperConfigHolder) GetString(key string) string {
@@ -59,19 +28,7 @@ func (v *ViperConfigHolder) GetString(key string) string {
 }
 
 func (v *ViperConfigHolder) GetStringOrDefault(key string, defaultValue string) string {
-	return getStringOrDefault(v.GetString, key, defaultValue)
-}
-
-func getStringOrDefault(predicate func(key string) string, key string, defaultValue string) string {
-	if value := predicate(key); value != "" {
-		return value
-	} else {
-		return defaultValue
-	}
-}
-
-type Writer interface {
-	SetString(key string, value string)
+	return common.GetStringOrDefault(v.GetString, key, defaultValue)
 }
 
 func (v *ViperConfigHolder) SetString(key string, value string) {
@@ -83,19 +40,19 @@ func (v *ViperConfigHolder) SetString(key string, value string) {
 	}
 
 	if _, ok := err.(*os.PathError); ok {
-		createDirectoryAndWrite(v.viperInstance, key)
+		createDirectoryAndWrite(v.viperInstance, key, v.writer)
 	} else {
-		common.PrintError("Could not write to config. Key: "+key, err)
+		common.PrintError(v.writer, "Could not write to config. Key: "+key, err)
 	}
 }
 
-func createDirectoryAndWrite(viperInstance *viper.Viper, key string) {
+func createDirectoryAndWrite(viperInstance *viper.Viper, key string, writer io.Writer) {
 	if err := makeConfigDirectory(); err != nil {
-		common.PrintError("Could not make config directory to config. Key: "+key, err)
+		common.PrintError(writer, "Could not make config directory to config. Key: "+key, err)
 	}
 
 	if err := viperInstance.WriteConfig(); err != nil {
-		common.PrintError("Could not write to config. Key: "+key, err)
+		common.PrintError(writer, "Could not write to config. Key: "+key, err)
 	}
 }
 
@@ -110,8 +67,4 @@ func makeConfigDirectory() error {
 	}
 
 	return nil
-}
-
-func (c *CliConfig) SetString(key string, value string) {
-	c.userConfigHolder.SetString(key, value)
 }
