@@ -10,42 +10,48 @@
 package config
 
 import (
+	"os"
 	"testing"
 
 	"github.com/spf13/viper"
+	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
 func TestViperConfigHolderReadValue(t *testing.T) {
 	v := viper.New()
 	v.Set("foo", "fooValue")
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	got := configHolder.GetString("foo")
-	assertString(t, "fooValue", got, "ViperConfigHolder did not read the value correctly")
+	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not read the value correctly")
 }
 
 func TestViperConfigHolderReadValueNotDefault(t *testing.T) {
 	v := viper.New()
 	v.Set("foo", "fooValue")
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
-	assertString(t, "fooValue", got, "ViperConfigHolder did not return the value correctly")
+	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not return the value correctly")
 }
 
 func TestViperConfigHolderReadDefault(t *testing.T) {
 	v := viper.New()
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	got := configHolder.GetStringOrDefault("foo", "fooDefault")
-	assertString(t, "fooDefault", got, "ViperConfigHolder did not read the default")
+	test.AssertString(t, "fooDefault", got, "ViperConfigHolder did not read the default")
 }
 
 func TestViperConfigHolderWrite(t *testing.T) {
 	v := viper.New()
-	configHolder := &ViperConfigHolder{viperInstance: v}
+	configHolder := createMockConfigHolder(v)
 
 	configHolder.SetString("foo", "fooValue")
 	got := configHolder.GetString("foo")
-	assertString(t, "fooValue", got, "ViperConfigHolder did not write the value correctly")
+	test.AssertString(t, "fooValue", got, "ViperConfigHolder did not write the value correctly")
+}
+
+func createMockConfigHolder(v *viper.Viper) *ViperConfigHolder {
+	return &ViperConfigHolder{viperInstance: v, writer: os.Stdout}
 }

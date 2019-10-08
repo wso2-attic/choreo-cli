@@ -11,15 +11,17 @@ package auth
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/auth/login"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewAuthCommand(cliConfig config.Config) *cobra.Command {
+func NewAuthCommand(cliContext runtime.CliContext) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     cmdAuth,
-		Short:   "Manage authentication and authorization",
-		Args:    cobra.ExactArgs(1),
+		Use:   cmdAuth,
+		Short: "Manage authentication and authorization",
+		Args:  cobra.ExactArgs(1),
 	}
-	cmd.AddCommand(NewConnectCommand(cliConfig))
+	cmd.AddCommand(login.NewLoginCommand(cliContext))
+	cmd.AddCommand(NewConnectCommand(cliContext))
 	return cmd
 }
