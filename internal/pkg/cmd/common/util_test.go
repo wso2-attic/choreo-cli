@@ -57,3 +57,17 @@ func TestPrintInfo(t *testing.T) {
 	expect := "test message\n"
 	test.AssertString(t, expect, b.String(), "Incorrect info message format")
 }
+
+func TestGetStringOrDefaultReturnValue(t *testing.T)  {
+	getValue := func(key string) string { return "test-value"}
+	output := GetStringOrDefault(getValue, "key", "default")
+
+	test.AssertString(t, "test-value", output, "GetStringOrDefault should return value when available")
+}
+
+func TestGetStringOrDefaultReturnDefault(t *testing.T)  {
+	getValue := func(key string) string { return ""}
+	output := GetStringOrDefault(getValue, "key", "default")
+
+	test.AssertString(t, "default", output, "GetStringOrDefault should return value when available")
+}

@@ -14,7 +14,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/wso2/choreo-cli/internal/pkg/config"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
@@ -45,13 +45,16 @@ func TestNewVersionCommand(t *testing.T) {
 
 type mockContext struct {
 	out io.Writer
-	config config.Config
 }
 
 func (c *mockContext) Out() io.Writer {
 	return c.out
 }
 
-func (c *mockContext) Config() config.Config {
-	return c.config
+func (c *mockContext) UserConfig() runtime.UserConfig {
+	return nil
+}
+
+func (c *mockContext) EnvConfig() runtime.EnvConfig {
+	return nil
 }

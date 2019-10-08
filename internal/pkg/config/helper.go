@@ -9,25 +9,19 @@
 
 package config
 
+import "github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
+
 type GetConfig func(key string) string
 type SetConfig func(key string, value string)
 
-func CreateUserConfigReader(cliConfig Config, configDefaults map[string]string) GetConfig {
-	return createConfigReader(cliConfig, configDefaults)
-}
-
-func CreateEnvironmentConfigReader(cliConfig Config, configDefaults map[string]string) GetConfig {
-	return createConfigReader(cliConfig.GetEnvironmentConfig(), configDefaults)
-}
-
-func CreateUserConfigWriter(cliConfig Config) SetConfig {
-	return func(key string, value string) {
-		cliConfig.SetString(key, value)
+func CreateConfigReader(reader runtime.Reader, configDefaults map[string]string) GetConfig {
+	return func(key string) string {
+		return reader.GetStringOrDefault(key, configDefaults[key])
 	}
 }
 
-func createConfigReader(reader Reader, configDefaults map[string]string) GetConfig {
-	return func(key string) string {
-		return reader.GetStringOrDefault(key, configDefaults[key])
+func CreateConfigWriter(cliConfig runtime.Writer) SetConfig {
+	return func(key string, value string) {
+		cliConfig.SetString(key, value)
 	}
 }

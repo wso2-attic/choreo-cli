@@ -35,8 +35,8 @@ func NewLoginCommand(cliContext runtime.CliContext) *cobra.Command {
 }
 
 func createLoginFunction(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
-	getEnvConfig := createEnvConfigReader(cliContext.Config())
-	setUserConfig := config.CreateUserConfigWriter(cliContext.Config())
+	getEnvConfig := createEnvConfigReader(cliContext)
+	setUserConfig := config.CreateConfigWriter(cliContext.UserConfig())
 	consoleWriter := cliContext.Out()
 
 	return func(cmd *cobra.Command, args []string) {

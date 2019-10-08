@@ -23,15 +23,20 @@ import (
 )
 
 type CliContextData struct {
-	config config.Config
+	userConfig runtime.UserConfig
+	envConfig runtime.EnvConfig
 }
 
 func (c *CliContextData) Out() io.Writer {
 	return os.Stdout
 }
 
-func (c *CliContextData) Config() config.Config {
-	return c.config
+func (c *CliContextData) UserConfig() runtime.UserConfig {
+	return c.userConfig
+}
+
+func (c *CliContextData) EnvConfig() runtime.EnvConfig {
+	return c.envConfig
 }
 
 func main() {
@@ -46,11 +51,17 @@ func main() {
 }
 
 func initConfig(cliContext *CliContextData) {
-	cliConfig, err := config.InitConfig()
+	userConfig, err := config.InitUserConfig()
 	if err != nil {
-		cmdCommon.ExitWithError(cliContext.Out(), "Error loading configs", err)
+		cmdCommon.ExitWithError(cliContext.Out(), "Error loading user configs", err)
 	}
-	cliContext.config = cliConfig
+	cliContext.userConfig = userConfig
+
+	envConfig, err := config.InitEnvConfig()
+	if err != nil {
+		cmdCommon.ExitWithError(cliContext.Out(), "Error loading env configs", err)
+	}
+	cliContext.envConfig = envConfig
 }
 
 func initCommands(cliContext runtime.CliContext) cobra.Command {
