@@ -12,10 +12,10 @@ package github
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,8 +31,11 @@ func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
 	consoleWriter := cliContext.Out()
 	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), client.EnvConfigs)
 
-	state := obtainState(cliContext)
+	state, err := obtainState(cliContext)
 	if state == "" {
+		if err != nil {
+			common.PrintErrorMessage(consoleWriter, err.Error())
+		}
 		common.ExitWithErrorMessage(consoleWriter, "Error while initiating authorization flow")
 	}
 
@@ -55,7 +58,7 @@ func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
 	}()
 
 	common.PrintInfo(consoleWriter, "You will now be taken to your browser for authentication")
-	err := common.OpenBrowser(authRequestUrl)
+	err = common.OpenBrowser(authRequestUrl)
 	if err != nil {
 		common.ExitWithError(consoleWriter, "Error opening browser: ", err)
 	}
@@ -97,40 +100,36 @@ func shutdownServer(consoleWriter io.Writer, server *http.Server) {
 	}
 }
 
-func obtainState(cliContext runtime.CliContext) string {
+func obtainState(cliContext runtime.CliContext) (string, error) {
 
 	req, err := client.NewRequest(cliContext, "GET", backendOauthStatePath, nil)
 	if err != nil {
-		log.Println("Error creating request to obtain state: ", err)
-		return ""
+		return "", err
 	}
 	httpClient := client.NewClient(cliContext)
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		log.Println("Error making get request to obtain state: ", err)
-		return ""
+		return "", err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error reading json body of state response: ", err)
-		return ""
+		return "", err
+	}
+	var stateObj struct {
+		State string `json:"state"`
 	}
 	if resp.StatusCode == http.StatusOK {
-		var stateObj struct {
-			State string `json:"state"`
-		}
 		err := json.Unmarshal(body, &stateObj)
 		if err != nil {
-			log.Println("Error converting json state into string state: ", err)
-			return ""
+			return "", err
 		}
-		return stateObj.State
 	} else {
-		log.Println("Error response received for state request: ", string(body))
+		err = fmt.Errorf("error response received for state request: %s", string(body))
+		return "", err
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		log.Println(err)
+		return "", err
 	}
-	return ""
+	return stateObj.State, nil
 }
