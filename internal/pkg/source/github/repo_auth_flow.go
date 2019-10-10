@@ -11,8 +11,11 @@ package github
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -28,9 +31,19 @@ func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
 	consoleWriter := cliContext.Out()
 	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), client.EnvConfigs)
 
+	state, err := obtainState(cliContext)
+	if state == "" {
+		if err != nil {
+			common.PrintErrorMessage(consoleWriter, err.Error())
+		}
+		common.ExitWithErrorMessage(consoleWriter, "Error while initiating authorization flow")
+	}
+
 	localServerPort := common.GetFirstOpenPort(localServerBasePort)
 	localServerUrl := "http://localhost:" + strconv.Itoa(localServerPort) + localServerPath
-	authRequestUrl := getEnvConfig(client.BackendUrl) + backendOauthRequestPath + "?user_redirect=" + url.QueryEscape(localServerUrl)
+	authRequestUrl := getEnvConfig(client.BackendUrl) + backendOauthRequestPath +
+		"?user_redirect=" + url.QueryEscape(localServerUrl) +
+		"&state=" + state
 
 	doneChannel := make(chan bool)
 	mux := http.NewServeMux()
@@ -45,7 +58,7 @@ func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
 	}()
 
 	common.PrintInfo(consoleWriter, "You will now be taken to your browser for authentication")
-	err := common.OpenBrowser(authRequestUrl)
+	err = common.OpenBrowser(authRequestUrl)
 	if err != nil {
 		common.ExitWithError(consoleWriter, "Error opening browser: ", err)
 	}
@@ -85,4 +98,38 @@ func shutdownServer(consoleWriter io.Writer, server *http.Server) {
 	if err != nil {
 		common.PrintError(consoleWriter, "Error shutting down the local server. Reason: ", err)
 	}
+}
+
+func obtainState(cliContext runtime.CliContext) (string, error) {
+
+	req, err := client.NewRequest(cliContext, "GET", backendOauthStatePath, nil)
+	if err != nil {
+		return "", err
+	}
+	httpClient := client.NewClient(cliContext)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	var stateObj struct {
+		State string `json:"state"`
+	}
+	if resp.StatusCode == http.StatusOK {
+		err := json.Unmarshal(body, &stateObj)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		err = fmt.Errorf("error response received for state request: %s", string(body))
+		return "", err
+	}
+	err = resp.Body.Close()
+	if err != nil {
+		return "", err
+	}
+	return stateObj.State, nil
 }

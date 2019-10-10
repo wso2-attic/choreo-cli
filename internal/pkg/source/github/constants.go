@@ -10,6 +10,7 @@
 package github
 
 const (
+	backendOauthStatePath   = "/internal/source_code/github/oauth/state"
 	backendOauthRequestPath = "/internal/source_code/github/oauth/request"
 	localServerBasePort     = 8080
 	localServerPath         = "/oauth/redirect"
