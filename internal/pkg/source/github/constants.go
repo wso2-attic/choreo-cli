@@ -7,9 +7,11 @@
  * You may not alter or remove any copyright or other notice from copies of this content.
  */
 
-package auth
+package github
 
 const (
-	cmdAuth              = "auth"
-	sourceProviderGithub = "github"
+	backendOauthStatePath   = "/internal/source_code/github/oauth/state"
+	backendOauthRequestPath = "/internal/source_code/github/oauth/request"
+	localServerBasePort     = 8080
+	localServerPath         = "/oauth/redirect"
 )

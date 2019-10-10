@@ -17,9 +17,11 @@ import (
 
 func NewAuthCommand(cliContext runtime.CliContext) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     cmdAuth,
-		Short:   "Manage authentication and authorization",
+		Use:   cmdAuth,
+		Short: "Manage authentication and authorization",
+		Args:  cobra.ExactArgs(1),
 	}
 	cmd.AddCommand(login.NewLoginCommand(cliContext))
+	cmd.AddCommand(NewConnectCommand(cliContext))
 	return cmd
 }

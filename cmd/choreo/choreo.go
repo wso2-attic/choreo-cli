@@ -24,7 +24,7 @@ import (
 
 type CliContextData struct {
 	userConfig runtime.UserConfig
-	envConfig runtime.EnvConfig
+	envConfig  runtime.EnvConfig
 }
 
 func (c *CliContextData) Out() io.Writer {
