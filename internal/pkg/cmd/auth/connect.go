@@ -12,6 +12,7 @@ package auth
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/source/github"
@@ -36,6 +37,11 @@ func runConnectCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, a
 	consoleWriter := cliContext.Out()
 
 	return func(cmd *cobra.Command, args []string) {
+
+		if !client.IsUserLoggedIn(cliContext) {
+			common.ExitWithErrorMessage(consoleWriter, "Please login first")
+		}
+
 		if strings.ToLower(args[0]) == sourceProviderGithub {
 			if github.PerformGithubAuthorization(cliContext) {
 				common.PrintInfo(consoleWriter, "GitHub authorization successful.")
