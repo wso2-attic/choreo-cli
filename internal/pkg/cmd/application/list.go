@@ -41,6 +41,10 @@ func NewListCommand(cliContext runtime.CliContext) *cobra.Command {
 func runListAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
+		if !client.IsUserLoggedIn(cliContext) {
+			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
+		}
+
 		listApps(cliContext)
 	}
 }

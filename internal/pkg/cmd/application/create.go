@@ -42,6 +42,10 @@ func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
 func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
+		if !client.IsUserLoggedIn(cliContext) {
+			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
+		}
+
 		description, _ := cmd.Flags().GetString("description")
 
 		app := Application{args[0], description}
