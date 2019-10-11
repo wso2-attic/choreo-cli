@@ -5,7 +5,7 @@
 CLI to manage integration applications with Choreo platform
 
 ## Table of content
-- [Getting started](docs/cli/reference.md)
+- [Getting started](docs/reference.md)
 - [Building from source](#building-from-source)
 
 ## Getting started with Choreo
