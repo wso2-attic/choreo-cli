@@ -21,5 +21,5 @@ var EnvConfigs = map[string]string{
 }
 
 var UserConfigs = map[string]string{
-	AccessToken: "login.oauth2.accessToken",
+	AccessToken: "",
 }
