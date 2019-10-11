@@ -46,3 +46,9 @@ func NewRequest(cliContext runtime.CliContext, method, path string, body io.Read
 
 	return req, err
 }
+
+func IsUserLoggedIn(cliContext runtime.UserConfigHolder) bool {
+
+	token := cliContext.UserConfig().GetString(AccessToken)
+	return token != ""
+}
