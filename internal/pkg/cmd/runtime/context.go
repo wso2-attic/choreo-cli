@@ -43,8 +43,17 @@ type ConsoleOutHolder interface {
 	Out() io.Writer
 }
 
-type CliContext interface {
+type ConsoleDebugOutHolder interface {
+	DebugOut() io.Writer
+}
+
+type ConsoleWriterHolder interface {
 	ConsoleOutHolder
+	ConsoleDebugOutHolder
+}
+
+type CliContext interface {
+	ConsoleWriterHolder
 	UserConfigHolder
 	EnvConfigHolder
 }

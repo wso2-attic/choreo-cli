@@ -13,9 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -57,40 +55,41 @@ func createApp(cliContext runtime.CliContext, application Application) {
 
 	jsonStr, err := json.Marshal(application)
 	if err != nil {
-		log.Print("Error converting application into json: ", err)
-		return
+		common.PrintError(cliContext.DebugOut(), "Error converting application into json: ", err)
+		common.ExitWithErrorMessage(cliContext.Out(), "Internal error occurred")
 	}
 	req, err := client.NewRequest(cliContext, "POST", pathApplications, bytes.NewBuffer(jsonStr))
 
 	if err != nil {
-		log.Print("Error creating post request for application creation: ", err)
-		return
+		common.PrintError(cliContext.DebugOut(), "Error creating post request for application creation: ", err)
+		common.ExitWithErrorMessage(cliContext.Out(), "Internal error occurred")
 	}
 
 	httpClient := client.NewClient(cliContext)
 
 	resp, err := httpClient.Do(req)
 	if err == nil {
-		showCreateAppResult(cliContext.Out(), resp)
+		showCreateAppResult(cliContext, resp)
 	} else {
-		log.Print("Error making post request for application creation: ", err)
+		common.PrintError(cliContext.DebugOut(), "Error making post request for application creation: ", err)
+		common.ExitWithErrorMessage(cliContext.Out(), "Error communicating with server")
 	}
 }
 
-func showCreateAppResult(consoleWriter io.Writer, resp *http.Response) {
+func showCreateAppResult(console runtime.ConsoleWriterHolder, resp *http.Response) {
 
 	if resp.StatusCode == http.StatusCreated {
-		common.PrintInfo(consoleWriter, "Application created successfully.")
+		common.PrintInfo(console.Out(), "Application created successfully")
 	} else {
-		common.PrintInfo(consoleWriter, "Error creating application.")
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Print("Error reading json body: ", err)
+			common.PrintError(console.DebugOut(), "Error reading json body: ", err)
 		}
-		fmt.Println("Error: ", string(body))
+		common.PrintErrorMessage(console.DebugOut(), "Received error message: "+string(body))
+		common.PrintInfo(console.Out(), "Error creating application")
 	}
 	err := resp.Body.Close()
 	if err != nil {
-		log.Print(err)
+		common.PrintError(console.DebugOut(), "Error closing response body: ", err)
 	}
 }

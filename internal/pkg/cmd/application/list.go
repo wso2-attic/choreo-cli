@@ -11,10 +11,7 @@ package application
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 
@@ -54,41 +51,43 @@ func listApps(cliContext runtime.CliContext) {
 	req, err := client.NewRequest(cliContext, "GET", pathApplications, nil)
 
 	if err != nil {
-		log.Print("Error creating post request for listing applications: ", err)
-		return
+		common.PrintError(cliContext.DebugOut(), "Error creating post request for listing applications: ", err)
+		common.ExitWithErrorMessage(cliContext.Out(), "Internal error occurred")
 	}
 
 	httpClient := client.NewClient(cliContext)
 
 	resp, err := httpClient.Do(req)
 	if err == nil {
-		showListAppsResult(cliContext.Out(), resp)
+		showListAppsResult(cliContext, resp)
 	} else {
-		log.Print("Error making post request for listing applications: ", err)
+		common.PrintError(cliContext.DebugOut(), "Error making post request for listing applications: ", err)
+		common.ExitWithErrorMessage(cliContext.Out(), "Error communicating with server")
 	}
 }
 
-func showListAppsResult(consoleWriter io.Writer, resp *http.Response) {
+func showListAppsResult(console runtime.ConsoleWriterHolder, resp *http.Response) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Print("Error reading json body: ", err)
-		return
+		common.PrintError(console.DebugOut(), "Error reading json body: ", err)
+		common.ExitWithErrorMessage(console.Out(), "Internal error occurred")
 	}
 	if resp.StatusCode == http.StatusOK {
 		var apps Applications
 		err := json.Unmarshal(body, &apps)
 		if err != nil {
-			log.Print("Error converting json into applications: ", err)
+			common.PrintError(console.DebugOut(), "Error converting json into applications: ", err)
+			common.ExitWithErrorMessage(console.Out(), "Internal error occurred")
 		}
 		printer := tableprinter.New(os.Stdout)
 		printer.Print(apps)
 	} else {
-		common.PrintInfo(consoleWriter, "Error listing applications.")
-		fmt.Println("Error: ", string(body))
+		common.PrintErrorMessage(console.DebugOut(), "Received error message: "+string(body))
+		common.PrintErrorMessage(console.Out(), "Error listing applications")
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		log.Print(err)
+		common.PrintError(console.DebugOut(), "Error closing response body: ", err)
 	}
 }
