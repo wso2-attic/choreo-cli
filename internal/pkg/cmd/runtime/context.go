@@ -43,8 +43,21 @@ type ConsoleOutHolder interface {
 	Out() io.Writer
 }
 
+type ApplicationApiClient interface {
+	CreateNewApp(name string, desc string) error
+}
+
+type Client interface {
+	ApplicationApiClient
+}
+
+type ClientHolder interface {
+	Client() Client
+}
+
 type CliContext interface {
 	ConsoleOutHolder
 	UserConfigHolder
 	EnvConfigHolder
+	ClientHolder
 }

@@ -14,6 +14,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/auth"
@@ -25,6 +26,11 @@ import (
 type CliContextData struct {
 	userConfig runtime.UserConfig
 	envConfig runtime.EnvConfig
+	apiClient runtime.Client
+}
+
+func (c *CliContextData) Client() runtime.Client {
+	return c.apiClient
 }
 
 func (c *CliContextData) Out() io.Writer {
@@ -43,11 +49,17 @@ func main() {
 	cliContext := &CliContextData{}
 
 	initConfig(cliContext)
+	initClient(cliContext)
 	command := initCommands(cliContext)
 
 	if err := command.Execute(); err != nil {
 		cmdCommon.ExitWithError(cliContext.Out(), "Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
 	}
+}
+
+func initClient(cliContext *CliContextData) {
+	cliClient := client.CreateClient(cliContext)
+	cliContext.apiClient = cliClient
 }
 
 func initConfig(cliContext *CliContextData) {

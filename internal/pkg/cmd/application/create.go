@@ -10,16 +10,9 @@
 package application
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
@@ -47,49 +40,9 @@ func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 			common.ExitWithError(cliContext.Out(), "Error reading description flag", err)
 		}
 
-		createApp(cliContext, &Application{Name: args[0], Description: description})
-	}
-}
-
-func createApp(cliContext runtime.CliContext, application *Application) {
-	err := createNewApp(cliContext, application)
-	if err != nil {
-		common.ExitWithError(cliContext.Out(), "Error occurred while creating the application. Reason: ", err)
-	}
-}
-
-func createNewApp(cliContext runtime.CliContext, application *Application) error {
-	jsonStr, err := json.Marshal(application)
-	if err != nil {
-		common.ExitWithError(cliContext.Out(), "Error converting application data into JSON format. Reason: ", err)
-	}
-
-	req, err := client.NewRequest(cliContext, "POST", pathApplications, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		common.ExitWithError(cliContext.Out(), "Error creating post request for application creation. Reason: ", err)
-	}
-
-	httpClient := client.NewClient(cliContext)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return err
-	} else if resp.StatusCode != http.StatusCreated {
-		body, err := ioutil.ReadAll(resp.Body)
-		defer closeResource(cliContext.Out(), resp.Body)()
+		err = cliContext.Client().CreateNewApp(args[0], description)
 		if err != nil {
-			return err
-		}
-
-		return errors.New(string(body))
-	}
-
-	return nil
-}
-
-func closeResource(consoleWriter io.Writer, res io.Closer) func() {
-	return func() {
-		if err := res.Close(); err != nil {
-			common.PrintError(consoleWriter, "Error closing resource. Reason: ", err)
+			common.ExitWithError(cliContext.Out(), "Error occurred while creating the application. Reason: ", err)
 		}
 	}
 }

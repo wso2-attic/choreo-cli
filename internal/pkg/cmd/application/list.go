@@ -17,6 +17,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/landoop/tableprinter"
 	"github.com/spf13/cobra"
@@ -47,14 +48,18 @@ func runListAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, a
 
 func listApps(cliContext runtime.CliContext) {
 
-	req, err := client.NewRequest(cliContext, "GET", pathApplications, nil)
+	backendUrl := cliContext.EnvConfig().GetStringOrDefault(client.BackendUrl, client.EnvConfigs[client.BackendUrl])
+	accessToken := cliContext.UserConfig().GetStringOrDefault(client.AccessToken, client.UserConfigs[client.AccessToken])
+	req, err := client.NewRequest(backendUrl, accessToken, "GET", pathApplications, nil)
 
 	if err != nil {
 		log.Print("Error creating post request for listing applications: ", err)
 		return
 	}
 
-	httpClient := client.NewClient(cliContext)
+	skipVerify, _ := strconv.ParseBool(cliContext.
+		EnvConfig().GetStringOrDefault(client.SkipVerify, client.EnvConfigs[client.SkipVerify]))
+	httpClient := client.NewClient(skipVerify)
 
 	resp, err := httpClient.Do(req)
 	if err == nil {
