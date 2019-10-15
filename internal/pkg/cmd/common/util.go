@@ -13,12 +13,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetAbsoluteCommandName(commandComponents ...string) string {
@@ -94,6 +97,46 @@ func OpenBrowser(url string) error {
 	} else {
 		return errors.New("unsupported platform")
 	}
+}
+
+func SendBrowserResponse(consoleWriter io.Writer, responseWriter http.ResponseWriter, status int, title string, messages ...string) {
+	responseWriter.WriteHeader(status)
+	responseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
+	htmlContent := `<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>%s</title>
+	</head>
+	<body>
+		<div style="text-align: center;">
+		%s
+		</div>
+	</body>
+</html>`
+	body := ""
+	for _, line := range messages {
+		body += "<h2>" + line + "</h2>"
+	}
+
+	if _, err := fmt.Fprintf(responseWriter, htmlContent, title, body); err != nil {
+		PrintError(consoleWriter, "Error displaying browser content", err)
+	}
+	flusher, ok := responseWriter.(http.Flusher)
+	if !ok {
+		PrintErrorMessage(consoleWriter, "Error in casting the flusher")
+	}
+	flusher.Flush()
+}
+
+func GetRandomString(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789")
+	var builder strings.Builder
+	for i := 0; i < length; i++ {
+		builder.WriteRune(chars[rand.Intn(len(chars))])
+	}
+	return builder.String()
 }
 
 func Println(writer io.Writer, message ...interface{}) {

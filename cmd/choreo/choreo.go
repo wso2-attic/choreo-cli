@@ -25,8 +25,8 @@ import (
 
 type CliContextData struct {
 	userConfig runtime.UserConfig
-	envConfig runtime.EnvConfig
-	apiClient runtime.Client
+	envConfig  runtime.EnvConfig
+	apiClient  runtime.Client
 }
 
 func (c *CliContextData) Client() runtime.Client {

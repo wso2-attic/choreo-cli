@@ -13,6 +13,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
@@ -35,6 +36,10 @@ func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
 
 func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		if !client.IsUserLoggedIn(cliContext) {
+			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
+		}
+
 		description, err := cmd.Flags().GetString(descriptionFlagName)
 		if err != nil {
 			common.ExitWithError(cliContext.Out(), "Error reading description flag", err)
@@ -46,3 +51,4 @@ func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 		}
 	}
 }
+

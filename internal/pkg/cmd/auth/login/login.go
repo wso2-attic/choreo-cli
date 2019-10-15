@@ -107,37 +107,19 @@ func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserC
 }
 
 func sendErrorToBrowser(consoleWriter io.Writer, httpWriter http.ResponseWriter) {
-	message := "Login to Choreo failed due to an internal error. Please try again."
-	sendBrowserResponse(consoleWriter, httpWriter, http.StatusInternalServerError, message)
+	common.SendBrowserResponse(consoleWriter, httpWriter, http.StatusInternalServerError, "CLI Login",
+		"Login to Choreo failed due to an internal error.", "Please try again.")
 }
 
-func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, writer http.ResponseWriter, consoleWriter io.Writer, setUserConfig config.SetConfig) error {
+func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, httpWriter http.ResponseWriter, consoleWriter io.Writer, setUserConfig config.SetConfig) error {
 	token, err := getAccessToken(code, oauth2Conf)
 	if err != nil {
 		return err
 	}
 	setUserConfig(client.AccessToken, token)
-	sendBrowserResponse(consoleWriter, writer, http.StatusOK, "Login to Choreo is successful. Please return to the CLI.")
+	common.SendBrowserResponse(consoleWriter, httpWriter, http.StatusOK, "CLI Login",
+		"Login to Choreo is successful.", "Please return to the CLI.")
 	return nil
-}
-
-func sendBrowserResponse(consoleWriter io.Writer, httpWriter http.ResponseWriter, status int, message string) {
-	httpWriter.WriteHeader(status)
-	httpWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
-	content := ` <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>CLI Login</title>
-  </head>
-  <body>
-    <h2>%s</h2>
-  </body>
-</html> `
-
-	if _, err := fmt.Fprintf(httpWriter, content, message); err != nil {
-		common.PrintError(consoleWriter, "Error while sending response to auth code redirect", err)
-	}
 }
 
 func openBrowserForAuthentication(consoleWriter io.Writer, conf *oauth2.Config) {

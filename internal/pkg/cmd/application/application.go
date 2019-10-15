@@ -11,7 +11,6 @@ package application
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
@@ -21,7 +20,6 @@ func NewApplicationCommand(cliContext runtime.CliContext) *cobra.Command {
 		Use:     cmdApplication,
 		Short:   "Manage applications",
 		Aliases: []string{"app"},
-		Example: common.GetAbsoluteCommandName(cmdApplication),
 		Args:    cobra.MaximumNArgs(1),
 	}
 	cmd.AddCommand(NewCreateCommand(cliContext))

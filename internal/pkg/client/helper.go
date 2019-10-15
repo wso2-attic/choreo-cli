@@ -13,6 +13,8 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
+
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
 // set InsecureSkipVerify option if required
@@ -34,4 +36,10 @@ func NewRequest(backendUrl string, accessToken string, method, path string, body
 	}
 
 	return req, err
+}
+
+func IsUserLoggedIn(cliContext runtime.UserConfigHolder) bool {
+
+	token := cliContext.UserConfig().GetString(AccessToken)
+	return token != ""
 }
