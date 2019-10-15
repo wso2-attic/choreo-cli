@@ -14,7 +14,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -28,15 +27,14 @@ import (
 
 func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
 
-	consoleWriter := cliContext.Out()
 	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), client.EnvConfigs)
 
 	state, err := obtainState(cliContext)
 	if state == "" {
 		if err != nil {
-			common.PrintErrorMessage(consoleWriter, err.Error())
+			common.PrintErrorMessage(cliContext.DebugOut(), err.Error())
 		}
-		common.ExitWithErrorMessage(consoleWriter, "Error while initiating authorization flow")
+		common.ExitWithErrorMessage(cliContext.Out(), "Error while initiating authorization flow")
 	}
 
 	localServerPort := common.GetFirstOpenPort(localServerBasePort)
@@ -48,28 +46,29 @@ func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
 	doneChannel := make(chan bool)
 	mux := http.NewServeMux()
 	server := &http.Server{Addr: common.GetLocalBindAddress(localServerPort), Handler: mux}
-	mux.HandleFunc(localServerPath, callbackHandler(consoleWriter, getEnvConfig, doneChannel))
+	mux.HandleFunc(localServerPath, callbackHandler(cliContext, getEnvConfig, doneChannel))
 
 	go func() {
 		// returns ErrServerClosed on graceful close
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			common.ExitWithError(consoleWriter, "Error while ListenAndServe: ", err)
+			common.ExitWithError(cliContext.Out(), "Error while ListenAndServe: ", err)
 		}
 	}()
 
-	common.PrintInfo(consoleWriter, "You will now be taken to your browser for authentication")
+	common.PrintInfo(cliContext.Out(), "You will now be taken to your browser for authentication")
 	err = common.OpenBrowser(authRequestUrl)
 	if err != nil {
-		common.ExitWithError(consoleWriter, "Error opening browser: ", err)
+		common.PrintErrorMessage(cliContext.DebugOut(), err.Error())
+		common.ExitWithErrorMessage(cliContext.Out(), "Error occurred while opening browser")
 	}
 
 	isAuthorized := <-doneChannel
-	shutdownServer(consoleWriter, server)
+	shutdownServer(cliContext, server)
 
 	return isAuthorized
 }
 
-func callbackHandler(consoleWriter io.Writer, getEnvConfig func(key string) string, doneChannel chan bool) func(responseWriter http.ResponseWriter, request *http.Request) {
+func callbackHandler(console runtime.ConsoleWriterHolder, getEnvConfig func(key string) string, doneChannel chan bool) func(responseWriter http.ResponseWriter, request *http.Request) {
 	return func(responseWriter http.ResponseWriter, request *http.Request) {
 
 		var isAuthorized = false
@@ -81,22 +80,23 @@ func callbackHandler(consoleWriter io.Writer, getEnvConfig func(key string) stri
 		title := "GitHub Authorization"
 		message := "Please return to the CLI."
 		if isAuthorized {
-			common.SendBrowserResponse(consoleWriter, responseWriter, http.StatusOK, title, "Authorization successful !", message)
+			common.SendBrowserResponse(console.Out(), responseWriter, http.StatusOK, title, "Authorization successful !", message)
 		} else {
-			common.SendBrowserResponse(consoleWriter, responseWriter, http.StatusInternalServerError, title, "Authorization failed !", message)
+			common.SendBrowserResponse(console.Out(), responseWriter, http.StatusInternalServerError, title, "Authorization failed !", message)
 		}
 
 		doneChannel <- isAuthorized
 	}
 }
 
-func shutdownServer(consoleWriter io.Writer, server *http.Server) {
+func shutdownServer(console runtime.ConsoleWriterHolder, server *http.Server) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	err := server.Shutdown(ctx)
 	if err != nil {
-		common.PrintError(consoleWriter, "Error shutting down the local server. Reason: ", err)
+		common.PrintErrorMessage(console.DebugOut(), err.Error())
+		common.PrintErrorMessage(console.Out(), "Error shutting down the local server")
 	}
 }
 

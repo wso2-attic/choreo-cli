@@ -179,7 +179,14 @@ $ chor application list
 #### Options
 
 ```
-  -h, --help   help for list
+  -h, --help    help for list
+```
+
+[Back to Command List](#chor-cli-commands)
+
+## Global flags 
+```
+  -v, --verbose     verbose output
 ```
 
 [Back to Command List](#chor-cli-commands)

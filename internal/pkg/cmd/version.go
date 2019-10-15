@@ -18,7 +18,7 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewVersionCommand(cliContext runtime.CliContext) *cobra.Command {
+func NewVersionCommand(cliContext runtime.ConsoleOutHolder) *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
 		Short:   "Get " + common.ProductName + " client version information",
@@ -28,7 +28,7 @@ func NewVersionCommand(cliContext runtime.CliContext) *cobra.Command {
 	}
 }
 
-func createRunVersion(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
+func createRunVersion(cliContext runtime.ConsoleOutHolder) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		printVersionInfo(cliContext.Out())
 	}
