@@ -57,12 +57,14 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 	}
 	jsonStr, err := json.Marshal(application)
 	if err != nil {
-		common.ExitWithError(c.out, "Error converting application data into JSON format. Reason: ", err)
+		common.PrintError(c.debug, "Error converting application data into JSON format. Reason: ", err)
+		return newInternalError()
 	}
 
 	req, err := NewRequest(c.backendUrl, c.accessToken, "POST", pathApplications, bytes.NewBuffer(jsonStr))
 	if err != nil {
-		common.ExitWithError(c.out, "Error creating post request for application creation. Reason: ", err)
+		common.PrintError(c.debug, "Error creating post request for application creation. Reason: ", err)
+		return newInternalError()
 	}
 
 	httpClient := NewClient(c.skipVerify)

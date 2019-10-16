@@ -10,6 +10,7 @@
 package client
 
 import (
+	"errors"
 	"io"
 	"strconv"
 
@@ -21,6 +22,7 @@ func CreateClient(ctx runtime.CliContext) *cliClient {
 	skipVerify, _ := strconv.ParseBool(ctx.EnvConfig().GetStringOrDefault(SkipVerify, EnvConfigs[SkipVerify]))
 	return &cliClient{
 		out: ctx.Out(),
+		debug: ctx.DebugOut(),
 		skipVerify: skipVerify,
 		backendUrl: ctx.EnvConfig().GetStringOrDefault(BackendUrl, EnvConfigs[BackendUrl]),
 		accessToken: ctx.UserConfig().GetStringOrDefault(AccessToken, UserConfigs[AccessToken]),
@@ -29,6 +31,7 @@ func CreateClient(ctx runtime.CliContext) *cliClient {
 
 type cliClient struct {
 	out         io.Writer
+	debug       io.Writer
 	skipVerify  bool
 	accessToken string
 	backendUrl  string
@@ -40,4 +43,8 @@ func closeResource(consoleWriter io.Writer, res io.Closer) func() {
 			common.PrintError(consoleWriter, "Error closing resource. Reason: ", err)
 		}
 	}
+}
+
+func newInternalError() error {
+	return errors.New("internal error occurred")
 }
