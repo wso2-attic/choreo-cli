@@ -51,4 +51,3 @@ func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 		}
 	}
 }
-

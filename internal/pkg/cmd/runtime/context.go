@@ -43,6 +43,15 @@ type ConsoleOutHolder interface {
 	Out() io.Writer
 }
 
+type ConsoleDebugOutHolder interface {
+	DebugOut() io.Writer
+}
+
+type ConsoleWriterHolder interface {
+	ConsoleOutHolder
+	ConsoleDebugOutHolder
+}
+
 type Application struct {
 	Name        string `json:"name" header:"Application Name"`
 	Description string `json:"description" header:"Description"`
@@ -67,7 +76,7 @@ type ClientHolder interface {
 }
 
 type CliContext interface {
-	ConsoleOutHolder
+	ConsoleWriterHolder
 	UserConfigHolder
 	EnvConfigHolder
 	ClientHolder

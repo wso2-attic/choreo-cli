@@ -44,9 +44,9 @@ func runConnectCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, a
 
 		if strings.ToLower(args[0]) == sourceProviderGithub {
 			if github.PerformGithubAuthorization(cliContext) {
-				common.PrintInfo(consoleWriter, "GitHub authorization successful.")
+				common.PrintInfo(consoleWriter, "GitHub authorization successful")
 			} else {
-				common.PrintErrorMessage(consoleWriter, "GitHub authorization failed.")
+				common.PrintErrorMessage(consoleWriter, "GitHub authorization failed")
 			}
 		} else {
 			common.PrintErrorMessage(consoleWriter, "Unsupported source provider specified: "+args[0]+

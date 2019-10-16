@@ -18,23 +18,35 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/cmd"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/application"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/auth"
-	cmdCommon "github.com/wso2/choreo-cli/internal/pkg/cmd/common"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
+type NoWriter struct {
+}
+
+func (c *NoWriter) Write(p []byte) (int, error) {
+	//do nothing
+	return 0, nil
+}
+
 type CliContextData struct {
-	userConfig runtime.UserConfig
-	envConfig  runtime.EnvConfig
+	userConfig    runtime.UserConfig
+	envConfig     runtime.EnvConfig
+	verboseWriter io.Writer
 	apiClient  runtime.Client
 }
 
 func (c *CliContextData) Client() runtime.Client {
 	return c.apiClient
 }
-
 func (c *CliContextData) Out() io.Writer {
 	return os.Stdout
+}
+
+func (c *CliContextData) DebugOut() io.Writer {
+	return c.verboseWriter
 }
 
 func (c *CliContextData) UserConfig() runtime.UserConfig {
@@ -51,9 +63,10 @@ func main() {
 	initConfig(cliContext)
 	initClient(cliContext)
 	command := initCommands(cliContext)
+	cobra.OnInitialize(cobraOnInit(cliContext, &command))
 
 	if err := command.Execute(); err != nil {
-		cmdCommon.ExitWithError(cliContext.Out(), "Error executing "+cmdCommon.GetAbsoluteCommandName()+" command", err)
+		common.ExitWithError(cliContext.Out(), "Error executing "+common.GetAbsoluteCommandName()+" command", err)
 	}
 }
 
@@ -65,26 +78,41 @@ func initClient(cliContext *CliContextData) {
 func initConfig(cliContext *CliContextData) {
 	userConfig, err := config.InitUserConfig()
 	if err != nil {
-		cmdCommon.ExitWithError(cliContext.Out(), "Error loading user configs", err)
+		common.ExitWithError(cliContext.Out(), "Error loading user configs", err)
 	}
 	cliContext.userConfig = userConfig
 
 	envConfig, err := config.InitEnvConfig()
 	if err != nil {
-		cmdCommon.ExitWithError(cliContext.Out(), "Error loading env configs", err)
+		common.ExitWithError(cliContext.Out(), "Error loading env configs", err)
 	}
 	cliContext.envConfig = envConfig
 }
 
-func initCommands(cliContext runtime.CliContext) cobra.Command {
+func initCommands(cliContext *CliContextData) cobra.Command {
 	command := cobra.Command{
-		Use:   cmdCommon.GetAbsoluteCommandName() + " COMMAND",
-		Short: "Manage integration applications with " + cmdCommon.ProductName + " platform",
+		Use:   common.GetAbsoluteCommandName() + " COMMAND",
+		Short: "Manage integration applications with " + common.ProductName + " platform",
 	}
+	command.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 
 	command.AddCommand(cmd.NewVersionCommand(cliContext))
 	command.AddCommand(auth.NewAuthCommand(cliContext))
 	command.AddCommand(application.NewApplicationCommand(cliContext))
 
 	return command
+}
+
+func cobraOnInit(cliContext *CliContextData, command *cobra.Command) func() {
+	return func() {
+		verbose, err := command.PersistentFlags().GetBool("verbose")
+		if err != nil {
+			common.ExitWithError(cliContext.Out(), "Error retrieving verbose flag value", err)
+		}
+		if verbose {
+			cliContext.verboseWriter = os.Stdout
+		} else {
+			cliContext.verboseWriter = &NoWriter{}
+		}
+	}
 }
