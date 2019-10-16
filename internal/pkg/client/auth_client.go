@@ -16,10 +16,10 @@ import (
 	"net/http"
 )
 
-const oauthApiResourcePath = "/internal/source_code/github/oauth/state"
+const oauthStateResourcePath = "/internal/source_code/github/oauth/state"
 
 func (c *cliClient) CreateOauthStateString() (string, error) {
-	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", oauthApiResourcePath, nil)
+	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", oauthStateResourcePath, nil)
 	if err != nil {
 		return "", err
 	}
