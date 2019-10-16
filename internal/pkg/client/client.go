@@ -10,19 +10,12 @@
 package client
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"io"
-	"io/ioutil"
-	"net/http"
 	"strconv"
 
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
-
-const pathApplications = "/applications"
 
 func CreateClient(ctx runtime.CliContext) *cliClient {
 	skipVerify, _ := strconv.ParseBool(ctx.EnvConfig().GetStringOrDefault(SkipVerify, EnvConfigs[SkipVerify]))
@@ -39,66 +32,6 @@ type cliClient struct {
 	skipVerify  bool
 	accessToken string
 	backendUrl  string
-}
-
-func (c *cliClient) ListApps() ([]runtime.Application, error) {
-	var apps []runtime.Application
-	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", pathApplications, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer closeResource(c.out, resp.Body)
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(string(body))
-	}
-
-	err = json.Unmarshal(body, &apps)
-	if err != nil {
-		return nil, errors.New("Error converting json into applications. Reason: "+ err.Error())
-	}
-
-	return apps, nil
-}
-
-func (c *cliClient) CreateNewApp(name string, desc string) error {
-	application := &runtime.Application{
-		Name:        name,
-		Description: desc,
-	}
-	jsonStr, err := json.Marshal(application)
-	if err != nil {
-		common.ExitWithError(c.out, "Error converting application data into JSON format. Reason: ", err)
-	}
-
-	req, err := NewRequest(c.backendUrl, c.accessToken, "POST", pathApplications, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		common.ExitWithError(c.out, "Error creating post request for application creation. Reason: ", err)
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return err
-	} else if resp.StatusCode != http.StatusCreated {
-		body, err := ioutil.ReadAll(resp.Body)
-		defer closeResource(c.out, resp.Body)()
-		if err != nil {
-			return err
-		}
-
-		return errors.New(string(body))
-	}
-
-	return nil
 }
 
 func closeResource(consoleWriter io.Writer, res io.Closer) func() {

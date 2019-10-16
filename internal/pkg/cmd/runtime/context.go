@@ -53,8 +53,13 @@ type ApplicationApiClient interface {
 	ListApps() ([]Application, error)
 }
 
+type AuthApiClient interface {
+	CreateOauthStateString() (string, error)
+}
+
 type Client interface {
 	ApplicationApiClient
+	AuthApiClient
 }
 
 type ClientHolder interface {
