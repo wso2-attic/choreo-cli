@@ -41,13 +41,36 @@ type cliClient struct {
 	backendUrl  string
 }
 
-type Application struct {
-	Name        string `json:"name" header:"Application Name"`
-	Description string `json:"description" header:"Description"`
+func (c *cliClient) ListApps() ([]runtime.Application, error) {
+	var apps []runtime.Application
+	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", pathApplications, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	httpClient := NewClient(c.skipVerify)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer closeResource(c.out, resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(string(body))
+	}
+
+	err = json.Unmarshal(body, &apps)
+	if err != nil {
+		return nil, errors.New("Error converting json into applications. Reason: "+ err.Error())
+	}
+
+	return apps, nil
 }
 
 func (c *cliClient) CreateNewApp(name string, desc string) error {
-	application := &Application{
+	application := &runtime.Application{
 		Name:        name,
 		Description: desc,
 	}

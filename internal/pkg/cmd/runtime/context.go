@@ -43,8 +43,14 @@ type ConsoleOutHolder interface {
 	Out() io.Writer
 }
 
+type Application struct {
+	Name        string `json:"name" header:"Application Name"`
+	Description string `json:"description" header:"Description"`
+}
+
 type ApplicationApiClient interface {
 	CreateNewApp(name string, desc string) error
+	ListApps() ([]Application, error)
 }
 
 type Client interface {

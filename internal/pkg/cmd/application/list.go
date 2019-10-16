@@ -10,14 +10,7 @@
 package application
 
 import (
-	"encoding/json"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
 
 	"github.com/landoop/tableprinter"
 	"github.com/spf13/cobra"
@@ -46,54 +39,20 @@ func runListAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, a
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
-		listApps(cliContext)
-	}
-}
-
-func listApps(cliContext runtime.CliContext) {
-
-	backendUrl := cliContext.EnvConfig().GetStringOrDefault(client.BackendUrl, client.EnvConfigs[client.BackendUrl])
-	accessToken := cliContext.UserConfig().GetStringOrDefault(client.AccessToken, client.UserConfigs[client.AccessToken])
-	req, err := client.NewRequest(backendUrl, accessToken, "GET", pathApplications, nil)
-
-	if err != nil {
-		log.Print("Error creating post request for listing applications: ", err)
-		return
-	}
-
-	skipVerify, _ := strconv.ParseBool(cliContext.
-		EnvConfig().GetStringOrDefault(client.SkipVerify, client.EnvConfigs[client.SkipVerify]))
-	httpClient := client.NewClient(skipVerify)
-
-	resp, err := httpClient.Do(req)
-	if err == nil {
-		showListAppsResult(cliContext.Out(), resp)
-	} else {
-		log.Print("Error making post request for listing applications: ", err)
-	}
-}
-
-func showListAppsResult(consoleWriter io.Writer, resp *http.Response) {
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Print("Error reading json body: ", err)
-		return
-	}
-	if resp.StatusCode == http.StatusOK {
-		var apps Applications
-		err := json.Unmarshal(body, &apps)
-		if err != nil {
-			log.Print("Error converting json into applications: ", err)
+		apps, err := cliContext.Client().ListApps()
+		if err == nil {
+			showApps(cliContext.Out(), apps)
+		} else {
+			common.ExitWithError(cliContext.Out(), "Error while retrieving application details", err)
 		}
-		printer := tableprinter.New(os.Stdout)
-		printer.Print(apps)
-	} else {
-		common.PrintInfo(consoleWriter, "Error listing applications.")
-		fmt.Println("Error: ", string(body))
 	}
-	err = resp.Body.Close()
-	if err != nil {
-		log.Print(err)
+}
+
+func showApps(consoleOut io.Writer, apps []runtime.Application) {
+	if len(apps) == 0 {
+		common.PrintInfo(consoleOut, "No applications to show!")
 	}
+
+	printer := tableprinter.New(consoleOut)
+	printer.Print(apps)
 }
