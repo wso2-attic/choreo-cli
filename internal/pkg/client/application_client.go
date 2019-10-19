@@ -32,7 +32,8 @@ func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	httpClient := NewClient(c.skipVerify)
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		common.PrintErrorMessage(c.debug, err.Error())
+		return nil, errors.New("error communicating with the server")
 	}
 
 	defer closeResource(c.out, resp.Body)
