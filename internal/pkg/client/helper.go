@@ -13,17 +13,12 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
-	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
 // set InsecureSkipVerify option if required
-func NewClient(cliContext runtime.CliContext) *http.Client {
-
-	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), EnvConfigs)
-	skipVerify, _ := strconv.ParseBool(getEnvConfig(SkipVerify))
+func NewClient(skipVerify bool) *http.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerify},
 	}
@@ -31,16 +26,12 @@ func NewClient(cliContext runtime.CliContext) *http.Client {
 }
 
 // creates the http request for the given path with Authorization header set
-func NewRequest(cliContext runtime.CliContext, method, path string, body io.Reader) (*http.Request, error) {
-
-	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), EnvConfigs)
-	getUserConfig := config.CreateConfigReader(cliContext.UserConfig(), UserConfigs)
-
-	completeUrl := getEnvConfig(BackendUrl) + path
+func NewRequest(backendUrl string, accessToken string, method, path string, body io.Reader) (*http.Request, error) {
+	completeUrl := backendUrl + path
 	req, err := http.NewRequest(method, completeUrl, body)
 
 	if err == nil {
-		req.Header.Set("Authorization", "Bearer "+getUserConfig(AccessToken))
+		req.Header.Set("Authorization", "Bearer "+accessToken)
 		req.Header.Set("Content-Type", "application/json")
 	}
 

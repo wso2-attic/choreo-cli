@@ -11,14 +11,12 @@ package github
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 
 	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
@@ -26,15 +24,13 @@ import (
 )
 
 func PerformGithubAuthorization(cliContext runtime.CliContext) bool {
-
+	consoleWriter := cliContext.Out()
 	getEnvConfig := config.CreateConfigReader(cliContext.EnvConfig(), client.EnvConfigs)
 
-	state, err := obtainState(cliContext)
-	if state == "" {
-		if err != nil {
-			common.PrintErrorMessage(cliContext.DebugOut(), err.Error())
-		}
-		common.ExitWithErrorMessage(cliContext.Out(), "Error while initiating authorization flow")
+	//state, err := obtainState(cliContext)
+	state, err := cliContext.Client().CreateOauthStateString()
+	if err != nil {
+		common.ExitWithError(consoleWriter, "Could not initiate GitHub OAuth flow", err)
 	}
 
 	localServerPort := common.GetFirstOpenPort(localServerBasePort)
@@ -98,38 +94,4 @@ func shutdownServer(console runtime.ConsoleWriterHolder, server *http.Server) {
 		common.PrintErrorMessage(console.DebugOut(), err.Error())
 		common.PrintErrorMessage(console.Out(), "Error shutting down the local server")
 	}
-}
-
-func obtainState(cliContext runtime.CliContext) (string, error) {
-
-	req, err := client.NewRequest(cliContext, "GET", backendOauthStatePath, nil)
-	if err != nil {
-		return "", err
-	}
-	httpClient := client.NewClient(cliContext)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	var stateObj struct {
-		State string `json:"state"`
-	}
-	if resp.StatusCode == http.StatusOK {
-		err := json.Unmarshal(body, &stateObj)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		err = fmt.Errorf("error response received for state request: %s", string(body))
-		return "", err
-	}
-	err = resp.Body.Close()
-	if err != nil {
-		return "", err
-	}
-	return stateObj.State, nil
 }

@@ -52,8 +52,32 @@ type ConsoleWriterHolder interface {
 	ConsoleDebugOutHolder
 }
 
+type Application struct {
+	Name        string `json:"name" header:"Application Name"`
+	Description string `json:"description" header:"Description"`
+}
+
+type ApplicationApiClient interface {
+	CreateNewApp(name string, desc string) error
+	ListApps() ([]Application, error)
+}
+
+type AuthApiClient interface {
+	CreateOauthStateString() (string, error)
+}
+
+type Client interface {
+	ApplicationApiClient
+	AuthApiClient
+}
+
+type ClientHolder interface {
+	Client() Client
+}
+
 type CliContext interface {
 	ConsoleWriterHolder
 	UserConfigHolder
 	EnvConfigHolder
+	ClientHolder
 }

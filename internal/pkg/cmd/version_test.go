@@ -14,7 +14,6 @@ import (
 	"io"
 	"testing"
 
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
@@ -49,12 +48,4 @@ type mockContext struct {
 
 func (c *mockContext) Out() io.Writer {
 	return c.out
-}
-
-func (c *mockContext) UserConfig() runtime.UserConfig {
-	return nil
-}
-
-func (c *mockContext) EnvConfig() runtime.EnvConfig {
-	return nil
 }

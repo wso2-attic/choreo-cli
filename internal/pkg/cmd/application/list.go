@@ -10,10 +10,7 @@
 package application
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"os"
+	"io"
 
 	"github.com/landoop/tableprinter"
 	"github.com/spf13/cobra"
@@ -42,52 +39,20 @@ func runListAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, a
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
-		listApps(cliContext)
-	}
-}
-
-func listApps(cliContext runtime.CliContext) {
-
-	req, err := client.NewRequest(cliContext, "GET", pathApplications, nil)
-
-	if err != nil {
-		common.PrintError(cliContext.DebugOut(), "Error creating post request for listing applications: ", err)
-		common.ExitWithErrorMessage(cliContext.Out(), "Internal error occurred")
-	}
-
-	httpClient := client.NewClient(cliContext)
-
-	resp, err := httpClient.Do(req)
-	if err == nil {
-		showListAppsResult(cliContext, resp)
-	} else {
-		common.PrintError(cliContext.DebugOut(), "Error making post request for listing applications: ", err)
-		common.ExitWithErrorMessage(cliContext.Out(), "Error communicating with server")
-	}
-}
-
-func showListAppsResult(console runtime.ConsoleWriterHolder, resp *http.Response) {
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		common.PrintError(console.DebugOut(), "Error reading json body: ", err)
-		common.ExitWithErrorMessage(console.Out(), "Internal error occurred")
-	}
-	if resp.StatusCode == http.StatusOK {
-		var apps Applications
-		err := json.Unmarshal(body, &apps)
-		if err != nil {
-			common.PrintError(console.DebugOut(), "Error converting json into applications: ", err)
-			common.ExitWithErrorMessage(console.Out(), "Internal error occurred")
+		apps, err := cliContext.Client().ListApps()
+		if err == nil {
+			showApps(cliContext.Out(), apps)
+		} else {
+			common.ExitWithError(cliContext.Out(), "Error while retrieving application details", err)
 		}
-		printer := tableprinter.New(os.Stdout)
-		printer.Print(apps)
-	} else {
-		common.PrintErrorMessage(console.DebugOut(), "Received error message: "+string(body))
-		common.PrintErrorMessage(console.Out(), "Error listing applications")
 	}
-	err = resp.Body.Close()
-	if err != nil {
-		common.PrintError(console.DebugOut(), "Error closing response body: ", err)
+}
+
+func showApps(consoleOut io.Writer, apps []runtime.Application) {
+	if len(apps) == 0 {
+		common.PrintInfo(consoleOut, "No applications to show!")
 	}
+
+	printer := tableprinter.New(consoleOut)
+	printer.Print(apps)
 }
