@@ -81,7 +81,7 @@ $ chor auth connect github
 ### chor version
 
 `version` command can be used to retrieve version information 
-related to the Choreo client. In addition to the cli version name, 
+related to the Choreo client. In addition to the CLI version name, 
 Git commit hash, built date and target platform details are also printed.
 
 #### Synopsis
