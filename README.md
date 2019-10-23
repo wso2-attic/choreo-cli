@@ -10,7 +10,7 @@ CLI to manage integration applications with Choreo platform
 
 ## Getting started with Choreo
 
-1. Download Choreo Cli from the [releases page](https://github.com/wso2/choreo-cli/releases)
+1. Download Choreo CLI from the [releases page](https://github.com/wso2/choreo-cli/releases)
 2. Extract the tar.gz file
     ```
     $tar -xf choreo-cli-0.0.1-{os}-x64.tar.gz
@@ -34,7 +34,7 @@ Visit [Choreo CLI reference](docs/reference.md) for more operations to interact 
     $ git clone git@github.com:wso2/choreo-cli.git
     ```
 
-3. Go inside the repository and execute the make goal `build-cli-all` to generate cli binaries for all platforms. The generated distributions can be found in `PROJECT/builder/target`.
+3. Go inside the repository and execute the make goal `build-cli-all` to generate CLI binaries for all platforms. The generated distributions can be found in `PROJECT/builder/target`.
     ```
     $ cd choreo-cli
     $ make build-cli-all
