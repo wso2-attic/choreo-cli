@@ -9,40 +9,16 @@
 
 package client
 
-import (
-	"encoding/json"
-	"errors"
-	"io/ioutil"
-	"net/http"
-)
-
 const oauthStateResourcePath = "/internal/source_code/github/oauth/state"
 
 func (c *cliClient) CreateOauthStateString() (string, error) {
-	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", oauthStateResourcePath, nil)
-	if err != nil {
-		return "", err
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	defer closeResource(c.out, resp.Body)
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("Error response received for state request. Server error: " + string(body))
-	}
-
 	var stateObj struct {
 		State string `json:"state"`
 	}
-	err = json.Unmarshal(body, &stateObj)
+
+	err := c.getHttpResource(oauthStateResourcePath, &stateObj)
 	if err != nil {
-		return "", errors.New("Error decoding the response. Reason: "+ err.Error())
+		return "", err
 	}
 
 	return stateObj.State, nil

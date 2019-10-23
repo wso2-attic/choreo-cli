@@ -24,28 +24,10 @@ const pathApplications = "/applications"
 
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
-	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", pathApplications, nil)
+
+	err := c.getHttpResource(pathApplications, &apps)
 	if err != nil {
 		return nil, err
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		common.PrintErrorMessage(c.debug, err.Error())
-		return nil, errors.New("error communicating with the server")
-	}
-
-	defer closeResource(c.out, resp.Body)
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(string(body))
-	}
-
-	err = json.Unmarshal(body, &apps)
-	if err != nil {
-		return nil, errors.New("Error converting json into applications. Reason: "+ err.Error())
 	}
 
 	return apps, nil
