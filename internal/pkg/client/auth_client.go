@@ -16,7 +16,7 @@ func (c *cliClient) CreateOauthStateString() (string, error) {
 		State string `json:"state"`
 	}
 
-	err := c.getHttpResource(oauthStateResourcePath, &stateObj)
+	err := c.getRestResource(oauthStateResourcePath, &stateObj)
 	if err != nil {
 		return "", err
 	}

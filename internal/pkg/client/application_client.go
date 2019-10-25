@@ -10,13 +10,6 @@
 package client
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"io/ioutil"
-	"net/http"
-
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
@@ -25,7 +18,7 @@ const pathApplications = "/applications"
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
 
-	err := c.getHttpResource(pathApplications, &apps)
+	err := c.getRestResource(pathApplications, &apps)
 	if err != nil {
 		return nil, err
 	}
@@ -38,30 +31,9 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 		Name:        name,
 		Description: desc,
 	}
-	jsonStr, err := json.Marshal(application)
-	if err != nil {
-		common.PrintError(c.debug, "Error converting application data into JSON format. Reason: ", err)
-		return newInternalError()
-	}
 
-	req, err := NewRequest(c.backendUrl, c.accessToken, "POST", pathApplications, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		common.PrintError(c.debug, "Error creating post request for application creation. Reason: ", err)
-		return newInternalError()
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
+	if err := c.createRestResource(pathApplications, application); err != nil {
 		return err
-	} else if resp.StatusCode != http.StatusCreated {
-		body, err := ioutil.ReadAll(resp.Body)
-		defer closeResource(c.out, resp.Body)()
-		if err != nil {
-			return err
-		}
-
-		return errors.New(string(body))
 	}
 
 	return nil

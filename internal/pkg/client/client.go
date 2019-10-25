@@ -10,6 +10,7 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -52,9 +53,8 @@ func newInternalError() error {
 	return errors.New("internal error occurred")
 }
 
-func (c *cliClient) getHttpResource(resourcePath string, v interface{}) error {
+func (c *cliClient) getRestResource(resourcePath string, v interface{}) error {
 	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", resourcePath, nil)
-
 	if err != nil {
 		return err
 	}
@@ -68,6 +68,9 @@ func (c *cliClient) getHttpResource(resourcePath string, v interface{}) error {
 
 	defer closeResource(c.out, resp.Body)
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("Error response received. Server error: " + string(body))
@@ -76,6 +79,40 @@ func (c *cliClient) getHttpResource(resourcePath string, v interface{}) error {
 	err = json.Unmarshal(body, v)
 	if err != nil {
 		return errors.New("Error decoding the response. Reason: "+ err.Error())
+	}
+
+	return nil
+}
+
+func (c *cliClient) createRestResource(resourcePath string, data interface{}) error {
+	jsonStr, err := json.Marshal(data)
+
+	if err != nil {
+		common.PrintError(c.debug, "Error converting data into JSON format. Reason: ", err)
+		return newInternalError()
+	}
+
+	req, err := NewRequest(c.backendUrl, c.accessToken, "POST", resourcePath, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		common.PrintError(c.debug, "Error creating post request. Reason: ", err)
+		return newInternalError()
+	}
+
+	httpClient := NewClient(c.skipVerify)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		common.PrintErrorMessage(c.debug, err.Error())
+		return errors.New("error communicating with the server")
+	}
+
+	defer closeResource(c.out, resp.Body)()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		return errors.New(string(body))
 	}
 
 	return nil
