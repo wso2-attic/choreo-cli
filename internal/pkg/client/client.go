@@ -10,8 +10,11 @@
 package client
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
@@ -47,4 +50,33 @@ func closeResource(consoleWriter io.Writer, res io.Closer) func() {
 
 func newInternalError() error {
 	return errors.New("internal error occurred")
+}
+
+func (c *cliClient) getHttpResource(resourcePath string, v interface{}) error {
+	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", resourcePath, nil)
+
+	if err != nil {
+		return err
+	}
+
+	httpClient := NewClient(c.skipVerify)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		common.PrintErrorMessage(c.debug, err.Error())
+		return errors.New("error communicating with the server")
+	}
+
+	defer closeResource(c.out, resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("Error response received. Server error: " + string(body))
+	}
+
+	err = json.Unmarshal(body, v)
+	if err != nil {
+		return errors.New("Error decoding the response. Reason: "+ err.Error())
+	}
+
+	return nil
 }
