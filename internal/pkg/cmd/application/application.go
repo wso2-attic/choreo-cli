@@ -24,5 +24,6 @@ func NewApplicationCommand(cliContext runtime.CliContext) *cobra.Command {
 	}
 	cmd.AddCommand(NewCreateCommand(cliContext))
 	cmd.AddCommand(NewListCommand(cliContext))
+	cmd.AddCommand(NewDeployCommand(cliContext))
 	return cmd
 }
