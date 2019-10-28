@@ -54,16 +54,9 @@ func newInternalError() error {
 }
 
 func (c *cliClient) getRestResource(resourcePath string, v interface{}) error {
-	req, err := NewRequest(c.backendUrl, c.accessToken, "GET", resourcePath, nil)
+	resp, err := c.makeHttpCall(resourcePath, "GET", nil)
 	if err != nil {
 		return err
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		common.PrintErrorMessage(c.debug, err.Error())
-		return errors.New("error communicating with the server")
 	}
 
 	defer closeResource(c.out, resp.Body)
@@ -92,17 +85,9 @@ func (c *cliClient) createRestResource(resourcePath string, data interface{}) er
 		return newInternalError()
 	}
 
-	req, err := NewRequest(c.backendUrl, c.accessToken, "POST", resourcePath, bytes.NewBuffer(jsonStr))
+	resp, err := c.makeHttpCall(resourcePath, "POST", bytes.NewBuffer(jsonStr))
 	if err != nil {
-		common.PrintError(c.debug, "Error creating post request. Reason: ", err)
-		return newInternalError()
-	}
-
-	httpClient := NewClient(c.skipVerify)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		common.PrintErrorMessage(c.debug, err.Error())
-		return errors.New("error communicating with the server")
+		return err
 	}
 
 	defer closeResource(c.out, resp.Body)()
@@ -116,4 +101,21 @@ func (c *cliClient) createRestResource(resourcePath string, data interface{}) er
 	}
 
 	return nil
+}
+
+func (c *cliClient) makeHttpCall(resourcePath string, method string, dataReader io.Reader) (*http.Response, error) {
+	req, err := NewRequest(c.backendUrl, c.accessToken, method, resourcePath, dataReader)
+	if err != nil {
+		common.PrintError(c.debug, "Error creating post request. Reason: ", err)
+		return nil, nil
+	}
+
+	httpClient := NewClient(c.skipVerify)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		common.PrintErrorMessage(c.debug, err.Error())
+		return nil, nil
+	}
+
+	return resp, nil
 }
