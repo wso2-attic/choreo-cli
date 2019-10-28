@@ -1,6 +1,6 @@
 # Choreo CLI (*chor*) reference
 
-Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](spec.md)
+Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](../../../tree/master/spec)
 
 ## Chor CLI Commands
 - [auth](#chor-auth) - authentication and authorization actions in Choreo
@@ -46,7 +46,7 @@ $ chor auth login
 #### Options
 
 ```
-  -h, --help   help for version
+  -h, --help   help for version..
 ```
 
 [Back to Command List](#chor-cli-commands)
