@@ -1,6 +1,6 @@
 # Choreo CLI (*chor*) reference
 
-Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](spec.md)
+Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](../../../tree/master/spec)
 
 ## Chor CLI Commands
 - [auth](#chor-auth) - authentication and authorization actions in Choreo
@@ -26,8 +26,8 @@ Manage authentication and authorization.
 
 ### chor auth login
 
-`auth login` command can be used login to Choreo. This is required to
-perform all the tasks that interacts with Choreo.
+`auth login` command can be used to login to Choreo. This is required to
+perform all the tasks that interact with Choreo.
 
 #### Synopsis
 
