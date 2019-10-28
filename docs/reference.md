@@ -113,7 +113,8 @@ $ chor version
 ### chor application
 
 `application` command is used to manage applications created with the Choreo platform. 
-Available sub commands include [create](#chor-application-create) and [list](#chor-application-list).
+Available sub commands include [create](#chor-application-create), [list](#chor-application-list) 
+and [deploy](#chor-application-deploy).
 
 #### Synopsis
 
@@ -174,6 +175,32 @@ application list
 
 ```
 $ chor application list
+```
+
+#### Options
+
+```
+  -h, --help    help for list
+```
+
+[Back to Command List](#chor-cli-commands)
+
+### chor application deploy
+
+`application deploy` command is used to deploy a Ballerina application to the Choreo platform.
+
+#### Synopsis
+
+Deploy a Ballerina application.
+
+```
+application deploy GITHUB_URL
+```
+
+#### Examples
+
+```
+$ chor application deploy https://github.com/someuser/ballerina-sample
 ```
 
 #### Options

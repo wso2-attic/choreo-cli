@@ -10,15 +10,11 @@
 package client
 
 import (
-	"bytes"
-	"errors"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
-	"io/ioutil"
-	"net/http"
 )
 
 const pathApplications = "/applications"
-const pathApplicationDeployment = "/applications/deployments"
+const pathApplicationDeployment = pathApplications + "/deployments"
 
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
@@ -45,21 +41,19 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 }
 
 func (c *cliClient) DeployApp(repoUrl string) (string, error) {
-	jsonStr := "{ \"repo_url\":\"" + repoUrl + "\"}"
-	resp, err := c.makeHttpCall(pathApplicationDeployment, "POST", bytes.NewBuffer([]byte(jsonStr)))
+	var deploymentRequest = struct {
+		RepoUrl string `json:"repo_url"`
+	}{
+		RepoUrl: repoUrl,
+	}
+
+	var deploymentDetails struct {
+		DeploymentUrl string `json:"deployment_url"`
+	}
+	err := c.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
 	if err != nil {
 		return "", err
 	}
-	defer closeResource(c.out, resp.Body)()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode == http.StatusOK {
-		return string(body), nil
-	} else {
-		return "", errors.New(string(body))
-	}
+	return deploymentDetails.DeploymentUrl, nil
 }
