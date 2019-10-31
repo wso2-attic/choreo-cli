@@ -34,8 +34,7 @@ func NewDeployCommand(cliContext runtime.CliContext) *cobra.Command {
 func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		if !client.IsUserLoggedIn(cliContext) {
-			common.PrintErrorMessage(cliContext.Out(), "Please login first")
-			return
+			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
 		deploymentUrl, err := cliContext.Client().DeployApp(args[0])

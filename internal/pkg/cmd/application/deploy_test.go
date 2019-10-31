@@ -11,52 +11,27 @@ package application
 
 import (
 	"bytes"
-	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
+	cl "github.com/wso2/choreo-cli/internal/pkg/client"
+	"github.com/wso2/choreo-cli/internal/pkg/test/mock/client"
 	"github.com/wso2/choreo-cli/internal/pkg/test/mock/config"
-	"io"
+	"github.com/wso2/choreo-cli/internal/pkg/test/mock/runtime"
 	"testing"
 
 	"github.com/wso2/choreo-cli/internal/pkg/test"
 )
 
-func TestNewDeployCommandWithoutLogin(t *testing.T) {
+func TestNewDeployCommand(t *testing.T) {
 	var b bytes.Buffer
-	deployCommand := NewDeployCommand(&mockContext{
-		out:        &b,
-		userConfig: config.NewMockConfigHolder(map[string]string{}),
-		envConfig:  config.NewMockConfigHolder(map[string]string{}),
+	deployCommand := NewDeployCommand(&runtime.MockCliContext{
+		MockOut:        &b,
+		MockUserConfig: config.NewMockConfigHolder(map[string]string{cl.AccessToken: "some-token"}),
+		MockEnvConfig:  config.NewMockConfigHolder(map[string]string{}),
+		MockClient: &client.MockClient{DeployApp_: func(repoUrl string) (s string, e error) {
+			return "https://development.choreo.dev/choreapps/123456/myapp", nil
+		}},
 	})
-	deployCommand.Run(nil, nil)
+	deployCommand.Run(nil, []string{"https://github.com/someuser/myapp"})
 
-	expect := `Please login first
-`
+	expect := "Deployment request submitted. Once deployed the app will be accessible at https://development.choreo.dev/choreapps/123456/myapp" + "\n"
 	test.AssertString(t, expect, b.String(), "Deployment command output is not as expected")
-}
-
-type mockContext struct {
-	out        io.Writer
-	debugOut   io.Writer
-	userConfig runtime.UserConfig
-	envConfig  runtime.EnvConfig
-	apiClient  runtime.Client
-}
-
-func (c *mockContext) Out() io.Writer {
-	return c.out
-}
-
-func (c *mockContext) DebugOut() io.Writer {
-	return c.debugOut
-}
-
-func (c *mockContext) UserConfig() runtime.UserConfig {
-	return c.userConfig
-}
-
-func (c *mockContext) EnvConfig() runtime.EnvConfig {
-	return c.envConfig
-}
-
-func (c *mockContext) Client() runtime.Client {
-	return c.apiClient
 }

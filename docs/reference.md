@@ -4,13 +4,17 @@ Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](
 
 ## Chor CLI Commands
 - [auth](#chor-auth) - authentication and authorization actions in Choreo
+    - [login](#chor-auth-login) - login to Choreo
+    - [connect](#chor-auth-connect) - connect a source code provider
 - [version](#chor-version) - get Choreo client version information
 - [application](#chor-application) - manage applications
+    - [create](#chor-application-create) - create an application
+    - [list](#chor-application-list) - list applications
+    - [deploy](#chor-application-deploy) - deploy a Ballerina application
 
 ### chor auth
 
-`auth` command is used to manage authentication and authorization in Choreo platform. 
-Available sub commands include [login](#chor-auth-login) and [connect](#chor-auth-connect).
+`auth` command is used to manage authentication and authorization in Choreo platform.
 
 #### Synopsis
 
@@ -112,9 +116,7 @@ $ chor version
 
 ### chor application
 
-`application` command is used to manage applications created with the Choreo platform. 
-Available sub commands include [create](#chor-application-create), [list](#chor-application-list) 
-and [deploy](#chor-application-deploy).
+`application` command is used to manage applications created with the Choreo platform.
 
 #### Synopsis
 
