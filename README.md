@@ -13,11 +13,11 @@ CLI to manage integration applications with Choreo platform
 1. Download Choreo CLI from the [releases page](https://github.com/wso2/choreo-cli/releases)
 2. Extract the tar.gz file
     ```
-    $tar -xf choreo-cli-0.0.1-{os}-x64.tar.gz
+    $tar -xf choreo-cli-0.0.3-{os}-x64.tar.gz
     ```
 3. Navigate to the `bin` directory and run `$chor` command
     ```
-    $cd choreo-0.0.1/bin
+    $cd choreo-0.0.3/bin
     ```
     ```
     $./chor
@@ -39,7 +39,7 @@ Visit [Choreo CLI reference](docs/reference.md) for more operations to interact 
     $ cd choreo-cli
     $ make build-cli-all
     $ ls builder/target
-    choreo-cli-0.0.1-SNAPSHOT-linux-x64.tar.gz   choreo-cli-0.0.1-SNAPSHOT-windows-x64.tar.gz   choreo-cli-0.0.1-SNAPSHOT-macosx-x64.tar.gz
+    choreo-cli-0.0.3-SNAPSHOT-linux-x64.tar.gz   choreo-cli-0.0.3-SNAPSHOT-windows-x64.tar.gz   choreo-cli-0.0.3-SNAPSHOT-macosx-x64.tar.gz
     ```
     
 ### Updating dependencies
