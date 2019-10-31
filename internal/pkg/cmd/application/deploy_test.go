@@ -32,6 +32,6 @@ func TestNewDeployCommand(t *testing.T) {
 	})
 	deployCommand.Run(nil, []string{"https://github.com/someuser/myapp"})
 
-	expect := "Deployment request submitted. Once deployed the app can be accessed from https://development.choreo.dev/choreapps/123456/myapp" + "\n"
+	expect := "Deployment request submitted! Once deployed, the app can be accessed from: https://development.choreo.dev/choreapps/123456/myapp" + "\n"
 	test.AssertString(t, expect, b.String(), "Deployment command output is not as expected")
 }
