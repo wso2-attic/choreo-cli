@@ -22,9 +22,15 @@ jobs:
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
-
-    - name: Build
-      run: make build-cli
+     
+    - name: Build Artifacts
+      run: make build-cli-all
 
     - name: Tests results
       run: make test
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+          name: Build artifacts
+          path: builder/target
