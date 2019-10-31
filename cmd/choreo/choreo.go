@@ -23,10 +23,10 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/config"
 )
 
-type NoWriter struct {
+type noWriter struct {
 }
 
-func (c *NoWriter) Write(p []byte) (int, error) {
+func (c *noWriter) Write(p []byte) (int, error) {
 	//do nothing
 	return 0, nil
 }
@@ -34,8 +34,16 @@ func (c *NoWriter) Write(p []byte) (int, error) {
 type CliContextData struct {
 	userConfig    runtime.UserConfig
 	envConfig     runtime.EnvConfig
-	verboseWriter io.Writer
+	verboseWriter *ioWriterWrapper
 	apiClient  runtime.Client
+}
+
+type ioWriterWrapper struct {
+	writer io.Writer
+}
+
+func (w *ioWriterWrapper) Write(data []byte) (n int, err error) {
+	return w.writer.Write(data)
 }
 
 func (c *CliContextData) Client() runtime.Client {
@@ -58,7 +66,9 @@ func (c *CliContextData) EnvConfig() runtime.EnvConfig {
 }
 
 func main() {
-	cliContext := &CliContextData{}
+	cliContext := &CliContextData{
+		verboseWriter: &ioWriterWrapper{writer: &noWriter{}},
+	}
 
 	initConfig(cliContext)
 	initClient(cliContext)
@@ -110,9 +120,9 @@ func cobraOnInit(cliContext *CliContextData, command *cobra.Command) func() {
 			common.ExitWithError(cliContext.Out(), "Error retrieving verbose flag value", err)
 		}
 		if verbose {
-			cliContext.verboseWriter = os.Stdout
+			cliContext.verboseWriter.writer = os.Stdout
 		} else {
-			cliContext.verboseWriter = &NoWriter{}
+			cliContext.verboseWriter.writer = &noWriter{}
 		}
 	}
 }

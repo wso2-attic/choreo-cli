@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -136,15 +137,15 @@ func (c *cliClient) createRestResourceWithResponse(resourcePath string, requestD
 func (c *cliClient) makeHttpCall(resourcePath string, method string, dataReader io.Reader) (*http.Response, error) {
 	req, err := NewRequest(c.backendUrl, c.accessToken, method, resourcePath, dataReader)
 	if err != nil {
-		common.PrintError(c.debug, "Error creating post request. Reason: ", err)
-		return nil, nil
+		common.PrintErrorMessage(c.debug, err.Error())
+		return nil, fmt.Errorf("error creating server request")
 	}
 
 	httpClient := NewClient(c.skipVerify)
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		common.PrintErrorMessage(c.debug, err.Error())
-		return nil, nil
+		return nil, fmt.Errorf("error communicating with the server")
 	}
 
 	return resp, nil
