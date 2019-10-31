@@ -60,6 +60,7 @@ type Application struct {
 type ApplicationApiClient interface {
 	CreateNewApp(name string, desc string) error
 	ListApps() ([]Application, error)
+	DeployApp(repoUrl string) (string, error)
 }
 
 type AuthApiClient interface {

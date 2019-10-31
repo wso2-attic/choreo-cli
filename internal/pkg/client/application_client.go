@@ -14,6 +14,7 @@ import (
 )
 
 const pathApplications = "/applications"
+const pathApplicationDeployment = pathApplications + "/deployments"
 
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
@@ -39,4 +40,20 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 	return nil
 }
 
+func (c *cliClient) DeployApp(repoUrl string) (string, error) {
+	var deploymentRequest = struct {
+		RepoUrl string `json:"repo_url"`
+	}{
+		RepoUrl: repoUrl,
+	}
 
+	var deploymentDetails struct {
+		DeploymentUrl string `json:"deployment_url"`
+	}
+	err := c.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
+	if err != nil {
+		return "", err
+	}
+
+	return deploymentDetails.DeploymentUrl, nil
+}

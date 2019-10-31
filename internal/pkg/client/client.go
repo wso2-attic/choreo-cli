@@ -25,10 +25,10 @@ import (
 func CreateClient(ctx runtime.CliContext) *cliClient {
 	skipVerify, _ := strconv.ParseBool(ctx.EnvConfig().GetStringOrDefault(SkipVerify, EnvConfigs[SkipVerify]))
 	return &cliClient{
-		out: ctx.Out(),
-		debug: ctx.DebugOut(),
-		skipVerify: skipVerify,
-		backendUrl: ctx.EnvConfig().GetStringOrDefault(BackendUrl, EnvConfigs[BackendUrl]),
+		out:         ctx.Out(),
+		debug:       ctx.DebugOut(),
+		skipVerify:  skipVerify,
+		backendUrl:  ctx.EnvConfig().GetStringOrDefault(BackendUrl, EnvConfigs[BackendUrl]),
 		accessToken: ctx.UserConfig().GetStringOrDefault(AccessToken, UserConfigs[AccessToken]),
 	}
 }
@@ -71,7 +71,7 @@ func (c *cliClient) getRestResource(resourcePath string, v interface{}) error {
 
 	err = json.Unmarshal(body, v)
 	if err != nil {
-		return errors.New("Error decoding the response. Reason: "+ err.Error())
+		return errors.New("Error decoding the response. Reason: " + err.Error())
 	}
 
 	return nil
@@ -100,6 +100,36 @@ func (c *cliClient) createRestResource(resourcePath string, data interface{}) er
 		return errors.New(string(body))
 	}
 
+	return nil
+}
+
+func (c *cliClient) createRestResourceWithResponse(resourcePath string, requestData interface{}, responseData interface{}) error {
+	jsonStr, err := json.Marshal(requestData)
+
+	if err != nil {
+		common.PrintError(c.debug, "Error converting data into JSON format. Reason: ", err)
+		return newInternalError()
+	}
+
+	resp, err := c.makeHttpCall(resourcePath, "POST", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return err
+	}
+
+	defer closeResource(c.out, resp.Body)()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(string(body))
+	}
+
+	err = json.Unmarshal(body, responseData)
+	if err != nil {
+		return errors.New("Error decoding the response. Reason: " + err.Error())
+	}
 	return nil
 }
 
