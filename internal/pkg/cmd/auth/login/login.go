@@ -11,9 +11,11 @@ package login
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -41,9 +43,9 @@ func createLoginFunction(cliContext runtime.CliContext) func(cmd *cobra.Command,
 
 	return func(cmd *cobra.Command, args []string) {
 		codeServicePort := common.GetFirstOpenPort(callBackDefaultPort)
-		oauth2Conf := createOauth2Conf(callbackUrlContext, codeServicePort, getEnvConfig)
-		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauth2Conf, setUserConfig, consoleWriter)
-		openBrowserForAuthentication(consoleWriter, oauth2Conf)
+		oauthClient := initOauthClient(callbackUrlContext, codeServicePort, getEnvConfig)
+		authCodeChannel, server := startAuthCodeReceivingService(codeServicePort, oauthClient, setUserConfig, consoleWriter)
+		openBrowserForAuthentication(consoleWriter, oauthClient)
 		<-authCodeChannel
 		stopAuthCodeServer(server)
 
@@ -51,8 +53,8 @@ func createLoginFunction(cliContext runtime.CliContext) func(cmd *cobra.Command,
 	}
 }
 
-func getAccessToken(authCode string, conf *oauth2.Config) (string, error) {
-	token, err := conf.Exchange(context.Background(), authCode)
+func getAccessToken(authCode string, conf *oauthClient) (string, error) {
+	token, err := conf.exchange(authCode)
 
 	if err == nil {
 		return token.AccessToken, nil
@@ -69,7 +71,7 @@ func stopAuthCodeServer(server *http.Server) {
 	}
 }
 
-func startAuthCodeReceivingService(port int, oauth2Conf *oauth2.Config, setUserConfig config.SetConfig, consoleWriter io.Writer) (<-chan bool, *http.Server) {
+func startAuthCodeReceivingService(port int, oauth2Conf *oauthClient, setUserConfig config.SetConfig, consoleWriter io.Writer) (<-chan bool, *http.Server) {
 	oauthDone := make(chan bool)
 
 	mux := http.NewServeMux()
@@ -111,7 +113,7 @@ func sendErrorToBrowser(consoleWriter io.Writer, httpWriter http.ResponseWriter)
 		"Login to Choreo failed due to an internal error.", "Please try again.")
 }
 
-func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, httpWriter http.ResponseWriter, consoleWriter io.Writer, setUserConfig config.SetConfig) error {
+func exchangeAuthCodeForToken(code string, oauth2Conf *oauthClient, httpWriter http.ResponseWriter, consoleWriter io.Writer, setUserConfig config.SetConfig) error {
 	token, err := getAccessToken(code, oauth2Conf)
 	if err != nil {
 		return err
@@ -122,32 +124,59 @@ func exchangeAuthCodeForToken(code string, oauth2Conf *oauth2.Config, httpWriter
 	return nil
 }
 
-func openBrowserForAuthentication(consoleWriter io.Writer, conf *oauth2.Config) {
-	hubAuthUrl := conf.AuthCodeURL("state")
+func openBrowserForAuthentication(consoleWriter io.Writer, client *oauthClient) {
+	hubAuthUrl := client.authCodeURL("state")
 	if err := common.OpenBrowser(hubAuthUrl); err != nil {
 		common.ExitWithError(consoleWriter, "Couldn't open browser for "+common.ProductName+" login", err)
 	}
 }
 
-func createOauth2Conf(context string, port int, getEnvConfig config.GetConfig) *oauth2.Config {
+func initOauthClient(context string, port int, getEnvConfig config.GetConfig) *oauthClient {
 	callBackUrlTemplate := "http://localhost:%d" + context
 	redirectUrl := fmt.Sprintf(callBackUrlTemplate, port)
 
-	conf := &oauth2.Config{
-		ClientID:    getEnvConfig(clientId),
-		RedirectURL: redirectUrl,
-		Endpoint: oauth2.Endpoint{
-			AuthURL:   getEnvConfig(authUrl),
-			TokenURL:  getEnvConfig(tokenUrl),
-			AuthStyle: 1,
-		},
-	}
-
-	return conf
+	skipVerify, _ := strconv.ParseBool(common.GetStringOrDefault(getEnvConfig, client.SkipVerify, client.EnvConfigs[client.SkipVerify]))
+	return createOathClient(getEnvConfig(clientId), redirectUrl, getEnvConfig(authUrl), getEnvConfig(tokenUrl), skipVerify)
 }
 
 func listenForAuthCode(server *http.Server, consoleWriter io.Writer) {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		common.ExitWithError(consoleWriter, "Error while initializing auth code accepting service", err)
+	}
+}
+
+type oauthClient struct {
+	oauthConf *oauth2.Config
+	ctx context.Context
+}
+
+func (c *oauthClient) authCodeURL(state string) string {
+	return c.oauthConf.AuthCodeURL(state)
+}
+
+func (c *oauthClient) exchange(code string) (*oauth2.Token, error) {
+	return c.oauthConf.Exchange(c.ctx, code)
+}
+
+func createOathClient(clientId, redirectUrl, authUrl, tokenUrl string, insecure bool) *oauthClient {
+	oauthConf := &oauth2.Config{
+		ClientID:     clientId,
+		Endpoint:     oauth2.Endpoint{
+			AuthURL:   authUrl,
+			TokenURL:  tokenUrl,
+			AuthStyle: 1,
+		},
+		RedirectURL:  redirectUrl,
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+	}
+	httpClient := &http.Client{Transport: tr}
+	ctx := context.WithValue(context.TODO(), oauth2.HTTPClient, httpClient)
+
+	return &oauthClient{
+		oauthConf: oauthConf,
+		ctx:       ctx,
 	}
 }

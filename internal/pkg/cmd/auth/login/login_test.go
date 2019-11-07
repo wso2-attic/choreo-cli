@@ -28,12 +28,12 @@ func TestCreateOauth2Conf(t *testing.T) {
 			return "ERROR_THIS_SHOULD_NOT_BE_RETURNED_AT_ALL"
 		}
 	}
-	oauth2Conf := createOauth2Conf("/oauth-context", 8765, getEnvConfig)
+	oauth2Conf := initOauthClient("/oauth-context", 8765, getEnvConfig)
 
-	test.AssertString(t,"testClientId", oauth2Conf.ClientID, "Client ID is not correct in oauth conf")
-	test.AssertString(t,"http://localhost:8765/oauth-context", oauth2Conf.RedirectURL, "RedirectURL is not correct in oauth conf")
-	test.AssertString(t,"http://localhost/auth", oauth2Conf.Endpoint.AuthURL,
+	test.AssertString(t,"testClientId", oauth2Conf.oauthConf.ClientID, "Client ID is not correct in oauth conf")
+	test.AssertString(t,"http://localhost:8765/oauth-context", oauth2Conf.oauthConf.RedirectURL, "RedirectURL is not correct in oauth conf")
+	test.AssertString(t,"http://localhost/auth", oauth2Conf.oauthConf.Endpoint.AuthURL,
 		"AuthURL is not correct in oauth conf")
-	test.AssertString(t,"http://localhost/token", oauth2Conf.Endpoint.TokenURL,
+	test.AssertString(t,"http://localhost/token", oauth2Conf.oauthConf.Endpoint.TokenURL,
 		"TokenURL is not correct in oauth conf")
 }
