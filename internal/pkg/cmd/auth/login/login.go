@@ -158,22 +158,22 @@ func (c *oauthClient) exchange(code string) (*oauth2.Token, error) {
 	return c.oauthConf.Exchange(c.ctx, code)
 }
 
-func createOathClient(clientId, redirectUrl, authUrl, tokenUrl string, insecure bool) *oauthClient {
+func createOathClient(clientId, redirectUrl, authUrl, tokenUrl string, skipSslVerify bool) *oauthClient {
 	oauthConf := &oauth2.Config{
 		ClientID:     clientId,
 		Endpoint:     oauth2.Endpoint{
 			AuthURL:   authUrl,
 			TokenURL:  tokenUrl,
-			AuthStyle: 1,
+			AuthStyle: oauth2.AuthStyleInParams,
 		},
 		RedirectURL:  redirectUrl,
 	}
 
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipSslVerify},
 	}
 	httpClient := &http.Client{Transport: tr}
-	ctx := context.WithValue(context.TODO(), oauth2.HTTPClient, httpClient)
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
 
 	return &oauthClient{
 		oauthConf: oauthConf,
