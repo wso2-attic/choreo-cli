@@ -11,6 +11,7 @@ package client
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -135,13 +136,21 @@ func (c *cliClient) createRestResourceWithResponse(resourcePath string, requestD
 }
 
 func (c *cliClient) makeHttpCall(resourcePath string, method string, dataReader io.Reader) (*http.Response, error) {
-	req, err := NewRequest(c.backendUrl, c.accessToken, method, resourcePath, dataReader)
+	completeUrl := c.backendUrl + resourcePath
+	req, err := http.NewRequest(method, completeUrl, dataReader)
 	if err != nil {
 		common.PrintErrorMessage(c.debug, err.Error())
 		return nil, fmt.Errorf("error creating server request")
 	}
 
-	httpClient := NewClient(c.skipVerify)
+	req.Header.Set("Authorization", "Bearer "+c.accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: c.skipVerify},
+	}
+	httpClient := &http.Client{Transport: tr}
+
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		common.PrintErrorMessage(c.debug, err.Error())
