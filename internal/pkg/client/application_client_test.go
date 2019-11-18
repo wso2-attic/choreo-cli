@@ -58,7 +58,7 @@ func TestListAppsError(t *testing.T) {
 }
 
 func TestCreateApp(t *testing.T) {
-	var actual *runtime.Application
+	var actual *runtime.ApplicationRequest
 
 	var b bytes.Buffer
 	client := &cliClient{
@@ -66,7 +66,7 @@ func TestCreateApp(t *testing.T) {
 		debug: &b,
 		httpClient: &mockHttpClient{
 			createRestResourceImpl: func(resourcePath string, data interface{}) error {
-				actual = data.(*runtime.Application)
+				actual = data.(*runtime.ApplicationRequest)
 				return nil
 			},
 		},
@@ -124,7 +124,9 @@ func TestDeployApp(t *testing.T) {
 		httpClient: &mockHttpClient{
 			createRestResourceWithResponseImpl: func(resourcePath string, requestData interface{},
 				responseData interface{}) error {
-				apps := responseData.(*struct { DeploymentUrl string `json:"deployment_url"`})
+				apps := responseData.(*struct {
+					DeploymentUrl string `json:"deployment_url"`
+				})
 				apps.DeploymentUrl = "http://example.com/apps/url"
 				return nil
 			},
@@ -135,4 +137,3 @@ func TestDeployApp(t *testing.T) {
 
 	test.AssertString(t, "http://example.com/apps/url", appUrl, "The app URL should be returned")
 }
-

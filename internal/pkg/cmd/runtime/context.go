@@ -53,6 +53,12 @@ type ConsoleWriterHolder interface {
 }
 
 type Application struct {
+	Id          string `json:"id" header:"Id"`
+	Name        string `json:"name" header:"Application Name"`
+	Description string `json:"description" header:"Description"`
+}
+
+type ApplicationRequest struct {
 	Name        string `json:"name" header:"Application Name"`
 	Description string `json:"description" header:"Description"`
 }

@@ -30,7 +30,7 @@ func (c *cliClient) ListApps() ([]runtime.Application, error) {
 }
 
 func (c *cliClient) CreateNewApp(name string, desc string) error {
-	application := &runtime.Application{
+	application := &runtime.ApplicationRequest{
 		Name:        name,
 		Description: desc,
 	}
