@@ -55,7 +55,6 @@ func TestListAppsError(t *testing.T) {
 	_, err := client.ListApps()
 
 	test.AssertNonNil(t, err, "An error should be returned")
-
 }
 
 func TestCreateApp(t *testing.T) {
@@ -76,7 +75,6 @@ func TestCreateApp(t *testing.T) {
 	_ = client.CreateNewApp("app1", "")
 
 	test.AssertString(t, actual.Name, "app1", "App data not created correctly")
-
 }
 
 func TestCreateAppError(t *testing.T) {
@@ -94,7 +92,6 @@ func TestCreateAppError(t *testing.T) {
 	err := client.CreateNewApp("app1", "")
 
 	test.AssertNonNil(t, err, "An error should be returned")
-
 }
 
 func TestDeployAppError(t *testing.T) {
@@ -113,7 +110,6 @@ func TestDeployAppError(t *testing.T) {
 	_, err := client.DeployApp("http://github.com/test/test")
 
 	test.AssertNonNil(t, err, "An error should be returned")
-
 }
 
 func TestDeployApp(t *testing.T) {
