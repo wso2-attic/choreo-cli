@@ -19,7 +19,7 @@ const pathApplicationDeployment = pathApplications + "/deployments"
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
 
-	err := c.getRestResource(pathApplications, &apps)
+	err := c.httpClient.getRestResource(pathApplications, &apps)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 		Description: desc,
 	}
 
-	if err := c.createRestResource(pathApplications, application); err != nil {
+	if err := c.httpClient.createRestResource(pathApplications, application); err != nil {
 		return err
 	}
 
@@ -50,7 +50,7 @@ func (c *cliClient) DeployApp(repoUrl string) (string, error) {
 	var deploymentDetails struct {
 		DeploymentUrl string `json:"deployment_url"`
 	}
-	err := c.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
+	err := c.httpClient.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
 	if err != nil {
 		return "", err
 	}

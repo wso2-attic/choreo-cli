@@ -22,3 +22,9 @@ func AssertBool(t *testing.T, expected bool, actual bool, message string) {
 		t.Errorf("%s; expected {%t} actual {%t}", message, expected, actual)
 	}
 }
+
+func AssertNonNil(t *testing.T, actual interface{}, message string) {
+	if actual == nil {
+		t.Errorf("%s; actual value is nil", message)
+	}
+}

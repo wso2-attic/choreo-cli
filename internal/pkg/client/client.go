@@ -11,6 +11,7 @@ package client
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,21 +26,39 @@ import (
 
 func CreateClient(ctx runtime.CliContext) *cliClient {
 	skipVerify, _ := strconv.ParseBool(ctx.EnvConfig().GetStringOrDefault(SkipVerify, EnvConfigs[SkipVerify]))
-	return &cliClient{
+	httpClient := &cliHttpClient{
 		out:         ctx.Out(),
 		debug:       ctx.DebugOut(),
 		skipVerify:  skipVerify,
 		backendUrl:  ctx.EnvConfig().GetStringOrDefault(BackendUrl, EnvConfigs[BackendUrl]),
 		accessToken: ctx.UserConfig().GetStringOrDefault(AccessToken, UserConfigs[AccessToken]),
 	}
+
+	return &cliClient{
+		out:         ctx.Out(),
+		debug:       ctx.DebugOut(),
+		httpClient: httpClient,
+	}
 }
 
-type cliClient struct {
+type cliHttpClient struct {
 	out         io.Writer
 	debug       io.Writer
 	skipVerify  bool
 	accessToken string
 	backendUrl  string
+}
+
+type restClient interface {
+	getRestResource(resourcePath string, v interface{}) error
+	createRestResource(resourcePath string, data interface{}) error
+	createRestResourceWithResponse(resourcePath string, requestData interface{}, responseData interface{}) error
+}
+
+type cliClient struct {
+	out        io.Writer
+	debug      io.Writer
+	httpClient restClient
 }
 
 func closeResource(consoleWriter io.Writer, res io.Closer) func() {
@@ -54,7 +73,7 @@ func newInternalError() error {
 	return errors.New("internal error occurred")
 }
 
-func (c *cliClient) getRestResource(resourcePath string, v interface{}) error {
+func (c *cliHttpClient) getRestResource(resourcePath string, v interface{}) error {
 	resp, err := c.makeHttpCall(resourcePath, "GET", nil)
 	if err != nil {
 		return err
@@ -78,7 +97,7 @@ func (c *cliClient) getRestResource(resourcePath string, v interface{}) error {
 	return nil
 }
 
-func (c *cliClient) createRestResource(resourcePath string, data interface{}) error {
+func (c *cliHttpClient) createRestResource(resourcePath string, data interface{}) error {
 	jsonStr, err := json.Marshal(data)
 
 	if err != nil {
@@ -104,7 +123,7 @@ func (c *cliClient) createRestResource(resourcePath string, data interface{}) er
 	return nil
 }
 
-func (c *cliClient) createRestResourceWithResponse(resourcePath string, requestData interface{}, responseData interface{}) error {
+func (c *cliHttpClient) createRestResourceWithResponse(resourcePath string, requestData interface{}, responseData interface{}) error {
 	jsonStr, err := json.Marshal(requestData)
 
 	if err != nil {
@@ -134,14 +153,22 @@ func (c *cliClient) createRestResourceWithResponse(resourcePath string, requestD
 	return nil
 }
 
-func (c *cliClient) makeHttpCall(resourcePath string, method string, dataReader io.Reader) (*http.Response, error) {
-	req, err := NewRequest(c.backendUrl, c.accessToken, method, resourcePath, dataReader)
+func (c *cliHttpClient) makeHttpCall(resourcePath string, method string, dataReader io.Reader) (*http.Response, error) {
+	completeUrl := c.backendUrl + resourcePath
+	req, err := http.NewRequest(method, completeUrl, dataReader)
 	if err != nil {
 		common.PrintErrorMessage(c.debug, err.Error())
 		return nil, fmt.Errorf("error creating server request")
 	}
 
-	httpClient := NewClient(c.skipVerify)
+	req.Header.Set("Authorization", "Bearer "+c.accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: c.skipVerify},
+	}
+	httpClient := &http.Client{Transport: tr}
+
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		common.PrintErrorMessage(c.debug, err.Error())
