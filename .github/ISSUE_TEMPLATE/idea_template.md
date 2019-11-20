@@ -1,6 +1,6 @@
 ---
 name: "\U0001F4A1 Idea"
-about: "if you have an idea in your mind and want to start a discussion on it"
+about: "If you have an idea in your mind and want to start a discussion on it"
 labels: 'Type/Idea'
 
 ---
