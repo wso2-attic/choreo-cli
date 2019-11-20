@@ -15,6 +15,7 @@ import (
 
 const pathApplications = "/applications"
 const pathApplicationDeployment = pathApplications + "/deployments"
+const pathApplicationLogs = pathApplications + "/logs"
 
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
@@ -56,4 +57,19 @@ func (c *cliClient) DeployApp(repoUrl string) (string, error) {
 	}
 
 	return deploymentDetails.DeploymentUrl, nil
+}
+
+func (c *cliClient) FetchLogs(appId string, linesCount string) (string, error) {
+
+	pathWithQueryParam := pathApplicationLogs + "?app_id=" + appId + "&lines_count=" + linesCount
+
+	var logsDetails struct {
+		Logs string `json:"logs"`
+	}
+	err := c.httpClient.getRestResource(pathWithQueryParam, &logsDetails)
+	if err != nil {
+		return "", err
+	}
+
+	return logsDetails.Logs, nil
 }

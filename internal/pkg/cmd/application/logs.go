@@ -14,17 +14,13 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-func NewApplicationCommand(cliContext runtime.CliContext) *cobra.Command {
+func NewLogsCommand(cliContext runtime.CliContext) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     cmdApplication,
-		Short:   "Manage applications",
-		Aliases: []string{"app"},
-		Args:    cobra.MaximumNArgs(1),
+		Use:   "logs",
+		Short: "Manage application logs",
+		Args:  cobra.MaximumNArgs(1),
 	}
-	cmd.AddCommand(NewCreateCommand(cliContext))
-	cmd.AddCommand(NewListCommand(cliContext))
-	cmd.AddCommand(NewDeployCommand(cliContext))
-	cmd.AddCommand(NewLogsCommand(cliContext))
+	cmd.AddCommand(NewShowLogsCommand(cliContext))
 	return cmd
 }
