@@ -63,10 +63,15 @@ type ApplicationRequest struct {
 	Description string `json:"description" header:"Description"`
 }
 
+type DeploymentDetails struct {
+	DeploymentUrl string `json:"deployment_url"`
+	ApplicationId string `json:"app_id"`
+}
+
 type ApplicationApiClient interface {
 	CreateNewApp(name string, desc string) error
 	ListApps() ([]Application, error)
-	DeployApp(repoUrl string) (string, error)
+	DeployApp(repoUrl string) (DeploymentDetails, error)
 	FetchLogs(appId string, linesCount uint) (string, error)
 }
 

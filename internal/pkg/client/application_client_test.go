@@ -113,10 +113,6 @@ func TestDeployAppError(t *testing.T) {
 }
 
 func TestDeployApp(t *testing.T) {
-	type deploymentDetails struct {
-		DeploymentUrl string `json:"deployment_url"`
-	}
-
 	var b bytes.Buffer
 	client := &cliClient{
 		out:   &b,
@@ -124,16 +120,18 @@ func TestDeployApp(t *testing.T) {
 		httpClient: &mockHttpClient{
 			createRestResourceWithResponseImpl: func(resourcePath string, requestData interface{},
 				responseData interface{}) error {
-				apps := responseData.(*struct {
-					DeploymentUrl string `json:"deployment_url"`
-				})
+				apps := responseData.(*runtime.DeploymentDetails)
 				apps.DeploymentUrl = "http://example.com/apps/url"
+				apps.ApplicationId = "appd83d56f4c6ff40428e8dd057c5b94bd5"
 				return nil
 			},
 		},
 	}
 
-	appUrl, _ := client.DeployApp("http://github.com/test/test")
+	deploymentDetails, _ := client.DeployApp("http://github.com/test/test")
 
-	test.AssertString(t, "http://example.com/apps/url", appUrl, "The app URL should be returned")
+	test.AssertString(t, "http://example.com/apps/url", deploymentDetails.DeploymentUrl,
+		"The app URL should be returned")
+	test.AssertString(t, "appd83d56f4c6ff40428e8dd057c5b94bd5", deploymentDetails.ApplicationId,
+		"The app id should be returned")
 }

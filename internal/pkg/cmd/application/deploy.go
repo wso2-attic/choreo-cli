@@ -37,11 +37,13 @@ func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
-		deploymentUrl, err := cliContext.Client().DeployApp(args[0])
+		deploymentDetails, err := cliContext.Client().DeployApp(args[0])
 		if err != nil {
 			common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
 		} else {
-			common.PrintInfo(cliContext.Out(), "Deployment request submitted! Once deployed, the app can be accessed from: "+deploymentUrl)
+			common.PrintInfo(cliContext.Out(), "A new application is created for deployment with Id: "+
+				deploymentDetails.ApplicationId+"\nOnce deployed, the app can be accessed from: "+
+				deploymentDetails.DeploymentUrl)
 		}
 	}
 }
