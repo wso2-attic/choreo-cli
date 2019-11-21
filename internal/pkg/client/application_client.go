@@ -10,6 +10,7 @@
 package client
 
 import (
+	"fmt"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
@@ -59,9 +60,12 @@ func (c *cliClient) DeployApp(repoUrl string) (string, error) {
 	return deploymentDetails.DeploymentUrl, nil
 }
 
-func (c *cliClient) FetchLogs(appId string, linesCount string) (string, error) {
+func (c *cliClient) FetchLogs(appId string, linesCount uint) (string, error) {
 
-	pathWithQueryParam := pathApplicationLogs + "/" + appId + "?lines_count=" + linesCount
+	pathWithQueryParam := pathApplicationLogs + "/" + appId
+	if linesCount > 0 {
+		pathWithQueryParam += "?lines_count=" + fmt.Sprint(linesCount)
+	}
 
 	var logsDetails struct {
 		Logs string `json:"logs"`

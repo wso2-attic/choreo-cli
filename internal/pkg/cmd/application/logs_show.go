@@ -30,7 +30,7 @@ func NewShowLogsCommand(cliContext runtime.CliContext) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		Run:  runShowLogsCommand(cliContext),
 	}
-	cmd.Flags().StringP(numOfLinesFlagName, "n", "", "Specify number of log lines which should be fetched")
+	cmd.Flags().UintP(numOfLinesFlagName, "n", 0, "Specify number of log lines which should be fetched")
 	return cmd
 }
 
@@ -40,7 +40,7 @@ func runShowLogsCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, 
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
-		linesCount, err := cmd.Flags().GetString(numOfLinesFlagName)
+		linesCount, err := cmd.Flags().GetUint(numOfLinesFlagName)
 		if err != nil {
 			common.ExitWithError(cliContext.Out(), "Error reading description flag", err)
 		}

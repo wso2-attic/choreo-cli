@@ -237,7 +237,7 @@ Manage application logs.
 
 #### Synopsis
 
-Show logs of a deployed application. Maximum number of log lines which can be shown is 500.
+Show logs of a deployed application. Maximum number of log lines shown is 500.
 If the number of log lines is not specified 50 lines is shown by default.
 
 ```

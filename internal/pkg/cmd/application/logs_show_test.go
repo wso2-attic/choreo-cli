@@ -26,11 +26,11 @@ func TestNewShowLogsCommand(t *testing.T) {
 		MockOut:        &b,
 		MockUserConfig: config.NewMockConfigHolder(map[string]string{cl.AccessToken: "some-token"}),
 		MockEnvConfig:  config.NewMockConfigHolder(map[string]string{}),
-		MockClient: &client.MockClient{FetchLogs_: func(appId string, linesCount string) (string, error) {
+		MockClient: &client.MockClient{FetchLogs_: func(appId string, linesCount uint) (string, error) {
 			return "some sample log line\nlog line number 2", nil
 		}},
 	})
-	showLogsCommand.Run(showLogsCommand, []string{"someAppId", "5"})
+	showLogsCommand.Run(showLogsCommand, []string{"someAppId", "-n 5"})
 
 	expect := "some sample log line\nlog line number 2" + "\n"
 	test.AssertString(t, expect, b.String(), "Show logs command output is not as expected")
