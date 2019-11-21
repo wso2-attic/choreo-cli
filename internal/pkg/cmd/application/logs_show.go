@@ -18,36 +18,38 @@ import (
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
 
-const descriptionFlagName = "description"
+const numOfLinesFlagName = "number-of-lines"
 
-func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
-	const cmdCreate = "create"
+func NewShowLogsCommand(cliContext runtime.CliContext) *cobra.Command {
+	const cmdShow = "show"
 	cmd := &cobra.Command{
-		Use:   cmdCreate + " APP_NAME",
-		Short: "Create an application",
-		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdCreate),
-			" app1 -d \"My first app\""),
+		Use:   cmdShow + " APP_ID",
+		Short: "Show logs of a deployed application",
+		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdLogs, cmdShow),
+			" app1234567890abcd"),
 		Args: cobra.ExactArgs(1),
-		Run:  runCreateAppCommand(cliContext),
+		Run:  runShowLogsCommand(cliContext),
 	}
-	cmd.Flags().StringP(descriptionFlagName, "d", "", "Specify description for the application")
+	cmd.Flags().UintP(numOfLinesFlagName, "n", 0, "Specify number of log lines which should be fetched")
 	return cmd
 }
 
-func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
+func runShowLogsCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		if !client.IsUserLoggedIn(cliContext) {
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
-		description, err := cmd.Flags().GetString(descriptionFlagName)
+		linesCount, err := cmd.Flags().GetUint(numOfLinesFlagName)
 		if err != nil {
 			common.ExitWithError(cliContext.Out(), "Error reading description flag", err)
 		}
 
-		err = cliContext.Client().CreateNewApp(args[0], description)
+		logs, err := cliContext.Client().FetchLogs(args[0], linesCount)
 		if err != nil {
-			common.ExitWithError(cliContext.Out(), "Error occurred while creating the application", err)
+			common.ExitWithError(cliContext.Out(), "Error occurred while fetching logs of the application", err)
+		} else {
+			common.PrintInfo(cliContext.Out(), logs)
 		}
 	}
 }

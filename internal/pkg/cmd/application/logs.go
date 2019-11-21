@@ -9,7 +9,18 @@
 
 package application
 
-const (
-	cmdApplication = "application"
-	cmdLogs        = "logs"
+import (
+	"github.com/spf13/cobra"
+	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
+
+func NewLogsCommand(cliContext runtime.CliContext) *cobra.Command {
+
+	cmd := &cobra.Command{
+		Use:   cmdLogs,
+		Short: "Manage application logs",
+		Args:  cobra.MaximumNArgs(1),
+	}
+	cmd.AddCommand(NewShowLogsCommand(cliContext))
+	return cmd
+}

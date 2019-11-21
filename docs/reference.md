@@ -11,6 +11,8 @@ Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](
     - [create](#chor-application-create) - create an application
     - [list](#chor-application-list) - list applications
     - [deploy](#chor-application-deploy) - deploy a Ballerina application
+    - [logs](#chor-application-logs) - manage application logs
+        - [show](#chor-application-logs-show) - show application logs
 
 ### chor auth
 
@@ -209,6 +211,50 @@ $ chor application deploy https://github.com/someuser/ballerina-sample
 
 ```
   -h, --help    help for list
+```
+
+[Back to Command List](#chor-cli-commands)
+
+### chor application logs
+
+`application logs` command is used to manage logs of a deployed application.
+
+#### Synopsis
+
+Manage application logs.
+
+#### Options
+
+```
+  -h, --help    help for list
+```
+
+[Back to Command List](#chor-cli-commands)
+
+### chor application logs show
+
+`application logs show APP_ID` command is used to show logs of a deployed application.
+
+#### Synopsis
+
+Show logs of a deployed application. Maximum number of log lines shown is 500.
+If the number of log lines is not specified 50 lines is shown by default.
+
+```
+application logs show APP_ID
+```
+
+#### Examples
+
+```
+$ chor application logs show app1234567890abcd
+```
+
+#### Options
+
+```
+  -n, --number-of-lines     specify number of log lines which should be fetched
+  -h, --help                help for list
 ```
 
 [Back to Command List](#chor-cli-commands)
