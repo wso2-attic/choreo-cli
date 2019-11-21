@@ -39,7 +39,7 @@ func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 
 		deploymentUrl, err := cliContext.Client().DeployApp(args[0])
 		if err != nil {
-			common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application. Reason: ", err)
+			common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
 		} else {
 			common.PrintInfo(cliContext.Out(), "Deployment request submitted! Once deployed, the app can be accessed from: "+deploymentUrl)
 		}

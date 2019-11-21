@@ -47,7 +47,7 @@ func runShowLogsCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, 
 
 		logs, err := cliContext.Client().FetchLogs(args[0], linesCount)
 		if err != nil {
-			common.ExitWithError(cliContext.Out(), "Error occurred while fetching logs of the application. Reason: ", err)
+			common.ExitWithError(cliContext.Out(), "Error occurred while fetching logs of the application", err)
 		} else {
 			common.PrintInfo(cliContext.Out(), logs)
 		}

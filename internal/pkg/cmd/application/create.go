@@ -47,7 +47,7 @@ func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 
 		err = cliContext.Client().CreateNewApp(args[0], description)
 		if err != nil {
-			common.ExitWithError(cliContext.Out(), "Error occurred while creating the application. Reason: ", err)
+			common.ExitWithError(cliContext.Out(), "Error occurred while creating the application", err)
 		}
 	}
 }
