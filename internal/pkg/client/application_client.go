@@ -61,7 +61,7 @@ func (c *cliClient) DeployApp(repoUrl string) (string, error) {
 
 func (c *cliClient) FetchLogs(appId string, linesCount string) (string, error) {
 
-	pathWithQueryParam := pathApplicationLogs + "?app_id=" + appId + "&lines_count=" + linesCount
+	pathWithQueryParam := pathApplicationLogs + "/" + appId + "?lines_count=" + linesCount
 
 	var logsDetails struct {
 		Logs string `json:"logs"`

@@ -17,7 +17,7 @@ import (
 func NewLogsCommand(cliContext runtime.CliContext) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "logs",
+		Use:   cmdLogs,
 		Short: "Manage application logs",
 		Args:  cobra.MaximumNArgs(1),
 	}

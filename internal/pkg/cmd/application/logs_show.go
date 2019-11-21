@@ -25,7 +25,7 @@ func NewShowLogsCommand(cliContext runtime.CliContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   cmdShow + " APP_ID",
 		Short: "Show logs of a deployed application",
-		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdShow),
+		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdLogs, cmdShow),
 			" app1234567890abcd"),
 		Args: cobra.ExactArgs(1),
 		Run:  runShowLogsCommand(cliContext),
