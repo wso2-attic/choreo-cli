@@ -53,14 +53,25 @@ type ConsoleWriterHolder interface {
 }
 
 type Application struct {
+	Id          string `json:"id" header:"Id"`
 	Name        string `json:"name" header:"Application Name"`
 	Description string `json:"description" header:"Description"`
+}
+
+type ApplicationRequest struct {
+	Name        string `json:"name" header:"Application Name"`
+	Description string `json:"description" header:"Description"`
+}
+
+type DeploymentDetails struct {
+	DeploymentUrl string `json:"deployment_url"`
+	ApplicationId string `json:"app_id"`
 }
 
 type ApplicationApiClient interface {
 	CreateNewApp(name string, desc string) error
 	ListApps() ([]Application, error)
-	DeployApp(repoUrl string) (string, error)
+	DeployApp(repoUrl string) (DeploymentDetails, error)
 	FetchLogs(appId string, linesCount uint) (string, error)
 }
 

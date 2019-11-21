@@ -30,7 +30,7 @@ func (c *cliClient) ListApps() ([]runtime.Application, error) {
 }
 
 func (c *cliClient) CreateNewApp(name string, desc string) error {
-	application := &runtime.Application{
+	application := &runtime.ApplicationRequest{
 		Name:        name,
 		Description: desc,
 	}
@@ -42,22 +42,18 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 	return nil
 }
 
-func (c *cliClient) DeployApp(repoUrl string) (string, error) {
+func (c *cliClient) DeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
 	var deploymentRequest = struct {
 		RepoUrl string `json:"repo_url"`
 	}{
 		RepoUrl: repoUrl,
 	}
 
-	var deploymentDetails struct {
-		DeploymentUrl string `json:"deployment_url"`
-	}
-	err := c.httpClient.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
-	if err != nil {
-		return "", err
-	}
+	var deploymentDetails runtime.DeploymentDetails
 
-	return deploymentDetails.DeploymentUrl, nil
+	err := c.httpClient.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
+
+	return deploymentDetails, err
 }
 
 func (c *cliClient) FetchLogs(appId string, linesCount uint) (string, error) {
