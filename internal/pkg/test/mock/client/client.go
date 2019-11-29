@@ -33,7 +33,7 @@ func (c *MockClient) ListApps() ([]runtime.Application, error) {
 	return nil, nil
 }
 
-func (c *MockClient) DeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
+func (c *MockClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
 	if c.DeployApp_ != nil {
 		return c.DeployApp_(repoUrl)
 	}

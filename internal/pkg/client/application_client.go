@@ -42,7 +42,7 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 	return nil
 }
 
-func (c *cliClient) DeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
+func (c *cliClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
 	var deploymentRequest = struct {
 		RepoUrl string `json:"repo_url"`
 	}{
