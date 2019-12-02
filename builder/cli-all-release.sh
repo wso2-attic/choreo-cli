@@ -12,14 +12,35 @@
 source builder/cli-constants.txt
 
 function generatePlatformArchive() {
-    pushd "$TEMP_BUILD_DIRECTORY" || exit
+    pushd "$TEMP_BUILD_DIRECTORY" || exit 1
 
     PLATFORM_ARCHIVE_NAME=choreo-cli-$CHOREO_CLI_VERSION-${OS_PLATFORM}-${PLATFORM_ARCHITECTURE}.tar.gz
 
     tar czf "$PLATFORM_ARCHIVE_NAME" "$TEMP_PLATFORM_BUILD_DIRECTORY_NAME" > /dev/null 2>&1
     rm -rf "$TEMP_PLATFORM_BUILD_DIRECTORY"
 
-    popd || exit
+    popd || exit 1
+}
+
+function generateHomebrewBottles() {
+    TEMP_BOTTLE_DIRECTORY_NAME=chor
+    TEMP_BOTTLE_DIRECTORY=$TEMP_BUILD_DIRECTORY/$TEMP_BOTTLE_DIRECTORY_NAME
+
+    AGGREGATED_GO_LDFLAGS="$GO_LDFLAGS -X $PROJECT_MODULE/internal/pkg/build.buildPlatform=darwin/amd64"
+
+    GOOS=darwin GOARCH=amd64 go build -o "$TEMP_BOTTLE_DIRECTORY"/"$CHOREO_CLI_VERSION"/bin/chor \
+                            -ldflags "$AGGREGATED_GO_LDFLAGS" -x "$PROJECT_MODULE/$CHORE_CLI_SRC_ROOT"
+
+    cp "$PROJECT_ROOT"/LICENSE "$TEMP_BOTTLE_DIRECTORY"/"$CHOREO_CLI_VERSION"
+
+    pushd "$TEMP_BUILD_DIRECTORY" || exit 1
+
+    tar czf chor-"$CHOREO_CLI_VERSION".high_sierra.bottle.tar.gz $TEMP_BOTTLE_DIRECTORY_NAME > /dev/null 2>&1
+    tar czf chor-"$CHOREO_CLI_VERSION".mojave.bottle.tar.gz $TEMP_BOTTLE_DIRECTORY_NAME > /dev/null 2>&1
+    tar czf chor-"$CHOREO_CLI_VERSION".catalina.bottle.tar.gz $TEMP_BOTTLE_DIRECTORY_NAME > /dev/null 2>&1
+    rm -rf "$TEMP_BOTTLE_DIRECTORY"
+
+    popd || exit 1
 }
 
 echo "Building Choreo CLI $CHOREO_CLI_VERSION"
@@ -59,6 +80,8 @@ do
 
     generatePlatformArchive
 done
+
+generateHomebrewBottles
 
 echo "Choreo CLI build completed"
 ls -lh "$TEMP_BUILD_DIRECTORY"
