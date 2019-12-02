@@ -10,17 +10,22 @@ CLI to manage integration applications with Choreo platform
 
 ## Getting started with Choreo
 
+### Mac users - Install with Homebrew
+```
+brew tap wso2/choreo && brew install chor
+```
+### Linux/Windows users - Download binary and install
 1. Download Choreo CLI from the [releases page](https://github.com/wso2/choreo-cli/releases)
 2. Extract the tar.gz file
     ```
-    $tar -xf choreo-cli-0.0.3-{os}-x64.tar.gz
+    tar -xf choreo-cli-{version}-{os}-x64.tar.gz
     ```
 3. Navigate to the `bin` directory and run `$chor` command
     ```
-    $cd choreo-0.0.3/bin
+    cd choreo-{version}/bin
     ```
     ```
-    $./chor
+    ./chor
     ```
 Visit [Choreo CLI reference](docs/reference.md) for more operations to interact with Choreo 
 
