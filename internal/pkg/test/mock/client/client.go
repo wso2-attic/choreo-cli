@@ -14,7 +14,8 @@ import "github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 type MockClient struct {
 	CreateNewApp_           func(name string, desc string) error
 	ListApps_               func() ([]runtime.Application, error)
-	DeployApp_              func(repoUrl string) (runtime.DeploymentDetails, error)
+	CreateAndDeployApp_     func(repoUrl string) (runtime.DeploymentDetails, error)
+	DeployApp_              func(appId, repoUrl string) (runtime.DeploymentDetails, error)
 	FetchLogs_              func(appId string, linesCount uint) (string, error)
 	CreateOauthStateString_ func() (string, error)
 }
@@ -34,8 +35,19 @@ func (c *MockClient) ListApps() ([]runtime.Application, error) {
 }
 
 func (c *MockClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
+	if c.CreateAndDeployApp_ != nil {
+		return c.CreateAndDeployApp_(repoUrl)
+	}
+	return runtime.DeploymentDetails{
+		DeploymentUrl: "",
+		ApplicationId: "",
+	}, nil
+}
+
+
+func (c *MockClient) CreateAndDeployAppWithName(appId, repoUrl string) (runtime.DeploymentDetails, error) {
 	if c.DeployApp_ != nil {
-		return c.DeployApp_(repoUrl)
+		return c.DeployApp_(appId, repoUrl)
 	}
 	return runtime.DeploymentDetails{
 		DeploymentUrl: "",

@@ -24,10 +24,11 @@ func NewDeployCommand(cliContext runtime.CliContext) *cobra.Command {
 		Use:   cmdDeploy + " GITHUB_REPO_URL",
 		Short: "Deploy an application",
 		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdDeploy),
-			" https://github.com/wso2/choreo"),
+			" https://github.com/wso2/choreo-ballerina-hello"),
 		Args: cobra.ExactArgs(1),
 		Run:  runDeployAppCommand(cliContext),
 	}
+	cmd.Flags().StringP("name", "n", "", "Specify the name to be used for the created application")
 	return cmd
 }
 
@@ -37,15 +38,28 @@ func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
 		}
 
-
-
-		deploymentDetails, err := cliContext.Client().CreateAndDeployApp(args[0])
-		if err != nil {
-			common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
-		} else {
-			common.PrintInfo(cliContext.Out(), "A new application is created for deployment with Id: "+
-				deploymentDetails.ApplicationId+"\nOnce deployed, the app can be accessed from: "+
-				deploymentDetails.DeploymentUrl)
+		appName, err := cmd.Flags().GetString("name")
+		if err !=nil {
+			common.ExitWithError(cliContext.Out(), "Error while reading the application name flag value", err)
 		}
+
+		if appName != "" {
+			deploymentDetails, err := cliContext.Client().CreateAndDeployAppWithName(appName, args[0])
+			printDeployResponse(err, cliContext, deploymentDetails)
+		} else {
+			deploymentDetails, err := cliContext.Client().CreateAndDeployApp(args[0])
+			printDeployResponse(err, cliContext, deploymentDetails)
+		}
+
+	}
+}
+
+func printDeployResponse(err error, cliContext runtime.CliContext, deploymentDetails runtime.DeploymentDetails) {
+	if err != nil {
+		common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
+	} else {
+		common.PrintInfo(cliContext.Out(), "A new application is created for deployment with Id: "+
+			deploymentDetails.ApplicationId+"\nOnce deployed, the app can be accessed from: "+
+			deploymentDetails.DeploymentUrl)
 	}
 }

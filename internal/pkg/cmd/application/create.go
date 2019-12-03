@@ -28,13 +28,13 @@ func NewCreateCommand(cliContext runtime.CliContext) *cobra.Command {
 		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdCreate),
 			" app1 -d \"My first app\""),
 		Args: cobra.ExactArgs(1),
-		Run:  runCreateAppCommand(cliContext),
+		Run:  createAppCreateCommand(cliContext),
 	}
 	cmd.Flags().StringP(descriptionFlagName, "d", "", "Specify description for the application")
 	return cmd
 }
 
-func runCreateAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
+func createAppCreateCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		if !client.IsUserLoggedIn(cliContext) {
 			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")

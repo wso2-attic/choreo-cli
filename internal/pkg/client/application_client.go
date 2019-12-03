@@ -56,6 +56,22 @@ func (c *cliClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetail
 	return deploymentDetails, err
 }
 
+func (c *cliClient) CreateAndDeployAppWithName(appName, repoUrl string) (runtime.DeploymentDetails, error) {
+	var deploymentRequest = struct {
+		AppName string `json:"name"`
+		RepoUrl string `json:"repo_url"`
+	}{
+		AppName: appName,
+		RepoUrl: repoUrl,
+	}
+
+	var deploymentDetails runtime.DeploymentDetails
+
+	err := c.httpClient.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
+
+	return deploymentDetails, err
+}
+
 func (c *cliClient) FetchLogs(appId string, linesCount uint) (string, error) {
 
 	pathWithQueryParam := pathApplicationLogs + "/" + appId

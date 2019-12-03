@@ -72,6 +72,7 @@ type ApplicationApiClient interface {
 	CreateNewApp(name string, desc string) error
 	ListApps() ([]Application, error)
 	CreateAndDeployApp(repoUrl string) (DeploymentDetails, error)
+	CreateAndDeployAppWithName(appName, repoUrl string) (DeploymentDetails, error)
 	FetchLogs(appId string, linesCount uint) (string, error)
 }
 
