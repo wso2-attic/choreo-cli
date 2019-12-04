@@ -12,14 +12,39 @@
 source builder/cli-constants.txt
 
 function generatePlatformArchive() {
-    pushd "$TEMP_BUILD_DIRECTORY" || exit
+    pushd "$TEMP_BUILD_DIRECTORY" || { echo "error: cannot pushd to $TEMP_BUILD_DIRECTORY"; exit 1; }
 
     PLATFORM_ARCHIVE_NAME=choreo-cli-$CHOREO_CLI_VERSION-${OS_PLATFORM}-${PLATFORM_ARCHITECTURE}.tar.gz
 
-    tar czf "$PLATFORM_ARCHIVE_NAME" "$TEMP_PLATFORM_BUILD_DIRECTORY_NAME" > /dev/null 2>&1
+    tar czf "$PLATFORM_ARCHIVE_NAME" "$TEMP_PLATFORM_BUILD_DIRECTORY_NAME"
     rm -rf "$TEMP_PLATFORM_BUILD_DIRECTORY"
 
-    popd || exit
+    popd || exit 1
+}
+
+function generateHomebrewBottles() {
+    pushd "$TEMP_BUILD_DIRECTORY" || { echo "error: cannot pushd to $TEMP_BUILD_DIRECTORY"; exit 1; }
+
+    MACOS_ARCHIVE=choreo-cli-$CHOREO_CLI_VERSION-macosx-x64.tar.gz
+    [ ! -f "$MACOS_ARCHIVE" ] && { echo "error: cannot find $MACOS_ARCHIVE"; exit 1; }
+    [ -e "$TEMP_PLATFORM_BUILD_DIRECTORY" ] && { echo "error: directory already exists: $TEMP_PLATFORM_BUILD_DIRECTORY"; exit 1; }
+    tar xzf "$MACOS_ARCHIVE"
+
+    TEMP_BOTTLE_DIRECTORY_NAME=chor
+    TEMP_BOTTLE_DIRECTORY=$TEMP_BUILD_DIRECTORY/$TEMP_BOTTLE_DIRECTORY_NAME
+
+    mkdir -p "$TEMP_BOTTLE_DIRECTORY_NAME"/"$CHOREO_CLI_VERSION"/bin
+
+    mv "$TEMP_PLATFORM_BUILD_DIRECTORY"/bin/chor "$TEMP_BOTTLE_DIRECTORY"/"$CHOREO_CLI_VERSION"/bin/chor
+    mv "$TEMP_PLATFORM_BUILD_DIRECTORY"/LICENSE "$TEMP_BOTTLE_DIRECTORY"/LICENSE
+    rm -rf "$TEMP_PLATFORM_BUILD_DIRECTORY"
+
+    tar czf chor-"$CHOREO_CLI_VERSION".high_sierra.bottle.tar.gz $TEMP_BOTTLE_DIRECTORY_NAME
+    tar czf chor-"$CHOREO_CLI_VERSION".mojave.bottle.tar.gz $TEMP_BOTTLE_DIRECTORY_NAME
+    tar czf chor-"$CHOREO_CLI_VERSION".catalina.bottle.tar.gz $TEMP_BOTTLE_DIRECTORY_NAME
+    rm -rf "$TEMP_BOTTLE_DIRECTORY"
+
+    popd || exit 1
 }
 
 echo "Building Choreo CLI $CHOREO_CLI_VERSION"
@@ -59,6 +84,8 @@ do
 
     generatePlatformArchive
 done
+
+generateHomebrewBottles
 
 echo "Choreo CLI build completed"
 ls -lh "$TEMP_BUILD_DIRECTORY"
