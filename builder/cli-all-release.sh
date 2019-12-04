@@ -12,7 +12,7 @@
 source builder/cli-constants.txt
 
 function generatePlatformArchive() {
-    pushd "$TEMP_BUILD_DIRECTORY" || exit 1
+    pushd "$TEMP_BUILD_DIRECTORY" || { echo "error: cannot pushd to $TEMP_BUILD_DIRECTORY"; exit 1; }
 
     PLATFORM_ARCHIVE_NAME=choreo-cli-$CHOREO_CLI_VERSION-${OS_PLATFORM}-${PLATFORM_ARCHITECTURE}.tar.gz
 
@@ -23,10 +23,11 @@ function generatePlatformArchive() {
 }
 
 function generateHomebrewBottles() {
-    pushd "$TEMP_BUILD_DIRECTORY" || exit 1
+    pushd "$TEMP_BUILD_DIRECTORY" || { echo "error: cannot pushd to $TEMP_BUILD_DIRECTORY"; exit 1; }
 
     MACOS_ARCHIVE=choreo-cli-$CHOREO_CLI_VERSION-macosx-x64.tar.gz
-    [ ! -f "$MACOS_ARCHIVE" ] && exit 1
+    [ ! -f "$MACOS_ARCHIVE" ] && { echo "error: cannot find $MACOS_ARCHIVE"; exit 1; }
+    [ -e "$TEMP_PLATFORM_BUILD_DIRECTORY" ] && { echo "error: directory already exists: $TEMP_PLATFORM_BUILD_DIRECTORY"; exit 1; }
     tar xzf "$MACOS_ARCHIVE"
 
     TEMP_BOTTLE_DIRECTORY_NAME=chor
