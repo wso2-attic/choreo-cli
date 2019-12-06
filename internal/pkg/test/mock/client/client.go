@@ -12,12 +12,12 @@ package client
 import "github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 
 type MockClient struct {
-	CreateNewApp_           func(name string, desc string) error
-	ListApps_               func() ([]runtime.Application, error)
-	CreateAndDeployApp_     func(repoUrl string) (runtime.DeploymentDetails, error)
-	DeployApp_              func(appId, repoUrl string) (runtime.DeploymentDetails, error)
-	FetchLogs_              func(appId string, linesCount uint) (string, error)
-	CreateOauthStateString_ func() (string, error)
+	CreateNewApp_               func(name string, desc string) error
+	ListApps_                   func() ([]runtime.Application, error)
+	CreateAndDeployApp_         func(repoUrl string) (runtime.DeploymentDetails, error)
+	CreateAndDeployAppWithName_ func(appId, repoUrl string) (runtime.DeploymentDetails, error)
+	FetchLogs_                  func(appId string, linesCount uint) (string, error)
+	CreateOauthStateString_     func() (string, error)
 }
 
 func (c *MockClient) CreateNewApp(name string, desc string) error {
@@ -46,8 +46,8 @@ func (c *MockClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetai
 
 
 func (c *MockClient) CreateAndDeployAppWithName(appId, repoUrl string) (runtime.DeploymentDetails, error) {
-	if c.DeployApp_ != nil {
-		return c.DeployApp_(appId, repoUrl)
+	if c.CreateAndDeployAppWithName_ != nil {
+		return c.CreateAndDeployAppWithName_(appId, repoUrl)
 	}
 	return runtime.DeploymentDetails{
 		DeploymentUrl: "",
