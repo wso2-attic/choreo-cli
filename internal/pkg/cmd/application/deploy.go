@@ -28,7 +28,7 @@ func NewDeployCommand(cliContext runtime.CliContext) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		Run:  runDeployAppCommand(cliContext),
 	}
-	cmd.Flags().StringP("name", "n", "", "Specify the name to be used for the created application")
+	cmd.Flags().StringP("name", "n", "", "the name to be used for the created application")
 	return cmd
 }
 
@@ -59,7 +59,7 @@ func printDeployResponse(err error, cliContext runtime.CliContext, deploymentDet
 		common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
 	} else {
 		common.PrintInfo(cliContext.Out(), "A new application is created for deployment with Id: "+
-			deploymentDetails.ApplicationId+"\nOnce deployed, the app can be accessed from: "+
+			deploymentDetails.ApplicationId+"\nOnce deployed, the app can be accessed from "+
 			deploymentDetails.DeploymentUrl)
 	}
 }
