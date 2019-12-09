@@ -204,13 +204,15 @@ application deploy GITHUB_URL
 #### Examples
 
 ```
-$ chor application deploy https://github.com/someuser/ballerina-sample
+$ chor application deploy https://github.com/someuser/choreo-sample
+$ chor application deploy -n my-app https://github.com/someuser/choreo-sample
 ```
 
 #### Options
 
 ```
-  -h, --help    help for list
+  -h, --help          help for deploy
+  -n, --name string   the name to be used for the created application
 ```
 
 [Back to Command List](#chor-cli-commands)

@@ -18,6 +18,11 @@ const pathApplications = "/applications"
 const pathApplicationDeployment = pathApplications + "/deployments"
 const pathApplicationLogs = pathApplications + "/logs"
 
+type appDeploymentRequest struct {
+	AppName string `json:"name"`
+	RepoUrl string `json:"repo_url"`
+}
+
 func (c *cliClient) ListApps() ([]runtime.Application, error) {
 	var apps []runtime.Application
 
@@ -42,10 +47,21 @@ func (c *cliClient) CreateNewApp(name string, desc string) error {
 	return nil
 }
 
-func (c *cliClient) DeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
-	var deploymentRequest = struct {
-		RepoUrl string `json:"repo_url"`
-	}{
+func (c *cliClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
+	deploymentRequest := appDeploymentRequest{
+		RepoUrl: repoUrl,
+	}
+
+	var deploymentDetails runtime.DeploymentDetails
+
+	err := c.httpClient.createRestResourceWithResponse(pathApplicationDeployment, &deploymentRequest, &deploymentDetails)
+
+	return deploymentDetails, err
+}
+
+func (c *cliClient) CreateAndDeployAppWithName(appName, repoUrl string) (runtime.DeploymentDetails, error) {
+	deploymentRequest := appDeploymentRequest{
+		AppName: appName,
 		RepoUrl: repoUrl,
 	}
 

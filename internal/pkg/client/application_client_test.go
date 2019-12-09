@@ -107,7 +107,7 @@ func TestDeployAppError(t *testing.T) {
 		},
 	}
 
-	_, err := client.DeployApp("http://github.com/test/test")
+	_, err := client.CreateAndDeployApp("http://github.com/test/test")
 
 	test.AssertNonNil(t, err, "An error should be returned")
 }
@@ -128,7 +128,7 @@ func TestDeployApp(t *testing.T) {
 		},
 	}
 
-	deploymentDetails, _ := client.DeployApp("http://github.com/test/test")
+	deploymentDetails, _ := client.CreateAndDeployApp("http://github.com/test/test")
 
 	test.AssertString(t, "http://example.com/apps/url", deploymentDetails.DeploymentUrl,
 		"The app URL should be returned")
