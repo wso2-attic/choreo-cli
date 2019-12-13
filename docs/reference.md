@@ -13,6 +13,7 @@ Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](
     - [deploy](#chor-application-deploy) - deploy a Ballerina application
     - [logs](#chor-application-logs) - manage application logs
         - [show](#chor-application-logs-show) - show application logs
+    - [delete](#chor-application-delete) - delete an application
 
 ### chor auth
 
@@ -257,6 +258,33 @@ $ chor application logs show app1234567890abcd
 ```
   -n, --number-of-lines     specify number of log lines which should be fetched
   -h, --help                help for list
+```
+
+[Back to Command List](#chor-cli-commands)
+
+### chor application delete
+
+`application delete` command is used to delete an application created in the Choreo platform. 
+It will also remove the app deployment if the application is already deployed.
+
+#### Synopsis
+
+Delete an application.
+
+```
+application delete APP_ID
+```
+
+#### Examples
+
+```
+$ chor application delete a123456788901
+```
+
+#### Options
+
+```
+  -h, --help          help for deploy
 ```
 
 [Back to Command List](#chor-cli-commands)

@@ -18,6 +18,7 @@ type MockClient struct {
 	CreateAndDeployAppWithName_ func(appId, repoUrl string) (runtime.DeploymentDetails, error)
 	FetchLogs_                  func(appId string, linesCount uint) (string, error)
 	CreateOauthStateString_     func() (string, error)
+	DeleteApp_                  func(appId string) error
 }
 
 func (c *MockClient) CreateNewApp(name string, desc string) error {
@@ -44,7 +45,6 @@ func (c *MockClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetai
 	}, nil
 }
 
-
 func (c *MockClient) CreateAndDeployAppWithName(appId, repoUrl string) (runtime.DeploymentDetails, error) {
 	if c.CreateAndDeployAppWithName_ != nil {
 		return c.CreateAndDeployAppWithName_(appId, repoUrl)
@@ -67,4 +67,11 @@ func (c *MockClient) CreateOauthStateString() (string, error) {
 		return c.CreateOauthStateString_()
 	}
 	return "", nil
+}
+
+func (c *MockClient) DeleteApp(appId string) error {
+	if c.DeleteApp_ != nil {
+		return c.DeleteApp_(appId)
+	}
+	return nil
 }

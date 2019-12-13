@@ -74,6 +74,7 @@ type ApplicationApiClient interface {
 	CreateAndDeployApp(repoUrl string) (DeploymentDetails, error)
 	CreateAndDeployAppWithName(appName, repoUrl string) (DeploymentDetails, error)
 	FetchLogs(appId string, linesCount uint) (string, error)
+	DeleteApp(appId string) error
 }
 
 type AuthApiClient interface {

@@ -35,8 +35,8 @@ func CreateClient(ctx runtime.CliContext) *cliClient {
 	}
 
 	return &cliClient{
-		out:         ctx.Out(),
-		debug:       ctx.DebugOut(),
+		out:        ctx.Out(),
+		debug:      ctx.DebugOut(),
 		httpClient: httpClient,
 	}
 }
@@ -53,6 +53,7 @@ type restClient interface {
 	getRestResource(resourcePath string, v interface{}) error
 	createRestResource(resourcePath string, data interface{}) error
 	createRestResourceWithResponse(resourcePath string, requestData interface{}, responseData interface{}) error
+	deleteRestResource(resourcePath string) error
 }
 
 type cliClient struct {
@@ -150,6 +151,25 @@ func (c *cliHttpClient) createRestResourceWithResponse(resourcePath string, requ
 	if err != nil {
 		return errors.New("Error decoding the response. Reason: " + err.Error())
 	}
+	return nil
+}
+
+func (c *cliHttpClient) deleteRestResource(resourcePath string) error {
+	resp, err := c.makeHttpCall(resourcePath, "DELETE", nil)
+	if err != nil {
+		return err
+	}
+
+	defer closeResource(c.out, resp.Body)()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusAccepted {
+		return errors.New(string(body))
+	}
+
 	return nil
 }
 

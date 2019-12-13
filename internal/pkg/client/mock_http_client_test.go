@@ -14,6 +14,7 @@ type mockHttpClient struct {
 	createRestResourceImpl             func(resourcePath string, data interface{}) error
 	createRestResourceWithResponseImpl func(resourcePath string, requestData interface{},
 		responseData interface{}) error
+	deleteRestResourceImpl 			   func(resourcePath string) error
 }
 
 func (c *mockHttpClient) getRestResource(resourcePath string, v interface{}) error {
@@ -34,6 +35,13 @@ func (c *mockHttpClient) createRestResourceWithResponse(resourcePath string,
 	requestData interface{}, responseData interface{}) error {
 	if c.createRestResourceWithResponseImpl != nil {
 		return c.createRestResourceWithResponseImpl(resourcePath, requestData, responseData)
+	}
+	return nil
+}
+
+func (c *mockHttpClient) deleteRestResource(resourcePath string) error {
+	if c.deleteRestResourceImpl != nil {
+		return c.deleteRestResourceImpl(resourcePath)
 	}
 	return nil
 }
