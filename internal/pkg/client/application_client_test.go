@@ -135,3 +135,35 @@ func TestDeployApp(t *testing.T) {
 	test.AssertString(t, "appd83d56f4c6ff40428e8dd057c5b94bd5", deploymentDetails.ApplicationId,
 		"The app id should be returned")
 }
+
+func TestDeleteApp(t *testing.T) {
+	var b bytes.Buffer
+	client := &cliClient{
+		out:   &b,
+		debug: &b,
+		httpClient: &mockHttpClient{
+			deleteRestResourceImpl: func(resourcePath string) error {
+				return nil
+			},
+		},
+	}
+
+	err := client.DeleteApp("a12345678901")
+	test.AssertNil(t, err, "There should not be an error")
+}
+
+func TestDeleteAppError(t *testing.T) {
+	var b bytes.Buffer
+	client := &cliClient{
+		out:   &b,
+		debug: &b,
+		httpClient: &mockHttpClient{
+			deleteRestResourceImpl: func(resourcePath string) error {
+				return fmt.Errorf("mock HTTP error")
+			},
+		},
+	}
+
+	err := client.DeleteApp("a12345678901")
+	test.AssertNonNil(t, err, "An error should be returned")
+}

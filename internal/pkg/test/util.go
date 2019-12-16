@@ -28,3 +28,9 @@ func AssertNonNil(t *testing.T, actual interface{}, message string) {
 		t.Errorf("%s; actual value is nil", message)
 	}
 }
+
+func AssertNil(t *testing.T, actual interface{}, message string) {
+	if actual != nil {
+		t.Errorf("%s; actual value is not nil", message)
+	}
+}

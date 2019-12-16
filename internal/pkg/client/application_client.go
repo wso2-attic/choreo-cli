@@ -89,3 +89,12 @@ func (c *cliClient) FetchLogs(appId string, linesCount uint) (string, error) {
 
 	return logsDetails.Logs, nil
 }
+
+func (c *cliClient) DeleteApp(appId string) error {
+
+	if err := c.httpClient.deleteRestResource(pathApplications + "/" + appId); err != nil {
+		return err
+	}
+
+	return nil
+}
