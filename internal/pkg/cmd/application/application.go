@@ -19,7 +19,7 @@ func NewApplicationCommand(cliContext runtime.CliContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     cmdApplication,
 		Short:   "Manage applications",
-		Aliases: []string{"app"},
+		Aliases: []string{"application"},
 		Args:    cobra.MaximumNArgs(1),
 	}
 	cmd.AddCommand(NewCreateCommand(cliContext))
