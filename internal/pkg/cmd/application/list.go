@@ -14,7 +14,6 @@ import (
 
 	"github.com/landoop/tableprinter"
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
@@ -35,9 +34,7 @@ func NewListCommand(cliContext runtime.CliContext) *cobra.Command {
 func runListAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 
-		if !client.IsUserLoggedIn(cliContext) {
-			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
-		}
+		failIfUserNotLoggedIn(cliContext)
 
 		apps, err := cliContext.Client().ListApps()
 		if err == nil {

@@ -19,6 +19,7 @@ type MockClient struct {
 	FetchLogs_                  func(appId string, linesCount uint) (string, error)
 	CreateOauthStateString_     func() (string, error)
 	DeleteApp_                  func(appId string) error
+	GetStatus_                  func(appId string) (string, error)
 }
 
 func (c *MockClient) CreateNewApp(name string, desc string) error {
@@ -74,4 +75,11 @@ func (c *MockClient) DeleteApp(appId string) error {
 		return c.DeleteApp_(appId)
 	}
 	return nil
+}
+
+func (c *MockClient) GetApplicationStatus(appId string) (string, error) {
+	if c.GetStatus_ != nil {
+		return c.GetStatus_(appId)
+	}
+	return "", nil
 }
