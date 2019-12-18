@@ -98,3 +98,18 @@ func (c *cliClient) DeleteApp(appId string) error {
 
 	return nil
 }
+
+func (c *cliClient) GetApplicationStatus(appId string) (string, error) {
+	pathApplicationStatus := pathApplications + "/state/" + appId
+	var stateResponse struct {
+		Id     string `json:"id"`
+		Entity int    `json:"entity"`
+		Kind   string `json:"value"`
+	}
+	err := c.httpClient.getRestResource(pathApplicationStatus, &stateResponse)
+	if err != nil {
+		return "", err
+	}
+
+	return stateResponse.Kind, nil
+}

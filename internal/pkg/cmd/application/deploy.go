@@ -13,7 +13,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/wso2/choreo-cli/internal/pkg/client"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/common"
 	"github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 )
@@ -34,12 +33,10 @@ func NewDeployCommand(cliContext runtime.CliContext) *cobra.Command {
 
 func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		if !client.IsUserLoggedIn(cliContext) {
-			common.ExitWithErrorMessage(cliContext.Out(), "Please login first")
-		}
+		failIfUserNotLoggedIn(cliContext)
 
 		appName, err := cmd.Flags().GetString("name")
-		if err !=nil {
+		if err != nil {
 			common.ExitWithError(cliContext.Out(), "Error while reading the application name flag value", err)
 		}
 
