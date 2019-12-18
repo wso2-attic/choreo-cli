@@ -10,6 +10,6 @@
 package application
 
 const (
-	cmdApplication = "application"
+	cmdApplication = "app"
 	cmdLogs        = "logs"
 )

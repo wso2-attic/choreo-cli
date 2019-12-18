@@ -7,13 +7,13 @@ Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](
     - [login](#chor-auth-login) - login to Choreo
     - [connect](#chor-auth-connect) - connect a source code provider
 - [version](#chor-version) - get Choreo client version information
-- [application](#chor-application) - manage applications
-    - [create](#chor-application-create) - create an application
-    - [list](#chor-application-list) - list applications
-    - [deploy](#chor-application-deploy) - deploy a Ballerina application
-    - [logs](#chor-application-logs) - manage application logs
-        - [show](#chor-application-logs-show) - show application logs
-    - [delete](#chor-application-delete) - delete an application
+- [app](#chor-app) - manage apps
+    - [create](#chor-app-create) - create an application
+    - [list](#chor-app-list) - list applications
+    - [deploy](#chor-app-deploy) - deploy a Ballerina application
+    - [logs](#chor-app-logs) - manage application logs
+        - [show](#chor-app-logs-show) - show application logs
+    - [delete](#chor-app-delete) - delete an application
 
 ### chor auth
 
@@ -117,9 +117,9 @@ $ chor version
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application
+### chor app
 
-`application` command is used to manage applications created with the Choreo platform.
+`app` command is used to manage applications created with the Choreo platform.
 
 #### Synopsis
 
@@ -137,22 +137,22 @@ app
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application create
+### chor app create
 
-`application create` command is used to create a new application with the Choreo platform.
+`app create` command is used to create a new application with the Choreo platform.
 
 #### Synopsis
 
 Create an application.
 
 ```
-application create APP_NAME [options]
+app create APP_NAME [options]
 ```
 
 #### Examples
 
 ```
-$ chor application create app1 -d "My first app"
+$ chor app create app1 -d "My first app"
 ```
 
 #### Options
@@ -164,22 +164,22 @@ $ chor application create app1 -d "My first app"
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application list
+### chor app list
 
-`application list` command is used to list applications created with the Choreo platform.
+`app list` command is used to list applications created with the Choreo platform.
 
 #### Synopsis
 
 List applications.
 
 ```
-application list
+app list
 ```
 
 #### Examples
 
 ```
-$ chor application list
+$ chor app list
 ```
 
 #### Options
@@ -190,23 +190,23 @@ $ chor application list
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application deploy
+### chor app deploy
 
-`application deploy` command is used to deploy a Ballerina application to the Choreo platform.
+`app deploy` command is used to deploy a Ballerina application to the Choreo platform.
 
 #### Synopsis
 
 Deploy a Ballerina application.
 
 ```
-application deploy GITHUB_URL
+app deploy GITHUB_URL
 ```
 
 #### Examples
 
 ```
-$ chor application deploy https://github.com/someuser/choreo-sample
-$ chor application deploy -n my-app https://github.com/someuser/choreo-sample
+$ chor app deploy https://github.com/someuser/choreo-sample
+$ chor app deploy -n my-app https://github.com/someuser/choreo-sample
 ```
 
 #### Options
@@ -218,9 +218,9 @@ $ chor application deploy -n my-app https://github.com/someuser/choreo-sample
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application logs
+### chor app logs
 
-`application logs` command is used to manage logs of a deployed application.
+`app logs` command is used to manage logs of a deployed application.
 
 #### Synopsis
 
@@ -234,7 +234,7 @@ Manage application logs.
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application logs show
+### chor app logs show
 
 `application logs show APP_ID` command is used to show logs of a deployed application.
 
@@ -244,13 +244,13 @@ Show logs of a deployed application. Maximum number of log lines shown is 500.
 If the number of log lines is not specified 50 lines is shown by default.
 
 ```
-application logs show APP_ID
+app logs show APP_ID
 ```
 
 #### Examples
 
 ```
-$ chor application logs show app1234567890abcd
+$ chor app logs show app1234567890abcd
 ```
 
 #### Options
@@ -262,9 +262,9 @@ $ chor application logs show app1234567890abcd
 
 [Back to Command List](#chor-cli-commands)
 
-### chor application delete
+### chor app delete
 
-`application delete` command is used to delete an application created in the Choreo platform. 
+`app delete` command is used to delete an application created in the Choreo platform.
 It will also remove the app deployment if the application is already deployed.
 
 #### Synopsis
@@ -272,13 +272,13 @@ It will also remove the app deployment if the application is already deployed.
 Delete an application.
 
 ```
-application delete APP_ID
+app delete APP_ID
 ```
 
 #### Examples
 
 ```
-$ chor application delete a123456788901
+$ chor app delete a123456788901
 ```
 
 #### Options
