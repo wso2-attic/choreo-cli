@@ -25,7 +25,7 @@ import (
 )
 
 func GetAbsoluteCommandName(commandComponents ...string) string {
-	commandName := commandRoot
+	commandName := CommandRoot
 	for _, component := range commandComponents {
 		commandName = commandName + " " + component
 	}

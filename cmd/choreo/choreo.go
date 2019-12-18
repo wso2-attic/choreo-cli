@@ -35,7 +35,7 @@ type CliContextData struct {
 	userConfig    runtime.UserConfig
 	envConfig     runtime.EnvConfig
 	verboseWriter *ioWriterWrapper
-	apiClient  runtime.Client
+	apiClient     runtime.Client
 }
 
 type ioWriterWrapper struct {
@@ -101,8 +101,9 @@ func initConfig(cliContext *CliContextData) {
 
 func initCommands(cliContext *CliContextData) cobra.Command {
 	command := cobra.Command{
-		Use:   common.GetAbsoluteCommandName() + " COMMAND",
-		Short: "Manage integration applications with " + common.ProductName + " platform",
+		Use: common.GetAbsoluteCommandName(),
+		Short: common.CommandRoot + " manages applications in " + common.ProductName +
+			"\n\nFind more information at: " + common.DocLink,
 	}
 	command.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 
