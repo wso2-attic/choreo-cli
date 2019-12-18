@@ -10,6 +10,7 @@
 package common
 
 const (
-	commandRoot = "chor"
+	CommandRoot = "chor"
 	ProductName = "Choreo"
+	DocLink     = "https://github.com/wso2-enterprise/choreo-cli/blob/master/docs/reference.md"
 )

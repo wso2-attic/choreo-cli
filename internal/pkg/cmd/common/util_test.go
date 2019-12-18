@@ -19,13 +19,13 @@ import (
 
 func TestGetAbsoluteCommandName(t *testing.T) {
 	generatedCommand := GetAbsoluteCommandName("foo")
-	expectedCommand := commandRoot + " foo"
+	expectedCommand := CommandRoot + " foo"
 	test.AssertString(t, expectedCommand, generatedCommand, "Generated command is incorrect")
 }
 
 func TestGetAbsoluteCommandNameLong(t *testing.T) {
 	generatedCommand := GetAbsoluteCommandName("foo", "bar", "abc")
-	expectedCommand := commandRoot + " foo bar abc"
+	expectedCommand := CommandRoot + " foo bar abc"
 	test.AssertString(t, expectedCommand, generatedCommand, "Generated command is incorrect")
 }
 
