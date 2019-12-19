@@ -12,14 +12,13 @@ package client
 import "github.com/wso2/choreo-cli/internal/pkg/cmd/runtime"
 
 type MockClient struct {
-	CreateNewApp_               func(name string, desc string) error
-	ListApps_                   func() ([]runtime.Application, error)
-	CreateAndDeployApp_         func(repoUrl string) (runtime.DeploymentDetails, error)
-	CreateAndDeployAppWithName_ func(appId, repoUrl string) (runtime.DeploymentDetails, error)
-	FetchLogs_                  func(appId string, linesCount uint) (string, error)
-	CreateOauthStateString_     func() (string, error)
-	DeleteApp_                  func(appId string) error
-	GetStatus_                  func(appId string) (string, error)
+	CreateNewApp_           func(name string, desc string) error
+	ListApps_               func() ([]runtime.Application, error)
+	CreateAndDeployApp_     func(deploymentRequest runtime.DeploymentInput) (runtime.DeploymentOut, error)
+	FetchLogs_              func(appId string, linesCount uint) (string, error)
+	CreateOauthStateString_ func() (string, error)
+	DeleteApp_              func(appId string) error
+	GetStatus_              func(appId string) (string, error)
 }
 
 func (c *MockClient) CreateNewApp(name string, desc string) error {
@@ -36,21 +35,11 @@ func (c *MockClient) ListApps() ([]runtime.Application, error) {
 	return nil, nil
 }
 
-func (c *MockClient) CreateAndDeployApp(repoUrl string) (runtime.DeploymentDetails, error) {
+func (c *MockClient) CreateAndDeployApp(deploymentRequest runtime.DeploymentInput) (runtime.DeploymentOut, error) {
 	if c.CreateAndDeployApp_ != nil {
-		return c.CreateAndDeployApp_(repoUrl)
+		return c.CreateAndDeployApp_(deploymentRequest)
 	}
-	return runtime.DeploymentDetails{
-		DeploymentUrl: "",
-		ApplicationId: "",
-	}, nil
-}
-
-func (c *MockClient) CreateAndDeployAppWithName(appId, repoUrl string) (runtime.DeploymentDetails, error) {
-	if c.CreateAndDeployAppWithName_ != nil {
-		return c.CreateAndDeployAppWithName_(appId, repoUrl)
-	}
-	return runtime.DeploymentDetails{
+	return runtime.DeploymentOut{
 		DeploymentUrl: "",
 		ApplicationId: "",
 	}, nil
