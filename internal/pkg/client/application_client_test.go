@@ -107,7 +107,7 @@ func TestDeployAppError(t *testing.T) {
 		},
 	}
 
-	_, err := client.CreateAndDeployApp("http://github.com/test/test")
+	_, err := client.CreateAndDeployApp(runtime.DeploymentInput{Url: "http://github.com/test/test"})
 
 	test.AssertNonNil(t, err, "An error should be returned")
 }
@@ -120,7 +120,7 @@ func TestDeployApp(t *testing.T) {
 		httpClient: &mockHttpClient{
 			createRestResourceWithResponseImpl: func(resourcePath string, requestData interface{},
 				responseData interface{}) error {
-				apps := responseData.(*runtime.DeploymentDetails)
+				apps := responseData.(*runtime.DeploymentOut)
 				apps.DeploymentUrl = "http://example.com/apps/url"
 				apps.ApplicationId = "appd83d56f4c6ff40428e8dd057c5b94bd5"
 				return nil
@@ -128,7 +128,7 @@ func TestDeployApp(t *testing.T) {
 		},
 	}
 
-	deploymentDetails, _ := client.CreateAndDeployApp("http://github.com/test/test")
+	deploymentDetails, _ := client.CreateAndDeployApp(runtime.DeploymentInput{Url: "http://github.com/test/test"})
 
 	test.AssertString(t, "http://example.com/apps/url", deploymentDetails.DeploymentUrl,
 		"The app URL should be returned")

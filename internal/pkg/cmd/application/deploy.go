@@ -24,11 +24,22 @@ func NewDeployCommand(cliContext runtime.CliContext) *cobra.Command {
 		Short: "Deploy an application",
 		Example: fmt.Sprint(common.GetAbsoluteCommandName(cmdApplication, cmdDeploy),
 			" https://github.com/wso2/choreo-ballerina-hello"),
-		Args: cobra.ExactArgs(1),
+		Args: checkArgCount(1, 2),
 		Run:  runDeployAppCommand(cliContext),
 	}
 	cmd.Flags().StringP("name", "n", "", "the name to be used for the created application")
 	return cmd
+}
+
+func checkArgCount(min int, max int) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		if len(args) > max {
+			return fmt.Errorf("accepts at most %d arg(s), received %d", max, len(args))
+		} else if len(args) < min {
+			return fmt.Errorf("requires at least %d arg(s), only received %d", min, len(args))
+		}
+		return nil
+	}
 }
 
 func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command, args []string) {
@@ -39,24 +50,24 @@ func runDeployAppCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 		if err != nil {
 			common.ExitWithError(cliContext.Out(), "Error while reading the application name flag value", err)
 		}
-
-		if appName != "" {
-			deploymentDetails, err := cliContext.Client().CreateAndDeployAppWithName(appName, args[0])
-			printDeployResponse(err, cliContext, deploymentDetails)
+		var deploymentRequest runtime.DeploymentInput
+		deploymentRequest.Name = appName
+		var msg string
+		if len(args) == 2 {
+			deploymentRequest.ApplicationId = args[0]
+			deploymentRequest.Url = args[1]
+			msg = "The application with id %s has been updated\nOnce deployed, the app can be accessed from %s"
 		} else {
-			deploymentDetails, err := cliContext.Client().CreateAndDeployApp(args[0])
-			printDeployResponse(err, cliContext, deploymentDetails)
+			deploymentRequest.Url = args[0]
+			msg = "A new application is created for deployment with Id: %s" +
+				"\nOnce deployed, the app can be accessed from %s"
 		}
-
-	}
-}
-
-func printDeployResponse(err error, cliContext runtime.CliContext, deploymentDetails runtime.DeploymentDetails) {
-	if err != nil {
-		common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
-	} else {
-		common.PrintInfo(cliContext.Out(), "A new application is created for deployment with Id: "+
-			deploymentDetails.ApplicationId+"\nOnce deployed, the app can be accessed from "+
-			deploymentDetails.DeploymentUrl)
+		deploymentDetails, err := cliContext.Client().CreateAndDeployApp(deploymentRequest)
+		if err != nil {
+			common.ExitWithError(cliContext.Out(), "Error occurred while deploying the application", err)
+		} else {
+			common.PrintInfo(cliContext.Out(), fmt.Sprintf(msg, deploymentDetails.ApplicationId,
+				deploymentDetails.DeploymentUrl))
+		}
 	}
 }
