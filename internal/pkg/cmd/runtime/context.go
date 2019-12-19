@@ -63,7 +63,14 @@ type ApplicationRequest struct {
 	Description string `json:"description" header:"Description"`
 }
 
-type DeploymentDetails struct {
+type DeploymentInput struct {
+	Url           string `json:"repo_url"`
+	ApplicationId string `json:"app_id"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+}
+
+type DeploymentOut struct {
 	DeploymentUrl string `json:"deployment_url"`
 	ApplicationId string `json:"app_id"`
 }
@@ -71,8 +78,7 @@ type DeploymentDetails struct {
 type ApplicationApiClient interface {
 	CreateNewApp(name string, desc string) error
 	ListApps() ([]Application, error)
-	CreateAndDeployApp(repoUrl string) (DeploymentDetails, error)
-	CreateAndDeployAppWithName(appName, repoUrl string) (DeploymentDetails, error)
+	CreateAndDeployApp(deploymentRequest DeploymentInput) (DeploymentOut, error)
 	FetchLogs(appId string, linesCount uint) (string, error)
 	DeleteApp(appId string) error
 	GetApplicationStatus(appId string) (string, error)
