@@ -12,5 +12,5 @@ package common
 const (
 	CommandRoot = "chor"
 	ProductName = "Choreo"
-	DocLink     = "https://github.com/wso2-enterprise/choreo-cli/blob/master/docs/reference.md"
+	DocLink     = "https://git.io/Je5te" //points to https://github.com/wso2-enterprise/choreo-cli/blob/master/docs/reference.md"
 )
