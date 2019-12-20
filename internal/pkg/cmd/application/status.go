@@ -36,7 +36,7 @@ func runAppStatusCommand(cliContext runtime.CliContext) func(cmd *cobra.Command,
 
 		status, err := cliContext.Client().GetApplicationStatus(args[0])
 		if err != nil {
-			common.ExitWithError(cliContext.Out(), "error occurred while retrieving status of the application", err)
+			common.ExitWithErrorMessage(cliContext.Out(), "Unable to retrieve state of the application")
 		} else {
 			common.PrintInfo(cliContext.Out(), status)
 		}
