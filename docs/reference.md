@@ -14,6 +14,7 @@ Choreo CLI (code name `$chor`) reference is based on [Choreo CLI specification](
     - [logs](#chor-app-logs) - manage application logs
         - [show](#chor-app-logs-show) - show application logs
     - [delete](#chor-app-delete) - delete an application
+    - [status](#chor-app-status) - status of an application
 
 ### chor auth
 
@@ -287,6 +288,29 @@ $ chor app delete a123456788901
   -h, --help          help for deploy
 ```
 
+### chor app status
+
+`app status` command is used to retrieve the status of an application created in the Choreo platform.
+
+#### Synopsis
+
+Get status of an application
+
+```
+app status APP_ID
+```
+
+#### Examples
+
+```
+$ chor app status a123456788901
+```
+
+#### Options
+
+```
+  -h, --help          help for deploy
+```
 [Back to Command List](#chor-cli-commands)
 
 ## Global flags 
