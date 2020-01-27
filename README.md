@@ -1,3 +1,7 @@
+# This repository is no longer maintained.
+
+Issue reports and pull requests will not be attended.
+
 # Choreo CLI
 
 [![Build Status](https://github.com/wso2/choreo-cli/workflows/Build/badge.svg)](https://github.com/wso2/choreo-cli/actions?workflow=Build)
